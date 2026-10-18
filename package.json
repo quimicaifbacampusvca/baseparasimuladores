@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Alicerces da Base Demo Oficial - SI, uma plataforma universal de simuladores educacionais.",
+  "description": "Colunas estruturais da Base Demo Oficial - SI: entidades, comandos, histórico e armazenamento local.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "node tests/foundation.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },

@@ -24,4 +24,4 @@ Os testes pendentes não bloqueiam o uso inicial da fundação, mas impedem cham
 
 ## Próxima etapa
 
-`0.2.0 — Colunas estruturais`: entidades neutras, estado de cena, comandos e desfazer, com gravação e restauração por projeto. Nenhum tipo de tubo ou dado químico fará parte desse modelo.
+`0.2.0 — Colunas estruturais`: entidades neutras, estado de cena, comandos e desfazer, com gravação e restauração por projeto. Nenhuma regra de domínio especializado fará parte desse modelo.

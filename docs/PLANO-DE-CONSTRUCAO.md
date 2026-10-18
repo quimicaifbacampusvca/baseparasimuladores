@@ -1,35 +1,35 @@
 # Construção da Base Demo Oficial - SI — por camadas
 
-## Princípios invariantes
+## Princípios
 
-1. Sem copiar motor ou conceitos químicos para o núcleo universal.
-2. O SIAB é referência operacional; a equivalência deve ser aferida por testes de fluxo e de layout, não afirmada por semelhança visual.
-3. Sem serviços, CDNs ou APIs obrigatórias para usar o simulador; dependências de execução serão locais.
-4. Uma fonte de código deverá produzir distribuições web/PWA e standalone compatíveis com as restrições do navegador.
-5. O que estiver consolidado e testado não deverá ser reconstruído sem causa documentada.
-6. Priorizar navegação por teclado, toque, foco visível, responsividade e contraste desde a fundação.
+1. O núcleo é independente de motores e conteúdos especializados.
+2. A equivalência funcional será demonstrada por testes de fluxos e de interface, nunca por aparência superficial.
+3. Execução sem CDNs, APIs externas ou rede obrigatória; recursos de execução empacotados.
+4. Uma fonte deverá gerar distribuições web/PWA e standalone adequadas às restrições dos navegadores.
+5. Estruturas homologadas não serão reconstruídas sem justificativa e testes de regressão.
+6. Teclado, toque, foco, responsividade e contraste são requisitos desde a origem.
 
-## Etapas propostas
+## Etapas
 
-| Etapa | Analogia | Versões | Entrega observável | Não incluir prematuramente |
-|---|---|---|---|---|
-| 1 | Alicerces | 0.1.x | Identidade, shell, rotas, contratos, preferências, organização e offline básico | Bancada científica |
-| 2 | Colunas estruturais | 0.2.x | Entidades universais, estado, comandos, seleção, desfazer e persistência | Regras de fenômenos específicos |
-| 3 | Laje e planta | 0.3.x | Workspace real, docas, foco, visão geral, modo mobile e controles | Instrumentos especializados |
-| 4 | Paredes e componentes | 0.4.x | Design system, menus, modais, painéis, caixas de seleção, ações e notificações | Conteúdo de disciplinas |
-| 5 | Infraestrutura plugável | 0.5.x | Registries para motores, objetos, ferramentas, instrumentos, visualizações | Acoplamento a um motor fixo |
-| 6 | Salas de aprendizagem | 0.6.x | Aprender, missões, roteiros, módulos, professor e permissões | Missões químicas do SIAB |
-| 7 | Instalações de dados | 0.7.x | Registros, relatórios, caderno, exportação, impressão e importação | pH/titulação obrigatórios |
-| 8 | Acabamento e distribuição | 0.8.x | Identidade amadurecida, PWA completo, standalone de HTML único e acessibilidade refinada | Recursos remotos obrigatórios |
-| 9 | Vistoria | 0.9.x | Casos de uso SIAB reproduzidos com domínio neutro; cross-browser, mobile, offline, integridade | Declarar paridade sem evidência |
-| 10 | Habite-se | 1.0.0 | Base universal demonstravelmente equivalente em capacidades operacionais, sem ciência fixa | Funcionalidade não homologada |
+| Fase | Analogia | Versões | Entrega observável |
+|---|---|---|---|
+| 1 | Alicerces | 0.1.x | Identidade, navegação, base responsiva e offline inicial |
+| 2 | Colunas | 0.2.x | Entidades, cena, comandos, seleção, histórico, persistência |
+| 3 | Laje | 0.3.x | Workspace, docas, foco, visão geral e mobile |
+| 4 | Paredes | 0.4.x | Design system, painéis, diálogos e interações |
+| 5 | Infraestrutura | 0.5.x | Contratos para motores, objetos, instrumentos e visualizações |
+| 6 | Salas | 0.6.x | Aprendizagem, missões, roteiros, módulos e recursos docentes |
+| 7 | Instalações | 0.7.x | Medições, registros, relatórios, exportação e impressão |
+| 8 | Acabamento | 0.8.x | Identidade madura, PWA completo e standalone |
+| 9 | Vistoria | 0.9.x | Homologação de fluxos, navegadores, acessibilidade e offline |
+| 10 | Entrega | 1.0.0 | Base funcional e homologada |
 
-### Política de versões
+## Versionamento
 
-- `x.y.0`: implementação completa do escopo de uma etapa.
-- `x.y.1` e seguintes: correções de bugs, acessibilidade e regressões da etapa.
-- Não antecipar funcionalidades para apenas preencher números de versão.
+- `x.y.0`: entrega da responsabilidade integral da etapa.
+- `x.y.1+`: apenas correções, melhorias de acessibilidade e regressões identificadas.
+- O avanço depende do cumprimento dos critérios de aceite de cada fase.
 
-### Como comprovar equivalência ao SIAB
+## Comprovação final
 
-A matriz de aceitação final comparará, em desktop e mobile: início, navegação, modos, workspace, docas, seleção de objetos, registros, ferramentas, Aprender, Missões, Roteiros, Professor, relatórios, acessibilidade, impressão e comportamento offline. O SIAB original continua externo ao núcleo universal.
+Testar início, navegação, modos, workspace, docas, seleção de objetos, ferramentas, atividades, recursos docentes, relatórios, acessibilidade, impressão, persistência e comportamento offline em desktop e mobile.

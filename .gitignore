@@ -4,7 +4,7 @@ node_modules/
 *.log
 coverage/
 
-# Regras legadas preservadas do repositório inicial (sem bloquear HTML de publicação)
+# Regras auxiliares de artefatos temporários (HTML e JS permanecem versionáveis)
 [_@]*
 *.mti
 *.dat

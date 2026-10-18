@@ -1,25 +1,30 @@
 # Base Demo Oficial - SI
 
-**Versão 0.1.0 — Fundações**. Plataforma-base universal para simuladores educacionais, construída por etapas tomando a experiência operacional do SIAB 1.0.0 como referência. O núcleo não inclui o motor ácido-base ou conteúdos científicos.
+**Versão 0.2.0 — Colunas estruturais.** Plataforma universal para a construção progressiva de simuladores educacionais, independente de qualquer domínio científico.
 
-## Como abrir
+## Executar
 
-- **Standalone de arquivos locais nesta etapa:** abra `index.html` no navegador, inclusive sem internet. Este pacote de arquivos ainda não é a distribuição final de HTML único.
-- **Servidor / PWA:** execute `python3 -m http.server 8080`, entre em `http://localhost:8080` e teste a instalação PWA. O service worker armazena todos os arquivos de execução.
-- **Desenvolvimento:** `npm install` (apenas para obter o compilador TypeScript), `npm run build`, `npm test`. `app.js` compilado já acompanha a distribuição, por isso nenhuma instalação é necessária para uso.
+- **Arquivos locais:** abra `index.html` diretamente no navegador; o JavaScript já está compilado. Não é preciso baixar bibliotecas, instalar pacotes ou acessar a internet.
+- **PWA / servidor local:** inicie `python3 -m http.server 8080` e abra `http://localhost:8080` para ativar o cache offline e testar a instalação.
+- **Desenvolvimento:** `npm install` fornece apenas o compilador TypeScript; `npm run build`, `npm test`, `npm run check`. O usuário final não precisa executar esses comandos.
 
-## O que a 0.1.0 oferece
+## Conteúdo da etapa
 
-Identidade configurada, HTML semântico, CSS responsivo, navegação interna, preferências de tema com armazenamento local seguro, registro de versão, manifesto PWA, service worker offline e contratos TypeScript iniciais. Não há bibliotecas, APIs, fontes ou CDNs de execução externas.
+- Identidade, navegação e preferências; layout responsivo de demonstração.
+- Estado central de cena: objetos universais (bloco, círculo e etiqueta), seleção e edição.
+- Comandos: adicionar, renomear, alterar cor, deslocar, excluir e limpar.
+- Histórico de desfazer/refazer e gravação local automática da cena.
+- Validação de dados armazenados; esquema v1 com limites de geometria, identidade e quantidade.
+- Arquivos HTML/CSS/JS e ícone locais; PWA com cache dos recursos fundamentais.
 
-**Não estão implementados:** ambiente científico, entidade, seleção, comandos, histórico, instrumentos, missões, relatórios, atividade docente, experiência fiel de workspace SIAB ou standalone de arquivo HTML único. A tela "Ambiente" mostra apenas a reserva de espaço da futura interface.
+**Limites:** um projeto local por navegador nesta etapa; sem exportação de backup, sem múltiplas cenas e sem motor especializado. Arquivos locais usam as regras de armazenamento de cada navegador; sempre teste retenção de dados no ambiente de uso. Compatibilidade plena ainda depende de homologação em mais de um navegador.
 
-## Governança
+## Princípios
 
-- O ZIP original do SIAB **não é modificado** nem importado para dentro deste repositório.
-- Cada fase terá escopo, testes e documentação de aceite; falhas não são ocultadas por rótulos de concluído.
-- Nenhuma biblioteca de execução poderá depender da internet; bibliotecas de desenvolvimento não são carregadas pelo usuário final.
-- Tipagem fica no código-fonte (`src/`) e é compilada para `app.js` único, sem importações dinâmicas que falhem em `file://`.
-- Este repositório já possui licença GNU GPL-3.0 (arquivo LICENSE do GitHub). Os arquivos atuais foram escritos de forma independente; qualquer código reaproveitado do SIAB e bibliotecas de terceiros exigirá preservação de avisos e licenças.
+1. A plataforma não contém regras de um domínio científico no seu núcleo.
+2. Nenhuma dependência de execução exige CDN, servidor remoto ou serviço externo.
+3. Cada fase implementa seu escopo completo, acompanhada de testes e critérios de aceite.
+4. Código-fonte em TypeScript, execução em JavaScript clássico para compatibilidade inclusive com `file://`.
+5. Dados são tratados como não confiáveis ao recuperar uma sessão.
 
-Consulte [o plano por camadas](docs/PLANO-DE-CONSTRUCAO.md) e [os critérios da fundação](docs/ACEITE-0.1.0.md).
+Consulte [plano de construção](docs/PLANO-DE-CONSTRUCAO.md), [aceite desta versão](docs/ACEITE-0.2.0.md) e [aceite da fundação](docs/ACEITE-0.1.0.md).

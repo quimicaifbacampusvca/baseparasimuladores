@@ -8,6 +8,7 @@ namespace BaseDemoSI {
       name.textContent = manifest.name;
     }
     setupPreferences();
+    setupScene();
     updateRoute();
     window.addEventListener("hashchange", updateRoute);
     const toggle = document.getElementById("nav-toggle");

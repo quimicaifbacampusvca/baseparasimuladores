@@ -26,40 +26,68 @@
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Fundação <span data-app-version>0.1.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.2.0</span></small></div>
     </aside>
 
     <div class="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Fundação da plataforma</strong></div>
-        <span class="version-pill">v<span data-app-version>0.1.0</span></span>
+        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Colunas estruturais</strong></div>
+        <span class="version-pill">v<span data-app-version>0.2.0</span></span>
       </header>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 01 · FUNDAÇÕES</p>
-            <h1 id="home-title">Uma estrutura pronta para crescer.</h1>
-            <p>Estamos construindo o núcleo operacional de uma plataforma universal para simuladores. A arquitetura será independente de motores científicos e terá funcionamento local desde a origem.</p>
-            <div class="hero-actions"><a class="button primary" href="#/ambiente">Conhecer o ambiente</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
+            <p class="eyebrow">ETAPA 02 · COLUNAS</p>
+            <h1 id="home-title">Objetos, ações e memória para cada projeto.</h1>
+            <p>O núcleo já cria, seleciona, modifica e recupera objetos genéricos. Cada alteração tem histórico e o projeto é salvo localmente, sem qualquer motor científico.</p>
+            <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir ambiente de demonstração</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
           </div>
-          <div class="section-heading"><h2>O que já existe nesta fundação</h2><p>Capacidades reais da versão 0.1.0; os módulos futuros não são apresentados como concluídos.</p></div>
+          <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
           <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Estrutura de aplicação</h3><p>Shell responsivo, rotas internas, páginas e hierarquia visual.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Identidade configurada</h3><p>Nome, versão, identificador e idioma isolados em um manifesto.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Preferências locais</h3><p>Tema claro, escuro ou automático com fallback seguro.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Base autocontida</h3><p>Nenhuma biblioteca, fonte, API ou CDN externa necessária para abrir.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Estado de cena</h3><p>Objetos independentes, seleção e propriedades editáveis.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Comandos e histórico</h3><p>Adicionar, mover, editar, excluir, desfazer e refazer.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Persistência local</h3><p>Projeto restaurado após recarregar, com validação de dados.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Base autocontida</h3><p>Sem CDNs nem serviços necessários para operar.</p><span class="mini-state">Implementado</span></article>
           </div>
         </section>
 
         <section class="view" data-view="ambiente" aria-labelledby="environment-title" hidden>
-          <div class="section-heading"><p class="eyebrow">ESTRUTURA PREPARATÓRIA</p><h1 id="environment-title">Ambiente universal</h1><p>Esta é a reserva de espaço do futuro workspace. Nenhum motor científico ou objeto está carregado nesta etapa.</p></div>
-          <div class="workspace-preview" aria-label="Prévia estrutural do espaço de simulação, ainda sem controles funcionais">
-            <div class="preview-dock"><strong>Preparar</strong><span>Ferramentas e recursos serão registrados aqui.</span></div>
-            <div class="preview-scene"><div class="empty-symbol" aria-hidden="true">◇</div><strong>Cena sem conteúdo</strong><span>Os elementos interativos serão introduzidos na fase de entidades e workspace.</span></div>
-            <div class="preview-dock"><strong>Ver e analisar</strong><span>Instrumentos e visualizações entrarão como extensões.</span></div>
+          <div class="section-heading"><p class="eyebrow">ETAPA 02 · ESTRUTURA INTERATIVA</p><h1 id="environment-title">Cena universal</h1><p>Uma demonstração funcional do núcleo de objetos, ainda sem instrumentos, docas definitivas ou motor científico.</p></div>
+          <div class="scene-toolbar" role="group" aria-label="Comandos de edição da cena">
+            <button class="button outline" id="scene-undo" type="button" disabled>↶ Desfazer</button>
+            <button class="button outline" id="scene-redo" type="button" disabled>↷ Refazer</button>
+            <button class="button outline scene-danger" id="scene-clear" type="button" disabled>Limpar cena</button>
+            <span id="scene-count" class="scene-count" aria-live="polite">0 / 60 objetos</span>
           </div>
-          <p class="notice" id="offline-status">Este aplicativo não precisa de conexão com a internet para executar seus arquivos locais.</p>
+          <div class="workspace-preview workspace-interactive" aria-label="Área de demonstração da cena universal">
+            <section class="preview-dock" aria-labelledby="tools-heading"><h2 id="tools-heading">Adicionar</h2><p>Objetos neutros para experimentar a estrutura.</p>
+              <div class="tool-stack"><button type="button" class="button outline" data-add-kind="block">▣ Adicionar bloco</button><button type="button" class="button outline" data-add-kind="circle">◯ Adicionar círculo</button><button type="button" class="button outline" data-add-kind="label">T Adicionar etiqueta</button></div>
+            </section>
+            <section class="preview-scene stage" aria-labelledby="scene-heading">
+              <h2 id="scene-heading" class="sr-only">Cena de objetos</h2>
+              <div id="scene-objects" class="scene-objects" aria-label="Objetos selecionáveis; use setas para mover o objeto com foco"></div>
+              <div id="scene-empty" class="scene-empty"><span aria-hidden="true">◇</span><strong>Cena vazia</strong><p>Adicione um objeto à esquerda para começar.</p></div>
+            </section>
+            <section class="preview-dock" aria-labelledby="inspector-heading"><h2 id="inspector-heading">Propriedades</h2>
+              <p id="no-selection">Selecione um objeto na cena para editar.</p>
+              <div id="object-inspector" hidden>
+                <p class="inspector-type">Tipo: <strong id="object-type">—</strong></p>
+                <label for="object-label">Nome</label><input id="object-label" type="text" maxlength="64" autocomplete="off">
+                <label for="object-tone">Cor</label><select id="object-tone"><option value="teal">Verde-azulado</option><option value="blue">Azul</option><option value="amber">Âmbar</option></select>
+                <p id="object-position" class="object-position">X: 0% · Y: 0%</p>
+                <div class="move-grid" role="group" aria-label="Mover objeto selecionado">
+                  <button type="button" data-move="up" aria-label="Mover para cima">↑</button>
+                  <button type="button" data-move="left" aria-label="Mover para a esquerda">←</button>
+                  <button type="button" data-move="down" aria-label="Mover para baixo">↓</button>
+                  <button type="button" data-move="right" aria-label="Mover para a direita">→</button>
+                </div>
+                <button type="button" id="scene-delete" class="button outline scene-danger">Excluir objeto</button>
+              </div>
+            </section>
+          </div>
+          <p class="notice" id="offline-status">Todos os recursos de execução estão no pacote local.</p>
+          <p id="scene-feedback" class="feedback" role="status" aria-live="polite">Projeto pronto.</p>
         </section>
 
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
@@ -70,10 +98,10 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Fidelidade:</strong> a equivalência com os fluxos do SIAB será alcançada e testada por etapas, não presumida nesta fundação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.1.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.2.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.1.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.2.0</span></span></footer>
     </div>
   </div>
 </body>

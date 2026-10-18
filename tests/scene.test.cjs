@@ -1,0 +1,64 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const vm=require('node:vm');
+const root=path.join(__dirname,'..');
+const js=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const stub={readyState:'loading',addEventListener(){},querySelectorAll(){return []},getElementById(){return null},documentElement:{},body:{classList:{remove(){}}}};
+const context={document:stub,window:{},navigator:{},Set,Map,Object,Date};
+vm.createContext(context);vm.runInContext(js,context);
+const api=context.BaseDemoSI;
+const store=api.createSceneStore();
+const entity=api.makeEntity('block','test-1');
+assert.equal(store.dispatch({type:'add',entity}),true);
+assert.equal(store.dispatch({type:'add',entity}),false,'duplicatas rejeitadas');
+assert.equal(store.getSnapshot().entities.length,1);
+assert.equal(store.getSnapshot().selectedId,'test-1');
+assert.equal(store.select(null),true);
+assert.equal(store.select('inexistente'),false);
+assert.equal(store.canUndo(),true);
+let snapshot=store.getSnapshot();
+snapshot.entities[0].label='MUTADO';
+assert.equal(store.getSnapshot().entities[0].label,'Bloco','estado isolado do consumidor');
+assert.equal(store.dispatch({type:'update',id:'test-1',changes:{label:'Exemplo',tone:'blue'}}),true);
+assert.equal(store.dispatch({type:'update',id:'test-1',changes:{x:-12}}),false);
+assert.equal(store.dispatch({type:'update',id:'test-1',changes:{id:'outro'}}),false);
+assert.equal(store.getSnapshot().entities[0].label,'Exemplo');
+assert.equal(store.undo(),true);
+assert.equal(store.getSnapshot().entities[0].label,'Bloco');
+assert.equal(store.redo(),true);
+assert.equal(store.getSnapshot().entities[0].label,'Exemplo');
+assert.equal(store.dispatch({type:'remove',id:'test-1'}),true);
+assert.equal(store.getSnapshot().entities.length,0);
+assert.equal(store.undo(),true);
+assert.equal(store.getSnapshot().entities.length,1);
+assert.equal(store.dispatch({type:'clear'}),true);
+assert.equal(store.getSnapshot().entities.length,0);
+assert.equal(store.undo(),true);
+assert.equal(store.getSnapshot().entities.length,1);
+const saved=api.serializeScene(store.getSnapshot());
+const restored=api.createSceneStore(JSON.parse(saved));
+assert.equal(restored.getSnapshot().entities[0].label,'Exemplo');
+for(const corrupted of [null,[],{}, {schemaVersion:99,entities:[],selectedId:null},
+  {schemaVersion:1,entities:[entity,entity],selectedId:null},
+  {schemaVersion:1,entities:[{...entity,label:'<script>alert(1)</script>',x:NaN}],selectedId:null},
+  {schemaVersion:1,entities:[],selectedId:'phantom'}]) {
+    assert.equal(api.parseScene(corrupted),null,`corrompido não rejeitado: ${JSON.stringify(corrupted)}`);
+}
+let changeCount=0;
+const unsub=restored.subscribe(()=>changeCount++);
+assert.equal(restored.dispatch({type:'update',id:'test-1',changes:{label:'Exemplo'}}),false);
+assert.equal(changeCount,0);
+assert.equal(restored.dispatch({type:'update',id:'test-1',changes:{label:'Novo'}}),true);
+assert.equal(changeCount,1);
+unsub();
+assert.equal(restored.undo(),true);
+assert.equal(changeCount,1);
+let n=0; while(n<100 && store.dispatch({type:'add',entity:api.makeEntity('circle',`id-${n}`,n)}))n++;
+assert.equal(store.getSnapshot().entities.length,60);
+assert.equal(n,59);
+assert.equal(store.dispatch({type:'add',entity:api.makeEntity('circle','overflow')}),false);
+assert.equal(api.manifest.version,'0.2.0');
+const documentation=['README.md','docs/PLANO-DE-CONSTRUCAO.md','docs/ACEITE-0.1.0.md','docs/ACEITE-0.2.0.md','index.html'];
+for(const file of documentation) assert(!/SIAB/i.test(fs.readFileSync(path.join(root,file),'utf8')),`${file}: referência indevida`);
+console.log('OK: cenas, comandos, histórico, isolamento, validação, 60 entidades, documentação autônoma.');
