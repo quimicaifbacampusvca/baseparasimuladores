@@ -23,6 +23,7 @@
     "src/scene.ts",
     "src/workspace.ts",
     "src/workspace-ui.ts",
+    "src/components.ts",
     "src/scene-ui.ts",
     "src/app.ts"
   ]

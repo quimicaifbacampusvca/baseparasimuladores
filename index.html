@@ -9,7 +9,8 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./app.css">
-  <link rel="stylesheet" href="./workspace.css">
+  <link rel="stylesheet" href="./workspace.css"
+  <link rel="stylesheet" href="./components.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
@@ -27,29 +28,29 @@
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.3.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.4.0</span></small></div>
     </aside>
 
     <div class="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Colunas estruturais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.3.0</span></span>
+        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Componentes operacionais</strong></div>
+        <span class="version-pill">v<span data-app-version>0.4.0</span></span>
       </header>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 03 · WORKSPACE</p>
-            <h1 id="home-title">Um ambiente que se adapta à investigação.</h1>
-            <p>A cena interativa já integra objetos genéricos, docas contextuais, foco e visão geral, com controles próprios para desktop e dispositivos móveis.</p>
+            <p class="eyebrow">ETAPA 04 · COMPONENTES</p>
+            <h1 id="home-title">Um ambiente consistente, em cada interação.</h1>
+            <p>A plataforma integra menus de ações, confirmações acessíveis, notificações e estados de interação sem alterar o núcleo de objetos ou a organização do workspace.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
           </div>
           <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
           <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Estado de cena</h3><p>Objetos independentes, seleção e propriedades editáveis.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Comandos e histórico</h3><p>Adicionar, mover, editar, excluir, desfazer e refazer.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Persistência local</h3><p>Projeto restaurado após recarregar, com validação de dados.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Base autocontida</h3><p>Sem CDNs nem serviços necessários para operar.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Componentes universais</h3><p>Menus, avisos e diálogos reutilizáveis, com navegação por teclado.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Comandos seguros</h3><p>Confirmação antes de operações destrutivas, mantendo desfazer e refazer.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Experiência responsiva</h3><p>Interações adequadas ao desktop e às superfícies de toque.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Recursos locais</h3><p>Sem CDNs nem serviços necessários para operar.</p><span class="mini-state">Implementado</span></article>
           </div>
         </section>
 
@@ -85,6 +86,16 @@
               <button class="button outline" id="scene-undo" type="button" disabled>↶ Desfazer</button>
               <button class="button outline" id="scene-redo" type="button" disabled>↷ Refazer</button>
               <button class="button outline scene-danger" id="scene-clear" type="button" disabled>Limpar cena</button>
+              <div class="si-toolmenu-wrap">
+                <button class="button outline si-more-trigger" id="scene-menu-toggle" type="button" aria-haspopup="menu" aria-controls="scene-tools-menu" aria-expanded="false">Mais <span aria-hidden="true">▾</span></button>
+                <div id="scene-tools-menu" class="si-toolmenu" role="menu" aria-label="Mais ações da cena" hidden>
+                  <button role="menuitem" type="button" data-menu-action="add-block">Adicionar bloco</button>
+                  <button role="menuitem" type="button" data-menu-action="add-circle">Adicionar círculo</button>
+                  <button role="menuitem" type="button" data-menu-action="add-label">Adicionar etiqueta</button>
+                  <span role="separator" class="si-menu-divider"></span>
+                  <button role="menuitem" type="button" data-menu-action="help">Atalhos de teclado</button>
+                </div>
+              </div>
               <span id="scene-count" class="scene-count" aria-live="polite">0 / 60 objetos</span>
             </div>
             <nav class="si-item-strip" aria-label="Objetos da cena" id="scene-strip"><span class="si-strip-placeholder">A lista de objetos aparecerá aqui.</span></nav>
@@ -142,11 +153,20 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.3.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.4.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.3.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.4.0</span></span></footer>
     </div>
+  </div>
+  <div id="si-notifications" class="si-notifications" aria-label="Notificações" aria-live="polite" aria-atomic="false"></div>
+  <div id="si-modal" class="si-modal-cover" hidden>
+    <section class="si-modal" role="alertdialog" aria-modal="true" aria-labelledby="si-modal-title" aria-describedby="si-modal-description">
+      <div class="si-modal-mark" aria-hidden="true">◇</div>
+      <h2 id="si-modal-title"></h2>
+      <p id="si-modal-description"></p>
+      <div class="si-modal-actions"><button id="si-modal-cancel" class="button outline" type="button">Cancelar</button><button id="si-modal-confirm" class="button primary" type="button">Confirmar</button></div>
+    </section>
   </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.3.0
+# Base Demo Oficial - SI · 0.4.0
 
-Base universal de simuladores — versão **0.3.0 (Workspace Universal)**.
+Base universal de simuladores — versão **0.4.0 (Componentes operacionais)**.
 
 ## Execução
 
@@ -13,6 +13,9 @@ Abrir `index.html` com navegador moderno, sem servidor ou conexão obrigatória.
 - Desktop: painéis laterais sobrepostos à área experimental, preservando a cena; em viewport compacto, uma doca por vez.
 - Mobile: botões fixos inferiores, docas como folhas inferiores modais, backdrop, Escape e retorno de foco.
 - Histórico, persistência local, seleção e edição de objetos preservados da 0.2.0.
+- Biblioteca interna de componentes: menu de ações, confirmações, notificações locais e estados visuais.
+- Menus operáveis por teclado e modais com foco controlado e retorno ao acionador.
+- Operações destrutivas com confirmação explícita; atualizações não intrusivas na tela.
 - Sem motor científico e sem serviços externos obrigatórios.
 
 ## Desenvolvimento
@@ -29,10 +32,11 @@ tsc -p tsconfig.json
 node tests/foundation.test.cjs
 node tests/scene.test.cjs
 node tests/workspace.test.cjs
+node tests/components.test.cjs
 ```
 
 ## Critérios e limites
 
-Ver `docs/ACEITE-0.3.0.md` e `docs/PLANO-DE-CONSTRUCAO.md`. A 0.3.0 entrega o contrato de apresentação do ambiente; não inclui instrumentos reais, simulação científica, roteiros ou sistema de professor. Homologação real em navegadores e dispositivos é requisito das versões subsequentes.
+Ver `docs/ACEITE-0.4.0.md` e `docs/PLANO-DE-CONSTRUCAO.md`. A 0.4.0 entrega os componentes operacionais sobre o workspace já construído; não inclui instrumentos reais, simulação científica, roteiros ou sistema de professor. Homologação real em navegadores e dispositivos é requisito das versões subsequentes.
 
 Licença: GPL-3.0, conforme `LICENSE` do repositório oficial.

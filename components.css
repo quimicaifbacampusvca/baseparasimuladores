@@ -1,0 +1,28 @@
+/* Componentes universais · 0.4.0 · sem dependência de bibliotecas remotas. */
+.si-actionbar .si-toolmenu-wrap{position:relative;display:flex;flex:0 0 auto}
+.si-actionbar .si-more-trigger{min-width:74px;gap:6px;white-space:nowrap}
+.si-toolmenu{position:absolute;bottom:calc(100% + 8px);right:0;min-width:220px;max-width:min(290px,calc(100vw - 24px));z-index:63;border:1px solid var(--border);border-radius:12px;background:var(--surface);box-shadow:0 12px 32px #0003;padding:6px}
+.si-toolmenu[hidden],.si-modal-cover[hidden]{display:none!important}
+.si-toolmenu button{display:block;width:100%;border:0;border-radius:8px;min-height:42px;text-align:left;padding:9px 11px;color:var(--text);background:transparent;cursor:pointer;font-weight:600;font-size:12px}
+.si-toolmenu button:hover,.si-toolmenu button:focus-visible{background:var(--tint)}.si-toolmenu button:disabled{opacity:.45;cursor:not-allowed}
+.si-menu-divider{display:block;height:1px;background:var(--border);margin:5px 4px}
+.si-notifications{position:fixed;top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));z-index:102;display:flex;flex-direction:column;gap:8px;width:min(350px,calc(100vw - 28px));pointer-events:none}
+.si-notice{pointer-events:auto;display:flex;gap:10px;align-items:start;padding:12px 12px 12px 15px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 12px 36px #0002;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.si-notice span{flex:1;min-width:0}.si-notice button{border:0;background:transparent;color:var(--muted);font-size:19px;line-height:1;cursor:pointer;min-width:30px;min-height:30px;border-radius:8px}
+.si-notice-warning{border-left-color:#b7791f}.si-notice-error{border-left-color:#b23b44}.si-notice-success{border-left-color:#1b8871}
+.si-modal-cover{position:fixed;inset:0;display:grid;place-items:center;padding:16px;z-index:95;background:rgba(5,18,29,.66);overscroll-behavior:contain}
+.si-modal{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:18px;width:min(470px,100%);max-height:min(90dvh,650px);overflow:auto;padding:26px;box-shadow:0 24px 70px #0005}
+.si-modal-mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--tint);font-size:26px;color:var(--accent);margin-bottom:14px}
+.si-modal h2{font-size:20px;letter-spacing:-.02em;margin-bottom:10px}.si-modal p{font-size:14px;color:var(--muted);margin:0 0 22px;white-space:pre-line}
+.si-modal-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.si-modal button{cursor:pointer}.si-modal .si-button-danger{background:#b23b44!important;color:white!important}
+body.si-modal-active{overflow:hidden}
+@media(max-width:900px){.si-notifications{top:max(9px,env(safe-area-inset-top));right:9px;width:min(350px,calc(100vw - 18px))}.si-modal{padding:23px}.si-actionbar .si-toolmenu-wrap{margin-left:0}.si-actionbar .si-more-trigger{min-width:56px;padding-inline:6px}}
+@media(max-width:360px){.si-actionbar .si-more-trigger{min-width:49px}.si-actionbar .scene-count{font-size:9px}.si-modal-actions .button{flex:1}}
+@media(prefers-reduced-motion:reduce){.si-notice,.si-toolmenu,.si-modal{animation:none!important;transition:none!important}}
+@media(forced-colors:active){.si-toolmenu,.si-modal,.si-notice{border:2px solid CanvasText}}
+@media print{.si-notifications,.si-modal-cover,.si-toolmenu-wrap{display:none!important}}
+/* Em 320 px o contador permanece disponível a leitores de tela sem comprimir ações. */
+@media(max-width:360px){
+ .si-actionbar .scene-count{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+}

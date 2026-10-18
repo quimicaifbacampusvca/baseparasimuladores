@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');const path=require('node:path');
+const root=path.join(__dirname,'..');
+const source=fs.readFileSync(path.join(root,'src/components.ts'),'utf8');
+const scene=fs.readFileSync(path.join(root,'src/scene-ui.ts'),'utf8');
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const css=fs.readFileSync(path.join(root,'components.css'),'utf8');
+const worker=fs.readFileSync(path.join(root,'sw.js'),'utf8');
+for(const id of ['si-notifications','si-modal','si-modal-title','si-modal-description','si-modal-cancel','si-modal-confirm','scene-menu-toggle','scene-tools-menu'])assert(html.includes(`id="${id}"`),id);
+for(const s of ['role="alertdialog"','aria-modal="true"','role="menu"','aria-haspopup="menu"','role="menuitem"'])assert(html.includes(s),s);
+for(const s of ['setTimeout','clearTimeout','Escape','Home','End','Tab','aria-expanded','focusTarget?.focus','stopImmediatePropagation'])assert(source.includes(s),s);
+assert(!scene.includes('window.confirm('),'native blocking dialog prohibited');
+assert(scene.includes('confirmDialog(') && scene.includes('setupActionMenu('),'integration missing');
+for(const s of ['max-width:900px','forced-colors','prefers-reduced-motion','.si-modal','.si-toolmenu','.si-notice'])assert(css.includes(s),s);
+assert(worker.includes('./components.css'),'offline cache missing components');
+for(const file of ['README.md','docs/PLANO-DE-CONSTRUCAO.md','docs/ACEITE-0.4.0.md','index.html','src/components.ts'])assert(!/SIAB/i.test(fs.readFileSync(path.join(root,file),'utf8')),'independence missing: '+file);
+console.log('OK: componentes, contratos de interface, semântica, integração, cache e documentação independente.');

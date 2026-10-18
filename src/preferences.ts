@@ -26,6 +26,7 @@ namespace BaseDemoSI {
       if (feedback) feedback.textContent = saved
         ? "Preferência salva neste navegador."
         : "Preferência aplicada nesta sessão; o navegador bloqueou o armazenamento local.";
+      notify(saved ? "Preferência de aparência salva." : "Aparência aplicada apenas nesta sessão.", saved ? "success" : "warning");
     });
     const media = window.matchMedia?.("(prefers-color-scheme: dark)");
     media?.addEventListener?.("change", () => {

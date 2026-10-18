@@ -90,28 +90,43 @@ namespace BaseDemoSI {
         const kind = button.dataset.addKind as EntityKind;
         const snap = store.getSnapshot();
         const created = store.dispatch({type:"add",entity:makeEntity(kind,freshId(),snap.entities.length)});
-        if (!created) announce("Limite de 60 objetos atingido.");
+        if (!created) { announce("Limite de 60 objetos atingido."); notify("Limite de 60 objetos atingido.", "warning"); }
+        else notify("Objeto adicionado à cena.", "success");
       });
     }
-    get("scene-undo")?.addEventListener("click", () => store.undo());
-    get("scene-redo")?.addEventListener("click", () => store.redo());
-    get("scene-clear")?.addEventListener("click", () => {
-      if (window.confirm("Limpar todos os objetos? É possível desfazer esta ação.")) store.dispatch({type:"clear"});
+    get("scene-undo")?.addEventListener("click", () => { if(store.undo())notify("Última alteração desfeita."); });
+    get("scene-redo")?.addEventListener("click", () => { if(store.redo())notify("Alteração refeita."); });
+    get("scene-clear")?.addEventListener("click", async () => {
+      const total=store.getSnapshot().entities.length;
+      if(!total)return;
+      const accepted=await confirmDialog({title:"Limpar cena?",description:`Os ${total} objetos serão removidos. Esta ação pode ser desfeita pelo histórico da sessão.`,confirmText:"Limpar cena",destructive:true});
+      if(accepted&&store.dispatch({type:"clear"}))notify("Cena limpa. Use Desfazer para recuperar.","warning");
+    });
+    setupActionMenu("scene-menu-toggle","scene-tools-menu", action=>{
+      if(action==="help"){
+        void confirmDialog({title:"Atalhos disponíveis",description:"Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.",confirmText:"Entendi",cancelText:"Fechar"});
+        return;
+      }
+      const kind=action==="add-block"?"block":action==="add-circle"?"circle":action==="add-label"?"label":null;
+      if(!kind)return;
+      const snap=store.getSnapshot();
+      if(store.dispatch({type:"add",entity:makeEntity(kind,freshId(),snap.entities.length)})) notify("Objeto adicionado à cena.","success");
+      else notify("Não foi possível adicionar o objeto.","warning");
     });
     get("scene-delete")?.addEventListener("click", () => {
-      const e = selected(); if (e) store.dispatch({ type:"remove", id:e.id });
+      const e = selected(); if (e && store.dispatch({ type:"remove", id:e.id })) notify("Objeto excluído. A ação pode ser desfeita.","info");
     });
     get("object-label")?.addEventListener("change", event => {
       const e = selected(); if (!e) return;
       const input = event.currentTarget as HTMLInputElement;
       const label = input.value.trim();
       if (!label || label.length > 64) { input.value = e.label; announce("Use um nome entre 1 e 64 caracteres."); return; }
-      store.dispatch({ type:"update", id:e.id, changes:{label} });
+      if(store.dispatch({ type:"update", id:e.id, changes:{label} }))notify("Nome do objeto atualizado.","success");
     });
     get("object-tone")?.addEventListener("change", event => {
       const e = selected(); if (!e) return;
       const tone = (event.currentTarget as HTMLSelectElement).value as EntityTone;
-      store.dispatch({ type:"update", id:e.id, changes:{tone} });
+      if(store.dispatch({ type:"update", id:e.id, changes:{tone} }))notify("Aparência do objeto atualizada.","success");
     });
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-move]")) {
       button.addEventListener("click", () => {
@@ -125,7 +140,7 @@ namespace BaseDemoSI {
     });
     document.addEventListener("keydown", event => {
       const element = event.target as HTMLElement | null;
-      if (element?.matches("input,select,textarea,[contenteditable]")) return;
+      if (element?.matches("input,select,textarea,[contenteditable]") || isPlatformDialogOpen()) return;
       const accel = event.ctrlKey || event.metaKey;
       if (!accel || event.altKey || event.key.toLowerCase() !== "z") return;
       event.preventDefault(); if (event.shiftKey) store.redo(); else store.undo();

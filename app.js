@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.3.0",
+        version: "0.4.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -106,6 +106,7 @@ var BaseDemoSI;
                 feedback.textContent = saved
                     ? "Preferência salva neste navegador."
                     : "Preferência aplicada nesta sessão; o navegador bloqueou o armazenamento local.";
+            BaseDemoSI.notify(saved ? "Preferência de aparência salva." : "Aparência aplicada apenas nesta sessão.", saved ? "success" : "warning");
         });
         const media = window.matchMedia?.("(prefers-color-scheme: dark)");
         media?.addEventListener?.("change", () => {
@@ -607,6 +608,181 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    /** Porta compartilhada de notificações; nenhuma notificação depende de serviços externos. */
+    let noticeSerial = 0;
+    const noticeTimers = new Map();
+    function notify(text, kind = "info") {
+        const rail = document.getElementById("si-notifications");
+        if (!rail)
+            return;
+        const item = document.createElement("div");
+        item.className = `si-notice si-notice-${kind}`;
+        item.setAttribute("role", kind === "error" ? "alert" : "status");
+        item.dataset.noticeId = String(++noticeSerial);
+        const message = document.createElement("span");
+        message.textContent = text;
+        const dismiss = document.createElement("button");
+        dismiss.type = "button";
+        dismiss.textContent = "×";
+        dismiss.setAttribute("aria-label", "Dispensar notificação");
+        item.append(message, dismiss);
+        const remove = () => {
+            const timer = noticeTimers.get(item);
+            if (timer !== undefined) {
+                window.clearTimeout(timer);
+                noticeTimers.delete(item);
+            }
+            item.remove();
+        };
+        dismiss.addEventListener("click", remove);
+        rail.append(item);
+        while (rail.children.length > 3)
+            rail.firstElementChild?.querySelector("button")?.click();
+        const duration = kind === "error" ? 9000 : kind === "warning" ? 6500 : 4400;
+        noticeTimers.set(item, window.setTimeout(remove, duration));
+    }
+    BaseDemoSI.notify = notify;
+    let finishModal = null;
+    let dialogOrigin = null;
+    let modalOpen = false;
+    const dialogNode = (id) => document.getElementById(id);
+    /** Modal acessível sem window.confirm(): exige decisão explícita e restaura o foco. */
+    function confirmDialog(spec) {
+        const root = dialogNode("si-modal");
+        if (!root || modalOpen)
+            return Promise.resolve(false);
+        modalOpen = true;
+        dialogOrigin = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        dialogNode("si-modal-title").textContent = spec.title;
+        dialogNode("si-modal-description").textContent = spec.description;
+        const accept = dialogNode("si-modal-confirm");
+        const cancel = dialogNode("si-modal-cancel");
+        accept.textContent = spec.confirmText ?? "Confirmar";
+        cancel.textContent = spec.cancelText ?? "Cancelar";
+        accept.classList.toggle("si-button-danger", !!spec.destructive);
+        root.hidden = false;
+        document.body.classList.add("si-modal-active");
+        const app = document.querySelector(".app-shell");
+        if (app)
+            app.inert = true;
+        // Sem dependência de HTMLDialogElement, compatível com os navegadores-alvo.
+        cancel.focus({ preventScroll: true });
+        return new Promise(resolve => { finishModal = resolve; });
+    }
+    BaseDemoSI.confirmDialog = confirmDialog;
+    function settleDialog(accepted) {
+        if (!modalOpen)
+            return;
+        const resolve = finishModal;
+        finishModal = null;
+        modalOpen = false;
+        const root = dialogNode("si-modal");
+        if (root)
+            root.hidden = true;
+        document.body.classList.remove("si-modal-active");
+        const app = document.querySelector(".app-shell");
+        if (app)
+            app.inert = false;
+        const focusTarget = dialogOrigin?.matches(":disabled") ? document.getElementById("scene-undo") : dialogOrigin;
+        focusTarget?.focus({ preventScroll: true });
+        dialogOrigin = null;
+        resolve?.(accepted);
+    }
+    function focusableIn(el) {
+        return Array.from(el.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex="0"]'))
+            .filter(item => !item.closest('[hidden],[inert]') && item.getClientRects().length > 0);
+    }
+    function isPlatformDialogOpen() { return modalOpen; }
+    BaseDemoSI.isPlatformDialogOpen = isPlatformDialogOpen;
+    function setupComponents() {
+        dialogNode("si-modal-cancel")?.addEventListener("click", () => settleDialog(false));
+        dialogNode("si-modal-confirm")?.addEventListener("click", () => settleDialog(true));
+        // Clicar fora equivale a cancelar, não confirmar uma ação destrutiva.
+        dialogNode("si-modal")?.addEventListener("click", event => { if (event.target === event.currentTarget)
+            settleDialog(false); });
+        document.addEventListener("keydown", event => {
+            if (!modalOpen)
+                return;
+            if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                settleDialog(false);
+                return;
+            }
+            if (event.key !== "Tab")
+                return;
+            const root = dialogNode("si-modal");
+            const items = focusableIn(root);
+            if (!items.length)
+                return;
+            const first = items[0], last = items[items.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            }
+            if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }, true);
+        window.addEventListener("si-route-changed", () => settleDialog(false));
+    }
+    BaseDemoSI.setupComponents = setupComponents;
+    /** Menu de ações reutilizável: fechar por Escape, clique externo e perda de foco. */
+    function setupActionMenu(triggerId, menuId, activate) {
+        const trigger = dialogNode(triggerId);
+        const menu = dialogNode(menuId);
+        if (!trigger || !menu)
+            return;
+        const items = () => Array.from(menu.querySelectorAll('[role="menuitem"]:not([disabled])'));
+        const close = (restore) => { menu.hidden = true; trigger.setAttribute("aria-expanded", "false"); if (restore)
+            trigger.focus({ preventScroll: true }); };
+        const open = () => { if (modalOpen)
+            return; menu.hidden = false; trigger.setAttribute("aria-expanded", "true"); items()[0]?.focus({ preventScroll: true }); };
+        trigger.addEventListener("click", () => menu.hidden ? open() : close(true));
+        trigger.addEventListener("keydown", event => { if (["ArrowDown", "Enter", " "].includes(event.key)) {
+            event.preventDefault();
+            open();
+        } });
+        menu.addEventListener("click", event => {
+            const clicked = event.target.closest('[role="menuitem"]');
+            if (!clicked || !menu.contains(clicked))
+                return;
+            const action = clicked.dataset.menuAction;
+            close(true);
+            if (action)
+                activate(action);
+        });
+        menu.addEventListener("keydown", event => {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopPropagation();
+                close(true);
+                return;
+            }
+            if (event.key === "Tab") {
+                close(false);
+                return;
+            }
+            if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key))
+                return;
+            event.preventDefault();
+            const list = items(), index = list.indexOf(document.activeElement);
+            const next = event.key === "Home" ? 0 : event.key === "End" ? list.length - 1 : (index + (event.key === "ArrowDown" ? 1 : -1) + list.length) % list.length;
+            list[next]?.focus();
+        });
+        document.addEventListener("pointerdown", event => {
+            if (menu.hidden)
+                return;
+            if (!menu.contains(event.target) && !trigger.contains(event.target))
+                close(false);
+        });
+        window.addEventListener("si-route-changed", () => close(false));
+    }
+    BaseDemoSI.setupActionMenu = setupActionMenu;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const projectKey = "scene-project-v1";
     let store;
     let serial = 0;
@@ -735,20 +911,44 @@ var BaseDemoSI;
                 const kind = button.dataset.addKind;
                 const snap = store.getSnapshot();
                 const created = store.dispatch({ type: "add", entity: BaseDemoSI.makeEntity(kind, freshId(), snap.entities.length) });
-                if (!created)
+                if (!created) {
                     announce("Limite de 60 objetos atingido.");
+                    BaseDemoSI.notify("Limite de 60 objetos atingido.", "warning");
+                }
+                else
+                    BaseDemoSI.notify("Objeto adicionado à cena.", "success");
             });
         }
-        get("scene-undo")?.addEventListener("click", () => store.undo());
-        get("scene-redo")?.addEventListener("click", () => store.redo());
-        get("scene-clear")?.addEventListener("click", () => {
-            if (window.confirm("Limpar todos os objetos? É possível desfazer esta ação."))
-                store.dispatch({ type: "clear" });
+        get("scene-undo")?.addEventListener("click", () => { if (store.undo())
+            BaseDemoSI.notify("Última alteração desfeita."); });
+        get("scene-redo")?.addEventListener("click", () => { if (store.redo())
+            BaseDemoSI.notify("Alteração refeita."); });
+        get("scene-clear")?.addEventListener("click", async () => {
+            const total = store.getSnapshot().entities.length;
+            if (!total)
+                return;
+            const accepted = await BaseDemoSI.confirmDialog({ title: "Limpar cena?", description: `Os ${total} objetos serão removidos. Esta ação pode ser desfeita pelo histórico da sessão.`, confirmText: "Limpar cena", destructive: true });
+            if (accepted && store.dispatch({ type: "clear" }))
+                BaseDemoSI.notify("Cena limpa. Use Desfazer para recuperar.", "warning");
+        });
+        BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
+            if (action === "help") {
+                void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
+                return;
+            }
+            const kind = action === "add-block" ? "block" : action === "add-circle" ? "circle" : action === "add-label" ? "label" : null;
+            if (!kind)
+                return;
+            const snap = store.getSnapshot();
+            if (store.dispatch({ type: "add", entity: BaseDemoSI.makeEntity(kind, freshId(), snap.entities.length) }))
+                BaseDemoSI.notify("Objeto adicionado à cena.", "success");
+            else
+                BaseDemoSI.notify("Não foi possível adicionar o objeto.", "warning");
         });
         get("scene-delete")?.addEventListener("click", () => {
             const e = selected();
-            if (e)
-                store.dispatch({ type: "remove", id: e.id });
+            if (e && store.dispatch({ type: "remove", id: e.id }))
+                BaseDemoSI.notify("Objeto excluído. A ação pode ser desfeita.", "info");
         });
         get("object-label")?.addEventListener("change", event => {
             const e = selected();
@@ -761,14 +961,16 @@ var BaseDemoSI;
                 announce("Use um nome entre 1 e 64 caracteres.");
                 return;
             }
-            store.dispatch({ type: "update", id: e.id, changes: { label } });
+            if (store.dispatch({ type: "update", id: e.id, changes: { label } }))
+                BaseDemoSI.notify("Nome do objeto atualizado.", "success");
         });
         get("object-tone")?.addEventListener("change", event => {
             const e = selected();
             if (!e)
                 return;
             const tone = event.currentTarget.value;
-            store.dispatch({ type: "update", id: e.id, changes: { tone } });
+            if (store.dispatch({ type: "update", id: e.id, changes: { tone } }))
+                BaseDemoSI.notify("Aparência do objeto atualizada.", "success");
         });
         for (const button of document.querySelectorAll("[data-move]")) {
             button.addEventListener("click", () => {
@@ -787,7 +989,7 @@ var BaseDemoSI;
         });
         document.addEventListener("keydown", event => {
             const element = event.target;
-            if (element?.matches("input,select,textarea,[contenteditable]"))
+            if (element?.matches("input,select,textarea,[contenteditable]") || BaseDemoSI.isPlatformDialogOpen())
                 return;
             const accel = event.ctrlKey || event.metaKey;
             if (!accel || event.altKey || event.key.toLowerCase() !== "z")
@@ -817,6 +1019,7 @@ var BaseDemoSI;
             name.textContent = BaseDemoSI.manifest.name;
         }
         BaseDemoSI.setupPreferences();
+        BaseDemoSI.setupComponents();
         BaseDemoSI.setupScene();
         BaseDemoSI.updateRoute();
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);

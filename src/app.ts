@@ -8,6 +8,7 @@ namespace BaseDemoSI {
       name.textContent = manifest.name;
     }
     setupPreferences();
+    setupComponents();
     setupScene();
     updateRoute();
     window.addEventListener("hashchange", updateRoute);
