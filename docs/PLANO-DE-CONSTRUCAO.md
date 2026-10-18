@@ -7,7 +7,7 @@
 | 0.3.x | Laje e planta | Workspace, docas, foco, visão geral, mobile | Implementada, homologação parcial |
 | 0.4.x | Paredes | Componentes, menus, diálogos e notificações | Implementada, homologação parcial |
 | 0.5.x | Extensões | Contratos locais para motores, ferramentas e instrumentos | Implementada, homologação parcial |
-| 0.6.x | Ambientes | Aprender, missões, roteiros, professor | Planejada |
+| 0.6.x | Ambientes | Aprender, missões, roteiros, professor | Implementada, homologação parcial |
 | 0.7.x | Instrumentos | Medidas, registros, relatórios e caderno | Planejada |
 | 0.8.x | Acabamentos | Identidade, distribuição e PWA/standalone final | Planejada |
 | 0.9.x | Vistoria | Regressões, responsividade e cross-browser | Planejada |

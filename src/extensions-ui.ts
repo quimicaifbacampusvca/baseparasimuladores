@@ -43,6 +43,7 @@ namespace BaseDemoSI {
         }log.append(list);}
     }
   }
+  export function extensionRecordCount():number {return extensionsReady?runtime.getRecords().length:0;}
   export function setupExtensions(scene:SceneStore):void {
     if(extensionsReady)return;
     runtime=createExtensionRuntime(scene,storage);
@@ -62,7 +63,7 @@ namespace BaseDemoSI {
         renderExtensions(scene.getSnapshot());
       });
     }
-    runtime.subscribe(()=>renderExtensions(scene.getSnapshot()));
+    runtime.subscribe(()=>{renderExtensions(scene.getSnapshot());window.dispatchEvent(new Event("si-education-observation"));});
     renderExtensions(scene.getSnapshot());
   }
 }

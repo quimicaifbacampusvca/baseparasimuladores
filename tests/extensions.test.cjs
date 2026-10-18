@@ -63,7 +63,7 @@ assert.equal(restored.activate('demo.nan'),true);
 assert.equal(restored.measure('bad').ok,false);
 for(const element of ['extension-choice','extension-tools','extension-instruments','extension-records','extension-descriptor','extension-status'])
  assert(read('index.html').includes(`id="${element}"`),'falta UI: '+element);
-for(const file of ['README.md','docs/PLANO-DE-CONSTRUCAO.md','docs/ACEITE-0.5.0.md','src/extension-contracts.ts','src/extensions.ts','src/extensions-demo.ts','index.html'])
+for(const file of ['README.md','docs/PLANO-DE-CONSTRUCAO.md','docs/ACEITE-0.6.0.md','src/extension-contracts.ts','src/extensions.ts','src/extensions-demo.ts','index.html'])
  assert(!/SIAB/i.test(read(file)),'referência indevida: '+file);
 assert(read('sw.js').includes('"./extensions.css"'),'recursos locais da extensão no precache');
 assert(!read('index.html').includes('href="./workspace.css"\n'),'link stylesheet deve estar fechado');

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./workspace.css">
   <link rel="stylesheet" href="./components.css">
   <link rel="stylesheet" href="./extensions.css">
+  <link rel="stylesheet" href="./education.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
@@ -26,32 +27,36 @@
       <nav class="nav" aria-label="Seções">
         <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span> Início</a>
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span> Ambiente</a>
+        <a data-route="aprender" href="#/aprender"><span aria-hidden="true">▤</span> Aprender</a>
+        <a data-route="missoes" href="#/missoes"><span aria-hidden="true">◈</span> Missões</a>
+        <a data-route="roteiros" href="#/roteiros"><span aria-hidden="true">☷</span> Roteiros</a>
+        <a data-route="professor" href="#/professor"><span aria-hidden="true">▦</span> Área do Professor</a>
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.5.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.6.0</span></small></div>
     </aside>
 
     <div class="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Extensões e instrumentos</strong></div>
-        <span class="version-pill">v<span data-app-version>0.5.0</span></span>
+        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
+        <span class="version-pill">v<span data-app-version>0.6.0</span></span>
       </header>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 05 · EXTENSÕES</p>
-            <h1 id="home-title">Uma base, múltiplos mecanismos conectáveis.</h1>
-            <p>A plataforma passa a aceitar extensões locais com ferramentas, instrumentos e estados próprios, preservando a cena universal e as docas.</p>
-            <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
+            <p class="eyebrow">ETAPA 06 · AMBIENTES EDUCACIONAIS</p>
+            <h1 id="home-title">Uma plataforma para explorar, orientar e construir atividades.</h1>
+            <p>Aprender, Missões, Roteiros e Área do Professor agora compartilham a mesma bancada universal, com atividades locais e validação do progresso.</p>
+            <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
           </div>
           <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
           <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Contratos universais</h3><p>Extensões tipadas com motores, ferramentas e instrumentos.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Extensões validadas</h3><p>Registro controlado e validação dos resultados antes de alterar a cena.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Integração responsiva</h3><p>Ferramentas nas docas e instrumentos no painel Ver.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Recursos locais</h3><p>Sem CDNs nem serviços necessários para operar.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Aprender</h3><p>Temas com leitura contextual e registro de conclusão.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Missões</h3><p>Objetivos associados a estados verificáveis da cena.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Roteiros</h3><p>Procedimentos em etapas conectadas ao workspace.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Área do Professor</h3><p>Criação e intercâmbio local de atividades em JSON.</p><span class="mini-state">Implementado</span></article>
           </div>
         </section>
 
@@ -150,6 +155,48 @@
           <p id="offline-status" class="sr-only">Todos os recursos operacionais estão disponíveis localmente.</p>
         </section>
 
+
+        <section class="view edu-view" data-view="aprender" aria-labelledby="learn-title" hidden>
+          <div class="section-heading edu-page-heading"><p class="eyebrow">TEMAS</p><h1 id="learn-title">Aprender</h1><p>Conteúdos organizados em temas, com leitura independente e marcação de conclusão.</p><p id="edu-topic-summary" class="edu-counter" aria-live="polite"></p></div>
+          <div id="edu-topic-list" class="edu-grid"></div>
+        </section>
+        <section class="view edu-view" data-view="missoes" aria-labelledby="missions-title" hidden>
+          <div class="section-heading edu-page-heading"><p class="eyebrow">ATIVIDADES</p><h1 id="missions-title">Missões</h1><p>Objetivos verificados a partir de ações realizadas na bancada. Sem ranking ou pontuação.</p></div>
+          <div id="edu-mission-list" class="edu-grid"></div>
+        </section>
+        <section class="view edu-view" data-view="roteiros" aria-labelledby="scripts-title" hidden>
+          <div class="section-heading edu-page-heading"><p class="eyebrow">INVESTIGAÇÃO ORIENTADA</p><h1 id="scripts-title">Roteiros</h1><p>Sequências com etapas próprias e retorno direto ao ambiente para montar e examinar.</p></div>
+          <div id="edu-script-list" class="edu-grid"></div>
+        </section>
+        <section class="view edu-view" data-view="professor" aria-labelledby="teacher-title" hidden>
+          <div class="section-heading edu-page-heading"><p class="eyebrow">AUTORIA LOCAL</p><h1 id="teacher-title">Área do Professor</h1><p>Configure atividades sem conta e sem serviços externos. Os arquivos JSON podem ser compartilhados e importados em outra instalação da base.</p></div>
+          <div class="edu-teacher-layout">
+            <section class="edu-card" aria-labelledby="edu-editor-title">
+              <h2 id="edu-editor-title">Nova atividade</h2>
+              <form id="edu-teacher-form" class="edu-form">
+                <label for="edu-form-kind">Tipo de atividade</label><select id="edu-form-kind"><option value="mission">Missão</option><option value="script">Roteiro</option></select>
+                <label for="edu-form-title">Título</label><input id="edu-form-title" maxlength="90" required placeholder="Ex.: Organizando uma cena">
+                <label for="edu-form-description">Orientação</label><textarea id="edu-form-description" maxlength="300" rows="3" required placeholder="Descreva o propósito da atividade."></textarea>
+                <fieldset><legend>Etapa 1</legend>
+                  <label for="edu-step-one-label">Procedimento</label><input id="edu-step-one-label" maxlength="140" required placeholder="O que o estudante deve fazer?">
+                  <div class="edu-form-row"><div><label for="edu-step-one-rule">Critério</label><select id="edu-step-one-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-one-min">Quantidade</label><input id="edu-step-one-min" type="number" min="1" max="60" value="1" disabled required></div></div>
+                </fieldset>
+                <fieldset id="edu-second-step" hidden><legend>Etapa 2</legend>
+                  <label for="edu-step-two-label">Procedimento</label><input id="edu-step-two-label" maxlength="140" placeholder="Próxima etapa">
+                  <div class="edu-form-row"><div><label for="edu-step-two-rule">Critério</label><select id="edu-step-two-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-two-min">Quantidade</label><input id="edu-step-two-min" type="number" min="1" max="60" value="1" disabled></div></div>
+                </fieldset>
+                <button class="button primary" type="submit">Criar atividade</button>
+              </form>
+            </section>
+            <section class="edu-card" aria-labelledby="edu-library-title">
+              <h2 id="edu-library-title">Biblioteca do professor</h2><p id="edu-teacher-summary" class="edu-counter" aria-live="polite"></p>
+              <div id="edu-teacher-list" class="edu-teacher-list"></div>
+              <div class="edu-data-tools"><button class="button outline" id="edu-export" type="button">Baixar JSON</button><label class="button outline edu-upload" for="edu-import">Importar JSON <input id="edu-import" type="file" accept=".json,application/json" aria-label="Selecionar arquivo JSON de atividades"></label></div>
+              <p class="edu-small-note">A importação substitui somente as atividades personalizadas após confirmação. Dados incompatíveis são rejeitados antes da gravação.</p>
+            </section>
+          </div>
+        </section>
+
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
           <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
@@ -158,10 +205,10 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.5.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.6.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.5.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.6.0</span></span></footer>
     </div>
   </div>
   <div id="si-notifications" class="si-notifications" aria-label="Notificações" aria-live="polite" aria-atomic="false"></div>

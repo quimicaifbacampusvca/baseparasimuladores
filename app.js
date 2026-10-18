@@ -6,12 +6,16 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.5.0",
+        version: "0.6.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
             { id: "inicio", title: "Início", subtitle: "Workspace universal" },
             { id: "ambiente", title: "Ambiente", subtitle: "Extensões, docas e visão geral" },
+            { id: "aprender", title: "Aprender", subtitle: "Temas e orientações" },
+            { id: "missoes", title: "Missões", subtitle: "Atividades verificáveis" },
+            { id: "roteiros", title: "Roteiros", subtitle: "Percursos guiados" },
+            { id: "professor", title: "Professor", subtitle: "Editor de atividades" },
             { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
             { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
         ])
@@ -45,7 +49,7 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
-    const validRoutes = new Set(["inicio", "ambiente", "configuracoes", "sobre"]);
+    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "configuracoes", "sobre"]);
     function currentRoute(hash) {
         const slug = hash.replace(/^#\/?/, "").split(/[?&]/, 1)[0];
         return validRoutes.has(slug) ? slug : "inicio";
@@ -375,6 +379,190 @@ var BaseDemoSI;
                 read: ({ state }) => ({ label: "Operações executadas", value: state.actions, unit: "ações" }) }
         ]
     };
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const EDU_KEY = "education-document-v1";
+    const ID = /^(?:topic|mission|script|teacher)-[a-z0-9-]{1,52}$/;
+    const RESERVED = new Set(["__proto__", "prototype", "constructor"]);
+    const MAX_TEACHER = 24;
+    const MAX_IMPORT = 65536;
+    const MAX_STEPS = 5;
+    BaseDemoSI.learningTopics = Object.freeze([
+        { id: "topic-scene", title: "Explorar o ambiente", summary: "Conheça a cena e os controles de navegação.",
+            paragraphs: ["O workspace é a área de interação. A região central recebe os objetos e mantém a prioridade visual, enquanto as docas organizam as ações e os registros.", "Use Montagem para criar objetos, Foco para destacar um elemento e Visão geral para comparar o conjunto."] },
+        { id: "topic-tools", title: "Ferramentas e instrumentos", summary: "Diferencie ações, observações e leituras.",
+            paragraphs: ["Ferramentas alteram objetos ou estados; instrumentos retornam valores registráveis. Cada extensão declara seus próprios recursos sem modificar a plataforma.", "A edição de objetos é reversível pelo histórico da cena. As leituras possuem registros próprios para consulta."] },
+        { id: "topic-records", title: "Registros e interpretação", summary: "Aprenda a registrar observações verificáveis.",
+            paragraphs: ["Uma observação descreve o que aparece na cena. Uma leitura acrescenta um valor, unidade e vínculo com o instrumento que a produziu.", "Conferir resultados implica distinguir ações realizadas, medidas obtidas e interpretações construídas a partir delas."] }
+    ]);
+    BaseDemoSI.officialActivities = Object.freeze([
+        { id: "mission-create", kind: "mission", origin: "official", title: "Primeira composição", description: "Adicione ao menos dois objetos ao ambiente.", steps: [{ label: "Adicionar dois objetos na cena", requirement: "entities", minimum: 2 }] },
+        { id: "mission-select", kind: "mission", origin: "official", title: "Objeto em foco", description: "Selecione um objeto para examiná-lo.", steps: [{ label: "Manter um objeto selecionado", requirement: "selection", minimum: 1 }] },
+        { id: "mission-read", kind: "mission", origin: "official", title: "Registrar uma leitura", description: "Utilize um instrumento de uma extensão local.", steps: [{ label: "Registrar pelo menos uma leitura", requirement: "readings", minimum: 1 }] },
+        { id: "script-start", kind: "script", origin: "official", title: "Construção orientada", description: "Prepare, selecione e amplie sua primeira montagem.", steps: [
+                { label: "Adicione o primeiro objeto", requirement: "entities", minimum: 1 },
+                { label: "Selecione o objeto para observação", requirement: "selection", minimum: 1 },
+                { label: "Amplie a montagem para dois objetos", requirement: "entities", minimum: 2 }
+            ] },
+        { id: "script-observe", kind: "script", origin: "official", title: "Da observação ao registro", description: "Organize um procedimento de inspeção e medição.", steps: [
+                { label: "Selecione um objeto no ambiente", requirement: "selection", minimum: 1 },
+                { label: "Utilize um instrumento e registre a leitura", requirement: "readings", minimum: 1 }
+            ] }
+    ]);
+    const emptyEducation = () => ({ schemaVersion: 1, topicsDone: [], progress: {}, teacherActivities: [] });
+    const clean = (value, max) => typeof value === "string" && value.trim().length > 0 && value.length <= max;
+    const validStep = (value) => {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return false;
+        const v = value;
+        return clean(v.label, 140) && ["manual", "entities", "selection", "readings"].includes(v.requirement)
+            && Number.isSafeInteger(v.minimum) && (v.minimum ?? 0) >= 1 && (v.minimum ?? 0) <= 60
+            && (v.requirement !== "selection" || v.minimum === 1)
+            && (v.requirement !== "manual" || v.minimum === 1);
+    };
+    function validTeacherActivity(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return false;
+        const a = value;
+        return typeof a.id === "string" && ID.test(a.id) && a.id.startsWith("teacher-") && !RESERVED.has(a.id)
+            && a.origin === "teacher" && (a.kind === "mission" || a.kind === "script")
+            && clean(a.title, 90) && clean(a.description, 300)
+            && Array.isArray(a.steps) && a.steps.length >= 1 && a.steps.length <= MAX_STEPS
+            && (a.kind !== "mission" || a.steps.length === 1)
+            && a.steps.every(validStep);
+    }
+    BaseDemoSI.validTeacherActivity = validTeacherActivity;
+    function parseEducation(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return null;
+        const v = value;
+        if (v.schemaVersion !== 1 || !Array.isArray(v.topicsDone) || v.topicsDone.length > BaseDemoSI.learningTopics.length
+            || !v.progress || typeof v.progress !== "object" || Array.isArray(v.progress)
+            || !Array.isArray(v.teacherActivities) || v.teacherActivities.length > MAX_TEACHER)
+            return null;
+        const availableTopics = new Set(BaseDemoSI.learningTopics.map(t => t.id));
+        if (new Set(v.topicsDone).size !== v.topicsDone.length || v.topicsDone.some(id => !availableTopics.has(id)))
+            return null;
+        if (!v.teacherActivities.every(validTeacherActivity))
+            return null;
+        const available = new Map([...BaseDemoSI.officialActivities, ...v.teacherActivities].map(a => [a.id, a]));
+        if (available.size !== BaseDemoSI.officialActivities.length + v.teacherActivities.length)
+            return null;
+        const progress = Object.create(null);
+        const entries = Object.entries(v.progress);
+        if (entries.length > BaseDemoSI.officialActivities.length + MAX_TEACHER)
+            return null;
+        for (const [id, position] of entries) {
+            const a = available.get(id);
+            if (!a || RESERVED.has(id) || !Number.isSafeInteger(position) || position < 0 || position > a.steps.length)
+                return null;
+            progress[id] = position;
+        }
+        return { schemaVersion: 1, topicsDone: [...v.topicsDone], progress, teacherActivities: v.teacherActivities.map(a => ({ ...a, steps: a.steps.map(s => ({ ...s })) })) };
+    }
+    BaseDemoSI.parseEducation = parseEducation;
+    function meetsRequirement(step, scene, readingCount) {
+        if (step.requirement === "manual")
+            return true;
+        if (step.requirement === "entities")
+            return scene.entities.length >= step.minimum;
+        if (step.requirement === "selection")
+            return !!scene.selectedId && scene.entities.some(e => e.id === scene.selectedId);
+        return readingCount >= step.minimum;
+    }
+    BaseDemoSI.meetsRequirement = meetsRequirement;
+    function createEducationStore(io) {
+        let restored = null;
+        try {
+            const raw = io.read(EDU_KEY);
+            restored = raw === null ? null : parseEducation(JSON.parse(raw));
+        }
+        catch {
+            restored = null;
+        }
+        let state = restored ?? emptyEducation();
+        const subscribers = new Set();
+        const emit = () => { for (const cb of [...subscribers])
+            cb(); };
+        const persist = (next) => {
+            const safe = parseEducation(next);
+            if (!safe)
+                return false;
+            state = safe;
+            io.write(EDU_KEY, JSON.stringify(state));
+            emit();
+            return true;
+        };
+        const available = () => [...BaseDemoSI.officialActivities, ...state.teacherActivities];
+        const get = (id) => available().find(a => a.id === id);
+        return {
+            snapshot: () => parseEducation(state),
+            list: (kind) => available().filter(a => a.kind === kind).map(a => ({ ...a, steps: a.steps.map(s => ({ ...s })) })),
+            toggleTopic(id) {
+                if (!BaseDemoSI.learningTopics.some(t => t.id === id))
+                    return false;
+                const topics = new Set(state.topicsDone);
+                if (topics.has(id))
+                    topics.delete(id);
+                else
+                    topics.add(id);
+                return persist({ ...state, topicsDone: [...topics] });
+            },
+            advance(id, scene, readingCount) {
+                const a = get(id);
+                if (!a)
+                    return { ok: false, message: "Atividade não encontrada." };
+                const i = state.progress[id] ?? 0;
+                if (i >= a.steps.length)
+                    return { ok: false, message: "Atividade já concluída." };
+                if (!meetsRequirement(a.steps[i], scene, readingCount))
+                    return { ok: false, message: "Critério ainda não atendido na cena." };
+                const progress = { ...state.progress, [id]: i + 1 };
+                persist({ ...state, progress });
+                return { ok: true, message: i + 1 === a.steps.length ? "Atividade concluída." : "Etapa registrada. Continue o roteiro." };
+            },
+            createActivity(value) {
+                if (!validTeacherActivity(value) || state.teacherActivities.length >= MAX_TEACHER || get(value.id))
+                    return false;
+                return persist({ ...state, teacherActivities: [...state.teacherActivities, value] });
+            },
+            removeActivity(id) {
+                if (!state.teacherActivities.some(a => a.id === id))
+                    return false;
+                const progress = { ...state.progress };
+                delete progress[id];
+                return persist({ ...state, teacherActivities: state.teacherActivities.filter(a => a.id !== id), progress });
+            },
+            importTeachers(value) {
+                if (!value || typeof value !== "object" || Array.isArray(value))
+                    return false;
+                const v = value;
+                if (v.format !== "base-demo-si-teacher-v1" || !Array.isArray(v.activities) || v.activities.length > MAX_TEACHER || !v.activities.every(validTeacherActivity))
+                    return false;
+                const ids = new Set(v.activities.map(a => a.id));
+                if (ids.size !== v.activities.length)
+                    return false;
+                const retained = new Set([...BaseDemoSI.officialActivities, ...v.activities].map(a => a.id));
+                const progress = Object.fromEntries(Object.entries(state.progress).filter(([id]) => retained.has(id)));
+                return persist({ ...state, progress, teacherActivities: v.activities });
+            },
+            exportTeachers: () => JSON.stringify({ format: "base-demo-si-teacher-v1", activities: state.teacherActivities }, null, 2),
+            subscribe(listener) { subscribers.add(listener); return () => { subscribers.delete(listener); }; }
+        };
+    }
+    BaseDemoSI.createEducationStore = createEducationStore;
+    function parseTeacherImport(text) {
+        if (text.length > MAX_IMPORT)
+            return null;
+        try {
+            return JSON.parse(text);
+        }
+        catch {
+            return null;
+        }
+    }
+    BaseDemoSI.parseTeacherImport = parseTeacherImport;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1118,6 +1306,8 @@ var BaseDemoSI;
         }
     }
     BaseDemoSI.renderExtensions = renderExtensions;
+    function extensionRecordCount() { return extensionsReady ? runtime.getRecords().length : 0; }
+    BaseDemoSI.extensionRecordCount = extensionRecordCount;
     function setupExtensions(scene) {
         if (extensionsReady)
             return;
@@ -1149,10 +1339,231 @@ var BaseDemoSI;
                 renderExtensions(scene.getSnapshot());
             });
         }
-        runtime.subscribe(() => renderExtensions(scene.getSnapshot()));
+        runtime.subscribe(() => { renderExtensions(scene.getSnapshot()); window.dispatchEvent(new Event("si-education-observation")); });
         renderExtensions(scene.getSnapshot());
     }
     BaseDemoSI.setupExtensions = setupExtensions;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    let education;
+    let educationScene;
+    let teacherSerial = 0;
+    const el = (id) => document.getElementById(id);
+    const text = (tag, value, className) => {
+        const node = document.createElement(tag);
+        node.textContent = value;
+        if (className)
+            node.className = className;
+        return node;
+    };
+    function button(label, action, mode = "outline") {
+        const node = document.createElement("button");
+        node.type = "button";
+        node.className = `button ${mode}`;
+        node.textContent = label;
+        node.addEventListener("click", action);
+        return node;
+    }
+    function countReadings() { return BaseDemoSI.extensionRecordCount(); }
+    function renderTopics() {
+        const target = el("edu-topic-list");
+        if (!target)
+            return;
+        target.replaceChildren();
+        const saved = education.snapshot();
+        for (const topic of BaseDemoSI.learningTopics) {
+            const card = document.createElement("article");
+            card.className = "edu-card";
+            card.dataset.topicId = topic.id;
+            card.append(text("p", saved.topicsDone.includes(topic.id) ? "Concluído" : "Tema", "edu-kicker"), text("h2", topic.title), text("p", topic.summary));
+            const details = document.createElement("details");
+            const summary = text("summary", "Ler conteúdo");
+            details.append(summary);
+            const body = document.createElement("div");
+            body.className = "edu-body";
+            for (const paragraph of topic.paragraphs)
+                body.append(text("p", paragraph));
+            details.append(body);
+            card.append(details);
+            card.append(button(saved.topicsDone.includes(topic.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => { if (education.toggleTopic(topic.id)) {
+                const next = target.querySelector(`[data-topic-id="${topic.id}"] button`);
+                next?.focus({ preventScroll: true });
+            } }));
+            target.append(card);
+        }
+        const stats = el("edu-topic-summary");
+        if (stats)
+            stats.textContent = `${saved.topicsDone.length} de ${BaseDemoSI.learningTopics.length} temas concluídos`;
+    }
+    function renderActivity(kind) {
+        const target = el(kind === "mission" ? "edu-mission-list" : "edu-script-list");
+        if (!target)
+            return;
+        target.replaceChildren();
+        const snapshot = education.snapshot();
+        for (const a of education.list(kind)) {
+            const card = document.createElement("article");
+            card.className = "edu-card";
+            card.dataset.activityId = a.id;
+            const position = snapshot.progress[a.id] ?? 0, finished = position >= a.steps.length;
+            card.append(text("p", `${a.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${a.steps.length} etapas`}`, "edu-kicker"), text("h2", a.title), text("p", a.description));
+            const list = document.createElement("ol");
+            list.className = "edu-steps";
+            for (let i = 0; i < a.steps.length; i++) {
+                const step = a.steps[i], item = document.createElement("li");
+                item.className = i < position ? "edu-step-done" : i === position ? "edu-step-current" : "";
+                item.append(text("strong", step.label));
+                const criterion = step.requirement === "entities" ? `${step.minimum} objeto(s) na cena` : step.requirement === "selection" ? "Um objeto selecionado" : step.requirement === "readings" ? `${step.minimum} leitura(s) registrada(s)` : "Confirmação de realização";
+                item.append(text("small", criterion));
+                list.append(item);
+            }
+            card.append(list);
+            const actions = document.createElement("div");
+            actions.className = "edu-actions";
+            const go = document.createElement("a");
+            go.className = "button outline";
+            go.href = "#/ambiente";
+            go.textContent = "Montar na bancada";
+            actions.append(go);
+            if (!finished) {
+                const step = a.steps[position];
+                const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
+                const confirm = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
+                    const outcome = education.advance(a.id, educationScene.getSnapshot(), countReadings());
+                    BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
+                    if (outcome.ok) {
+                        const current = target.querySelector(`[data-activity-id="${a.id}"]`);
+                        (current?.querySelector("button") ?? current?.querySelector("a"))?.focus({ preventScroll: true });
+                    }
+                }, "primary");
+                confirm.disabled = !allowed;
+                confirm.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
+                actions.append(confirm);
+            }
+            else
+                actions.append(text("span", "Atividade finalizada", "edu-finished"));
+            card.append(actions);
+            target.append(card);
+        }
+        if (!target.children.length)
+            target.append(text("p", "Nenhuma atividade disponível."));
+    }
+    function renderTeacher() {
+        const target = el("edu-teacher-list");
+        if (!target)
+            return;
+        target.replaceChildren();
+        const activities = education.snapshot().teacherActivities;
+        const summary = el("edu-teacher-summary");
+        if (summary)
+            summary.textContent = `${activities.length} / 24 atividades personalizadas`;
+        if (!activities.length)
+            target.append(text("p", "Nenhuma atividade personalizada. Crie uma atividade no editor abaixo."));
+        for (const a of activities) {
+            const card = document.createElement("article");
+            card.className = "edu-teacher-item";
+            const info = document.createElement("div");
+            info.append(text("strong", a.title), text("small", `${a.kind === "mission" ? "Missão" : "Roteiro"} · ${a.steps.length} etapa(s)`));
+            card.append(info, button("Excluir", async () => {
+                const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir atividade?", description: `A atividade ${a.title} e seu progresso serão excluídos deste navegador.`, confirmText: "Excluir", destructive: true });
+                if (accepted && education.removeActivity(a.id))
+                    BaseDemoSI.notify("Atividade removida.", "info");
+            }));
+            target.append(card);
+        }
+    }
+    function renderAll() { renderTopics(); renderActivity("mission"); renderActivity("script"); renderTeacher(); }
+    const inputValue = (id) => el(id)?.value.trim() ?? "";
+    const rule = (id) => el(id).value;
+    const step = (prefix) => ({ label: inputValue(`${prefix}-label`), requirement: rule(`${prefix}-rule`), minimum: Number(inputValue(`${prefix}-min`) || 1) });
+    function displayTeacherKind() {
+        const show = el("edu-form-kind").value === "script";
+        const second = el("edu-second-step");
+        if (second)
+            second.hidden = !show;
+    }
+    function setupTeacherForm() {
+        const kind = el("edu-form-kind");
+        kind?.addEventListener("change", displayTeacherKind);
+        for (const prefix of ["edu-step-one", "edu-step-two"]) {
+            const control = el(`${prefix}-rule`);
+            control?.addEventListener("change", () => {
+                const min = el(`${prefix}-min`);
+                min.disabled = ["manual", "selection"].includes(control.value);
+                if (min.disabled)
+                    min.value = "1";
+            });
+        }
+        displayTeacherKind();
+        el("edu-teacher-form")?.addEventListener("submit", event => {
+            event.preventDefault();
+            const type = kind?.value;
+            const created = { id: `teacher-${Date.now().toString(36)}-${(++teacherSerial).toString(36)}`, kind: type, origin: "teacher",
+                title: inputValue("edu-form-title"), description: inputValue("edu-form-description"),
+                steps: type === "script" ? [step("edu-step-one"), step("edu-step-two")] : [step("edu-step-one")] };
+            if (!education.createActivity(created)) {
+                BaseDemoSI.notify("Revise os campos: título, descrição, critérios e etapas são obrigatórios.", "warning");
+                return;
+            }
+            el("edu-teacher-form").reset();
+            displayTeacherKind();
+            BaseDemoSI.notify("Atividade personalizada criada.", "success");
+        });
+        el("edu-export")?.addEventListener("click", () => {
+            const file = new Blob([education.exportTeachers()], { type: "application/json;charset=utf-8" });
+            const url = URL.createObjectURL(file);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = "base-si-atividades-professor.json";
+            document.body.append(anchor);
+            anchor.click();
+            anchor.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+            BaseDemoSI.notify("Arquivo JSON preparado para download.", "success");
+        });
+        el("edu-import")?.addEventListener("change", async (event) => {
+            const source = event.target;
+            const file = source.files?.[0];
+            source.value = "";
+            if (!file)
+                return;
+            if (file.size > 65536) {
+                BaseDemoSI.notify("Arquivo acima do limite de 64 KiB.", "warning");
+                return;
+            }
+            let decoded = null;
+            try {
+                decoded = BaseDemoSI.parseTeacherImport(await file.text());
+            }
+            catch {
+                decoded = null;
+            }
+            if (!decoded) {
+                BaseDemoSI.notify("Arquivo de atividades inválido.", "warning");
+                return;
+            }
+            const accepted = await BaseDemoSI.confirmDialog({ title: "Importar atividades?", description: "As atividades personalizadas atuais serão substituídas. O progresso dos temas e das atividades oficiais será mantido.", confirmText: "Importar atividades", destructive: true });
+            if (!accepted)
+                return;
+            if (education.importTeachers(decoded))
+                BaseDemoSI.notify("Atividades importadas e validadas.", "success");
+            else
+                BaseDemoSI.notify("Formato incompatível ou conteúdo inválido; nenhuma atividade foi alterada.", "warning");
+        });
+    }
+    function setupEducation(scene) {
+        educationScene = scene;
+        education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        education.subscribe(renderAll);
+        scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
+            renderAll(); });
+        window.addEventListener("si-education-observation", () => renderAll());
+        window.addEventListener("si-route-changed", () => renderAll());
+        setupTeacherForm();
+        renderAll();
+    }
+    BaseDemoSI.setupEducation = setupEducation;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1281,6 +1692,7 @@ var BaseDemoSI;
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
         BaseDemoSI.setupExtensions(store);
+        BaseDemoSI.setupEducation(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;

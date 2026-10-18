@@ -87,6 +87,7 @@ namespace BaseDemoSI {
     store.subscribe(event => { render(); if (event !== "selection") save(); });
     setupWorkspace(() => store.getSnapshot(), id => store.select(id));
     setupExtensions(store);
+    setupEducation(store);
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-add-kind]")) {
       button.addEventListener("click", () => {
         const kind = button.dataset.addKind as EntityKind;

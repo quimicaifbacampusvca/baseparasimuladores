@@ -3,7 +3,7 @@
  * Nesta primeira versão os contratos definem o shell; cena e engine virão depois.
  */
 namespace BaseDemoSI {
-  export type RouteId = "inicio" | "ambiente" | "configuracoes" | "sobre";
+  export type RouteId = "inicio" | "ambiente" | "aprender" | "missoes" | "roteiros" | "professor" | "configuracoes" | "sobre";
   export type ThemePreference = "sistema" | "claro" | "escuro";
 
   export interface RouteDefinition {
