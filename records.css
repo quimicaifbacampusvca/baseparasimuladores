@@ -1,0 +1,57 @@
+/* Camada documental; isolada das dimensões e comportamento do workspace. */
+.si-records-view {padding-bottom:34px;max-width:1400px;margin-inline:auto}
+.si-records-grid {display:grid;grid-template-columns:minmax(280px,0.94fr) minmax(0,1.3fr);gap:16px;align-items:start}
+.si-records-card {background:var(--surface, #fff);border:1px solid var(--border,#cad3dd);border-radius:18px;padding:20px;min-width:0}
+.si-records-card h2 {font-size:1.13rem;margin:0 0 12px}
+.si-records-card-top {display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.si-records-card-top h2 {margin:0}
+.si-records-card-top span {font-size:.83rem;color:var(--muted,#67778c)}
+.si-record-form {display:grid;gap:10px}
+.si-record-form label {font-size:.89rem;font-weight:650}
+.si-record-form input:not([type=checkbox]), .si-record-form select, .si-record-form textarea {box-sizing:border-box;width:100%;min-width:0;padding:10px 12px;border:1px solid var(--border,#a5b5c3);border-radius:10px;background:var(--surface,#fff);color:var(--text,#172d40);font:inherit}
+.si-record-form textarea {resize:vertical;min-height:95px}
+.si-record-form button {margin-top:8px}
+.si-record-file-actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.si-record-upload {position:relative;cursor:pointer}
+.si-record-upload input {position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;inset:auto}
+.si-record-upload:focus-within {outline:3px solid var(--accent,#1875a0);outline-offset:2px}
+.si-records-help {font-size:.83rem;color:var(--muted,#667689);overflow-wrap:anywhere}
+.si-records-empty {font-size:.94rem;color:var(--muted,#667689)}
+.si-journal-list,.si-reports-list {display:grid;gap:11px;max-height:680px;overflow:auto}
+.si-journal-entry,.si-report-entry {border:1px solid var(--border,#cbd3dd);border-radius:12px;padding:13px 14px;min-width:0}
+.si-journal-entry p {margin:9px 0 10px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.si-journal-entry-head,.si-report-entry {display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.si-journal-entry-head span,.si-report-entry small {color:var(--muted,#667689);font-size:.8rem}
+.si-report-entry>div:first-child {display:grid;gap:5px;min-width:0;overflow-wrap:anywhere}
+.si-journal-actions {display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.si-journal-actions .button {font-size:.84rem;padding:8px 12px}
+.si-journal-entry .si-journal-actions {justify-content:flex-end}
+.si-report-entry.is-open {border-color:var(--accent,#3b83ad)}
+.si-report-options {border:1px solid var(--border,#cbd3dd);border-radius:12px;padding:12px;display:grid;gap:8px}
+.si-report-options label {display:flex;gap:9px;align-items:center;font-weight:500}
+.si-report-preview-card {margin-top:16px}
+.si-report-preview {overflow:hidden;border:1px solid var(--border,#cbd3dd);border-radius:10px}
+.si-report-paper {background:#fff;color:#1e2b37;padding:25px 28px;line-height:1.55;overflow-wrap:anywhere;font-family:Georgia,serif}
+.si-report-paper h2 {font-size:1.75rem;margin:5px 0 8px}
+.si-report-paper h3 {font-size:1.04rem;margin:17px 0 9px}
+.si-report-kicker {font:700 .7rem Arial,sans-serif;letter-spacing:.14em;color:#456476}
+.si-report-byline {font:.85rem Arial,sans-serif;color:#526879}
+.si-report-section {padding-top:8px;border-top:1px solid #d6dfe5;margin-top:18px}
+.si-report-section p {white-space:pre-wrap}
+.si-report-table-wrap {overflow-x:auto}
+.si-report-table {width:100%;border-collapse:collapse;table-layout:fixed;font:0.83rem Arial,sans-serif}
+.si-report-table th,.si-report-table td {border:1px solid #b7c8d2;padding:8px;overflow-wrap:anywhere;vertical-align:top;text-align:left}
+.si-report-table th {background:#edf3f6}
+.si-report-disclaimer {border-top:1px solid #c7d3dc;padding-top:12px;font-size:.83rem;margin-top:22px}
+.si-print-sheet {display:none}
+@media(max-width:840px){.si-records-grid {grid-template-columns:1fr}.si-records-card {padding:15px}.si-report-paper {padding:18px}.si-records-view {padding-bottom:70px}}
+@media(max-width:360px){.si-record-file-actions .button {font-size:.81rem}.si-journal-entry {padding:10px}.si-records-card {padding:12px}.si-report-paper {padding:13px}}
+@media print {
+  @page {size:A4;margin:15mm}
+  html,body {background:#fff!important;color:#111!important;margin:0!important}
+  .app-shell,.si-modal-cover,.si-notifications {display:none!important}
+  .si-print-sheet,.si-print-sheet[hidden] {display:block!important;position:static!important;visibility:visible!important}
+  .si-print-sheet .si-report-paper {padding:0;color:#111;box-shadow:none;overflow:visible}
+  .si-print-sheet .si-report-table-wrap {overflow:visible}
+  .si-print-sheet tr,.si-print-sheet .si-report-section {break-inside:avoid}
+}

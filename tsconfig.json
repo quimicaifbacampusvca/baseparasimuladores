@@ -23,14 +23,17 @@
     "src/extension-contracts.ts",
     "src/extensions.ts",
     "src/extensions-demo.ts",
+    "src/records-contracts.ts",
     "src/education-contracts.ts",
     "src/education.ts",
+    "src/records.ts",
     "src/scene.ts",
     "src/workspace.ts",
     "src/workspace-ui.ts",
     "src/components.ts",
     "src/extensions-ui.ts",
     "src/education-ui.ts",
+    "src/records-ui.ts",
     "src/scene-ui.ts",
     "src/app.ts"
   ]

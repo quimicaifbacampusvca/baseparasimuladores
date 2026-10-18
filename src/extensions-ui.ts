@@ -43,6 +43,7 @@ namespace BaseDemoSI {
         }log.append(list);}
     }
   }
+  export function extensionGetRecords():readonly ReadingRecord[] {return extensionsReady?runtime.getRecords():[];}
   export function extensionRecordCount():number {return extensionsReady?runtime.getRecords().length:0;}
   export function setupExtensions(scene:SceneStore):void {
     if(extensionsReady)return;

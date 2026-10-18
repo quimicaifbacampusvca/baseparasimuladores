@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
-  "description": "Ambientes educacionais, missões, roteiros e autoria local de atividades.",
+  "description": "Caderno, observações, relatórios locais configuráveis e impressão.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },

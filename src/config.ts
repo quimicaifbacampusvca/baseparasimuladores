@@ -4,7 +4,7 @@ namespace BaseDemoSI {
     id: "base-demo-oficial-si",
     name: "Base Demo Oficial - SI",
     shortName: "SI",
-    version: "0.6.0",
+    version: "0.7.0",
     language: "pt-BR",
     requiresNetwork: false,
     routes: Object.freeze<RouteDefinition[]>([
@@ -14,6 +14,8 @@ namespace BaseDemoSI {
       { id: "missoes", title: "Missões", subtitle: "Atividades verificáveis" },
       { id: "roteiros", title: "Roteiros", subtitle: "Percursos guiados" },
       { id: "professor", title: "Professor", subtitle: "Editor de atividades" },
+      { id: "caderno", title: "Caderno", subtitle: "Observações e interpretações" },
+      { id: "relatorios", title: "Relatórios", subtitle: "Documentação e impressão" },
       { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
       { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
     ])

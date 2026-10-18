@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.6.0",
+        version: "0.7.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -16,6 +16,8 @@ var BaseDemoSI;
             { id: "missoes", title: "Missões", subtitle: "Atividades verificáveis" },
             { id: "roteiros", title: "Roteiros", subtitle: "Percursos guiados" },
             { id: "professor", title: "Professor", subtitle: "Editor de atividades" },
+            { id: "caderno", title: "Caderno", subtitle: "Observações e interpretações" },
+            { id: "relatorios", title: "Relatórios", subtitle: "Documentação e impressão" },
             { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
             { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
         ])
@@ -49,7 +51,7 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
-    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "configuracoes", "sobre"]);
+    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "configuracoes", "sobre"]);
     function currentRoute(hash) {
         const slug = hash.replace(/^#\/?/, "").split(/[?&]/, 1)[0];
         return validRoutes.has(slug) ? slug : "inicio";
@@ -563,6 +565,180 @@ var BaseDemoSI;
         }
     }
     BaseDemoSI.parseTeacherImport = parseTeacherImport;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const JOURNAL_KEY = "journal-document-v1";
+    const JOURNAL_IDS = /^(note|report)-[a-z0-9-]{1,65}$/;
+    const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+    const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+    const MAX_NOTES = 80;
+    const MAX_REPORTS = 20;
+    const MAX_JSON_LENGTH = 300000;
+    const valueText = (value, max) => typeof value === "string" && value.trim().length > 0 && value.length <= max;
+    const safeOptional = (value, max) => typeof value === "string" && value.length <= max;
+    const realDay = (value) => typeof value === "string" && ISO_DAY.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+    const instant = (value) => typeof value === "string" && ISO_INSTANT.test(value) && !Number.isNaN(Date.parse(value));
+    const id = (value, prefix) => typeof value === "string" && JOURNAL_IDS.test(value) && value.startsWith(prefix + "-");
+    const noteKinds = ["observacao", "hipotese", "conclusao"];
+    function validNote(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return false;
+        const n = value;
+        return id(n.id, "note") && instant(n.createdAt) && noteKinds.includes(n.kind)
+            && valueText(n.body, 1200) && (n.entityId === null || valueText(n.entityId, 80))
+            && (n.entityLabel === null || valueText(n.entityLabel, 64))
+            && ((n.entityId === null) === (n.entityLabel === null));
+    }
+    function validReading(r) {
+        if (!r || typeof r !== "object" || Array.isArray(r))
+            return false;
+        const x = r;
+        return valueText(x.label, 90) && typeof x.value === "number" && Number.isFinite(x.value)
+            && safeOptional(x.unit, 24) && valueText(x.extensionId, 80) && valueText(x.instrumentId, 80)
+            && (x.entityId === null || valueText(x.entityId, 80))
+            && Number.isSafeInteger(x.sequence) && (x.sequence ?? 0) > 0;
+    }
+    function validReport(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return false;
+        const r = value;
+        if (!id(r.id, "report") || !instant(r.createdAt) || !valueText(r.title, 100)
+            || !safeOptional(r.author, 100) || !realDay(r.sessionDate) || !safeOptional(r.objective, 1000)
+            || !r.options || typeof r.options !== "object" || Array.isArray(r.options)
+            || typeof r.options.includeScene !== "boolean" || typeof r.options.includeNotes !== "boolean"
+            || typeof r.options.includeReadings !== "boolean" || !Array.isArray(r.scene) || r.scene.length > 60
+            || !Array.isArray(r.notes) || r.notes.length > MAX_NOTES || !Array.isArray(r.readings) || r.readings.length > 40)
+            return false;
+        const sceneOk = r.scene.every(e => !!e && valueText(e.id, 80) && valueText(e.label, 64) && ["block", "circle", "label"].includes(e.kind));
+        const uniqueScene = new Set(r.scene.map(e => e.id)).size === r.scene.length;
+        const readingSequences = r.readings.map(e => e.sequence);
+        return sceneOk && uniqueScene && r.notes.every(validNote) && r.readings.every(validReading)
+            && new Set(readingSequences).size === readingSequences.length
+            && (r.options.includeScene || r.scene.length === 0)
+            && (r.options.includeNotes || r.notes.length === 0)
+            && (r.options.includeReadings || r.readings.length === 0);
+    }
+    function parseJournal(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return null;
+        const v = value;
+        if (v.schemaVersion !== 1 || !Array.isArray(v.notes) || v.notes.length > MAX_NOTES
+            || !Array.isArray(v.reports) || v.reports.length > MAX_REPORTS
+            || !v.notes.every(validNote) || !v.reports.every(validReport))
+            return null;
+        const ids = [...v.notes.map(n => n.id), ...v.reports.map(r => r.id)];
+        if (new Set(ids).size !== ids.length)
+            return null;
+        try {
+            const json = JSON.stringify(v);
+            if (json.length > MAX_JSON_LENGTH)
+                return null;
+            const cloned = JSON.parse(json);
+            return { schemaVersion: 1, notes: cloned.notes, reports: cloned.reports };
+        }
+        catch {
+            return null;
+        }
+    }
+    BaseDemoSI.parseJournal = parseJournal;
+    function parseJournalImport(value) {
+        if (value.length > MAX_JSON_LENGTH)
+            return null;
+        try {
+            return JSON.parse(value);
+        }
+        catch {
+            return null;
+        }
+    }
+    BaseDemoSI.parseJournalImport = parseJournalImport;
+    function createJournalStore(io, clock = () => new Date()) {
+        const empty = { schemaVersion: 1, notes: [], reports: [] };
+        let recovered = null;
+        try {
+            const raw = io.read(JOURNAL_KEY);
+            recovered = raw === null ? null : parseJournal(JSON.parse(raw));
+        }
+        catch {
+            recovered = null;
+        }
+        let state = recovered ?? empty;
+        let serial = 0;
+        const listeners = new Set();
+        const emit = () => { for (const listener of [...listeners])
+            listener(); };
+        const persist = (value) => {
+            const parsed = parseJournal(value);
+            if (!parsed || !io.write(JOURNAL_KEY, JSON.stringify(parsed)))
+                return false;
+            state = parsed;
+            emit();
+            return true;
+        };
+        const nextId = (prefix) => {
+            const existing = new Set([...state.notes.map(n => n.id), ...state.reports.map(r => r.id)]);
+            let next = "";
+            do {
+                next = `${prefix}-${clock().getTime().toString(36)}-${(++serial).toString(36)}`;
+            } while (existing.has(next));
+            return next;
+        };
+        return {
+            snapshot: () => parseJournal(state),
+            addNote(value, scene) {
+                if (state.notes.length >= MAX_NOTES || !value || typeof value !== "object" || Array.isArray(value))
+                    return false;
+                const data = value;
+                if (!noteKinds.includes(data.kind) || !valueText(data.body, 1200))
+                    return false;
+                const selected = scene.entities.find(e => e.id === scene.selectedId);
+                const note = { id: nextId("note"), createdAt: clock().toISOString(), kind: data.kind,
+                    body: data.body.trim(), entityId: selected?.id ?? null, entityLabel: selected?.label ?? null };
+                return persist({ ...state, notes: [...state.notes, note] });
+            },
+            removeNote(noteId) {
+                if (!state.notes.some(n => n.id === noteId))
+                    return false;
+                return persist({ ...state, notes: state.notes.filter(n => n.id !== noteId) });
+            },
+            makeReport(value, scene, readings) {
+                if (state.reports.length >= MAX_REPORTS || !value || typeof value !== "object" || Array.isArray(value))
+                    return false;
+                const v = value;
+                if (!valueText(v.title, 100) || !safeOptional(v.author, 100) || !realDay(v.sessionDate)
+                    || !safeOptional(v.objective, 1000) || typeof v.includeScene !== "boolean"
+                    || typeof v.includeNotes !== "boolean" || typeof v.includeReadings !== "boolean")
+                    return false;
+                const report = { id: nextId("report"), createdAt: clock().toISOString(), title: v.title.trim(),
+                    author: v.author.trim(), sessionDate: v.sessionDate, objective: v.objective.trim(),
+                    scene: v.includeScene ? scene.entities.map(e => ({ id: e.id, label: e.label, kind: e.kind })) : [],
+                    notes: v.includeNotes ? state.notes.map(n => ({ ...n })) : [],
+                    readings: v.includeReadings ? readings.map(r => ({ ...r })) : [],
+                    options: { includeScene: v.includeScene, includeNotes: v.includeNotes, includeReadings: v.includeReadings } };
+                if (!validReport(report))
+                    return false;
+                return persist({ ...state, reports: [...state.reports, report] });
+            },
+            removeReport(reportId) {
+                if (!state.reports.some(r => r.id === reportId))
+                    return false;
+                return persist({ ...state, reports: state.reports.filter(r => r.id !== reportId) });
+            },
+            importJSON(value) {
+                if (!value || typeof value !== "object" || Array.isArray(value))
+                    return false;
+                const candidate = value;
+                if (candidate.format !== "base-demo-si-journal-v1")
+                    return false;
+                const parsed = parseJournal(candidate.document);
+                return parsed !== null && persist(parsed);
+            },
+            exportJSON: () => JSON.stringify({ format: "base-demo-si-journal-v1", document: state }, null, 2),
+            subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; }
+        };
+    }
+    BaseDemoSI.createJournalStore = createJournalStore;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1306,6 +1482,8 @@ var BaseDemoSI;
         }
     }
     BaseDemoSI.renderExtensions = renderExtensions;
+    function extensionGetRecords() { return extensionsReady ? runtime.getRecords() : []; }
+    BaseDemoSI.extensionGetRecords = extensionGetRecords;
     function extensionRecordCount() { return extensionsReady ? runtime.getRecords().length : 0; }
     BaseDemoSI.extensionRecordCount = extensionRecordCount;
     function setupExtensions(scene) {
@@ -1567,6 +1745,285 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    let journal;
+    let journalScene;
+    let openReportId = null;
+    let registered = false;
+    const j = (id) => document.getElementById(id);
+    function element(tag, content, className) {
+        const e = document.createElement(tag);
+        e.textContent = content;
+        if (className)
+            e.className = className;
+        return e;
+    }
+    function action(label, callback, primary = false) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `button ${primary ? "primary" : "outline"}`;
+        button.textContent = label;
+        button.addEventListener("click", callback);
+        return button;
+    }
+    function localDate(iso) {
+        const [year, month, day] = iso.slice(0, 10).split("-");
+        return `${day}/${month}/${year}`;
+    }
+    function kindName(kind) { return kind === "observacao" ? "Observação" : kind === "hipotese" ? "Hipótese" : "Conclusão"; }
+    function createList(title, headings, lines) {
+        const section = document.createElement("section");
+        section.className = "si-report-section";
+        section.append(element("h3", title));
+        if (!lines.length) {
+            section.append(element("p", "Nenhum registro disponível para esta seção."));
+            return section;
+        }
+        const wrapper = document.createElement("div");
+        wrapper.className = "si-report-table-wrap";
+        const table = document.createElement("table");
+        table.className = "si-report-table";
+        const thead = document.createElement("thead"), header = document.createElement("tr");
+        for (const label of headings)
+            header.append(element("th", label));
+        thead.append(header);
+        table.append(thead);
+        const tbody = document.createElement("tbody");
+        for (const line of lines) {
+            const tr = document.createElement("tr");
+            for (const value of line)
+                tr.append(element("td", value));
+            tbody.append(tr);
+        }
+        table.append(tbody);
+        wrapper.append(table);
+        section.append(wrapper);
+        return section;
+    }
+    function reportContent(report) {
+        const paper = document.createElement("article");
+        paper.className = "si-report-paper";
+        paper.append(element("p", "BASE DEMO OFICIAL - SI · RELATÓRIO", "si-report-kicker"), element("h2", report.title));
+        const subtitle = element("p", `Responsável: ${report.author || "Não informado"} · Data: ${localDate(report.sessionDate)} · Emissão: ${localDate(report.createdAt)}`);
+        subtitle.className = "si-report-byline";
+        paper.append(subtitle);
+        if (report.objective) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", "Objetivo e descrição"), element("p", report.objective));
+            paper.append(section);
+        }
+        if (report.options.includeScene)
+            paper.append(createList("Montagem registrada", ["Objeto", "Tipo"], report.scene.map(e => [e.label, e.kind === "block" ? "Bloco" : e.kind === "circle" ? "Círculo" : "Etiqueta"])));
+        if (report.options.includeReadings)
+            paper.append(createList("Medições", ["Leitura", "Resultado", "Origem"], report.readings.map(r => [r.label, `${r.value} ${r.unit}`.trim(), `${r.extensionId} / ${r.instrumentId} · #${r.sequence}`])));
+        if (report.options.includeNotes)
+            paper.append(createList("Registros do Caderno", ["Tipo e data", "Descrição", "Referência"], report.notes.map(n => [`${kindName(n.kind)} · ${localDate(n.createdAt)}`, n.body, n.entityLabel ?? "Cena"])));
+        paper.append(element("p", "Registro documental produzido localmente. Resultados científicos dependem do motor especializado conectado.", "si-report-disclaimer"));
+        return paper;
+    }
+    function renderJournal() {
+        if (!registered)
+            return;
+        const target = j("journal-entries");
+        if (!target)
+            return;
+        target.replaceChildren();
+        const state = journal.snapshot();
+        j("journal-total").textContent = `${state.notes.length} de 80 registros`;
+        j("journal-readings").textContent = `${extensionRecords().length} leituras instrumentais disponíveis`;
+        if (!state.notes.length)
+            target.append(element("p", "Nenhuma observação registrada. Use o formulário para iniciar o Caderno.", "si-records-empty"));
+        for (const note of [...state.notes].reverse()) {
+            const entry = document.createElement("article");
+            entry.className = "si-journal-entry";
+            const header = document.createElement("div");
+            header.className = "si-journal-entry-head";
+            header.append(element("strong", kindName(note.kind)), element("span", `${localDate(note.createdAt)} · ${note.entityLabel ?? "Cena"}`));
+            const buttons = document.createElement("div");
+            buttons.className = "si-journal-actions";
+            buttons.append(action("Excluir", () => {
+                void (async () => {
+                    const yes = await BaseDemoSI.confirmDialog({ title: "Excluir registro?", description: "Este registro será removido do Caderno. Os relatórios já emitidos preservam suas cópias.", confirmText: "Excluir", destructive: true });
+                    if (yes) {
+                        if (journal.removeNote(note.id))
+                            BaseDemoSI.notify("Registro removido.", "info");
+                        else
+                            BaseDemoSI.notify("Não foi possível excluir o registro.", "warning");
+                    }
+                })();
+            }));
+            entry.append(header, element("p", note.body), buttons);
+            target.append(entry);
+        }
+    }
+    function renderReports() {
+        if (!registered)
+            return;
+        const state = journal.snapshot(), list = j("reports-entries"), preview = j("report-preview");
+        if (!list || !preview)
+            return;
+        list.replaceChildren();
+        preview.replaceChildren();
+        j("reports-total").textContent = `${state.reports.length} de 20 relatórios`;
+        if (openReportId && !state.reports.some(r => r.id === openReportId))
+            openReportId = null;
+        if (!openReportId)
+            openReportId = state.reports[state.reports.length - 1]?.id ?? null;
+        if (!state.reports.length)
+            list.append(element("p", "Ainda não existem relatórios salvos.", "si-records-empty"));
+        for (const report of [...state.reports].reverse()) {
+            const item = document.createElement("article");
+            item.className = "si-report-entry";
+            if (report.id === openReportId)
+                item.classList.add("is-open");
+            const info = document.createElement("div");
+            info.append(element("strong", report.title), element("small", `${localDate(report.sessionDate)} · ${report.author || "Sem identificação"}`));
+            const actions = document.createElement("div");
+            actions.className = "si-journal-actions";
+            actions.append(action("Visualizar", () => { openReportId = report.id; renderReports(); }));
+            actions.append(action("Excluir", () => {
+                void (async () => {
+                    const yes = await BaseDemoSI.confirmDialog({ title: "Excluir relatório?", description: "O relatório salvo será removido. Observações e leituras originais serão mantidas.", confirmText: "Excluir", destructive: true });
+                    if (yes) {
+                        if (journal.removeReport(report.id))
+                            BaseDemoSI.notify("Relatório excluído.", "info");
+                        else
+                            BaseDemoSI.notify("Não foi possível excluir o relatório.", "warning");
+                    }
+                })();
+            }));
+            item.append(info, actions);
+            list.append(item);
+        }
+        const selected = state.reports.find(r => r.id === openReportId);
+        if (selected)
+            preview.append(reportContent(selected));
+        else
+            preview.append(element("p", "Selecione ou crie um relatório para visualizar.", "si-records-empty"));
+        for (const btnId of ["reports-print", "reports-html"]) {
+            const b = j(btnId);
+            if (b)
+                b.disabled = !selected;
+        }
+    }
+    function currentReport() { return journal.snapshot().reports.find(r => r.id === openReportId); }
+    function exportFile(name, body, type) {
+        const blob = new Blob([body], { type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+    function reportHTML(report) {
+        const reportNode = reportContent(report);
+        const style = `body{font:11pt/1.5 Georgia,serif;color:#1b2933;max-width:820px;margin:28px auto;padding:20px}h2{font-size:24pt}h3{font-size:13pt;margin-top:22px}p{white-space:pre-wrap;overflow-wrap:anywhere}.si-report-kicker{font:700 9pt Arial;letter-spacing:.12em}.si-report-byline{font:10pt Arial;color:#455867}table{width:100%;border-collapse:collapse;font:9pt Arial;table-layout:fixed}th,td{border:1px solid #b8c4cc;padding:8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#e7eef3}.si-report-disclaimer{font-size:9pt;margin-top:26px;border-top:1px solid #aebbc5;padding-top:10px}@page{size:A4;margin:15mm}`;
+        return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório local</title><style>${style}</style></head><body>${reportNode.outerHTML}</body></html>`;
+    }
+    function configure() {
+        j("journal-form")?.addEventListener("submit", event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const data = { kind: j("journal-kind").value, body: j("journal-body").value.trim() };
+            if (journal.addNote(data, journalScene.getSnapshot())) {
+                form.reset();
+                BaseDemoSI.notify("Registro adicionado ao Caderno.", "success");
+            }
+            else
+                BaseDemoSI.notify("Não foi possível salvar. Verifique os campos ou o espaço disponível no navegador.", "warning");
+        });
+        j("reports-form")?.addEventListener("submit", event => {
+            event.preventDefault();
+            const i = (id) => j(id).value.trim();
+            const checked = (id) => j(id).checked;
+            const draft = { title: i("report-title"), author: i("report-author"), sessionDate: i("report-date"), objective: i("report-objective"),
+                includeScene: checked("report-scene"), includeNotes: checked("report-notes"), includeReadings: checked("report-readings") };
+            if (journal.makeReport(draft, journalScene.getSnapshot(), extensionRecords())) {
+                openReportId = null;
+                renderReports();
+                BaseDemoSI.notify("Relatório criado com uma cópia dos registros selecionados.", "success");
+            }
+            else
+                BaseDemoSI.notify("Relatório não salvo. Revise os campos, os limites ou o armazenamento local.", "warning");
+        });
+        const date = j("report-date");
+        if (date && !date.value)
+            date.value = (() => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); })();
+        j("journal-export")?.addEventListener("click", () => exportFile("base-si-caderno-backup.json", journal.exportJSON(), "application/json;charset=utf-8"));
+        j("journal-import")?.addEventListener("change", event => {
+            void (async () => {
+                const field = event.currentTarget, file = field.files?.[0];
+                field.value = "";
+                if (!file)
+                    return;
+                if (file.size > 300000) {
+                    BaseDemoSI.notify("Arquivo acima do limite de importação.", "warning");
+                    return;
+                }
+                let decoded = null;
+                try {
+                    decoded = BaseDemoSI.parseJournalImport(await file.text());
+                }
+                catch {
+                    decoded = null;
+                }
+                if (!decoded || !BaseDemoSI.parseJournal(decoded.document) || decoded.format !== "base-demo-si-journal-v1") {
+                    BaseDemoSI.notify("Arquivo incompatível ou inválido. O Caderno não foi alterado.", "warning");
+                    return;
+                }
+                const yes = await BaseDemoSI.confirmDialog({ title: "Restaurar Caderno e relatórios?", description: "O conteúdo atual do Caderno e os relatórios salvos serão substituídos. Cena, extensões e atividades não serão alteradas.", confirmText: "Restaurar backup", destructive: true });
+                if (yes) {
+                    if (journal.importJSON(decoded)) {
+                        openReportId = null;
+                        BaseDemoSI.notify("Backup restaurado com validação.", "success");
+                    }
+                    else
+                        BaseDemoSI.notify("Não foi possível restaurar o arquivo.", "warning");
+                }
+            })();
+        });
+        j("reports-print")?.addEventListener("click", () => {
+            const report = currentReport(), sheet = j("si-print-sheet");
+            if (!report || !sheet)
+                return;
+            sheet.replaceChildren(reportContent(report));
+            sheet.hidden = false;
+            window.print();
+        });
+        window.addEventListener("afterprint", () => { const sheet = j("si-print-sheet"); if (sheet) {
+            sheet.hidden = true;
+            sheet.replaceChildren();
+        } });
+        j("reports-html")?.addEventListener("click", () => {
+            const report = currentReport();
+            if (!report)
+                return;
+            exportFile(`base-si-relatorio-${report.id}.html`, reportHTML(report), "text/html;charset=utf-8");
+            BaseDemoSI.notify("Relatório HTML autocontido preparado.", "success");
+        });
+    }
+    function extensionRecords() { return BaseDemoSI.extensionGetRecords(); }
+    BaseDemoSI.extensionRecords = extensionRecords;
+    function setupJournal(scene) {
+        if (registered)
+            return;
+        registered = true;
+        journalScene = scene;
+        journal = BaseDemoSI.createJournalStore(BaseDemoSI.storage);
+        journal.subscribe(() => { renderJournal(); renderReports(); });
+        window.addEventListener("si-education-observation", () => renderJournal());
+        window.addEventListener("si-route-changed", () => { renderJournal(); renderReports(); });
+        configure();
+        renderJournal();
+        renderReports();
+    }
+    BaseDemoSI.setupJournal = setupJournal;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const projectKey = "scene-project-v1";
     let store;
     let serial = 0;
@@ -1693,6 +2150,7 @@ var BaseDemoSI;
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
         BaseDemoSI.setupExtensions(store);
         BaseDemoSI.setupEducation(store);
+        BaseDemoSI.setupJournal(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;
