@@ -6,12 +6,12 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.4.0",
+        version: "0.5.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
             { id: "inicio", title: "Início", subtitle: "Workspace universal" },
-            { id: "ambiente", title: "Ambiente", subtitle: "Docas, foco e visão geral" },
+            { id: "ambiente", title: "Ambiente", subtitle: "Extensões, docas e visão geral" },
             { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
             { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
         ])
@@ -115,6 +115,266 @@ var BaseDemoSI;
         });
     }
     BaseDemoSI.setupPreferences = setupPreferences;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const SESSION_KEY = "extension-session-v1";
+    const MAX_RECORDS = 40;
+    const MAX_STATE_BYTES = 8192;
+    const TOKEN = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/;
+    const SEMVER = /^\d+\.\d+\.\d+$/;
+    function safeJSON(value) {
+        try {
+            const valueText = JSON.stringify(value);
+            if (typeof valueText !== "string" || valueText.length > MAX_STATE_BYTES)
+                return null;
+            const parsed = JSON.parse(valueText);
+            const visit = (entry) => {
+                if (entry === null || typeof entry === "string" || typeof entry === "boolean")
+                    return true;
+                if (typeof entry === "number")
+                    return Number.isFinite(entry);
+                if (Array.isArray(entry))
+                    return entry.every(visit);
+                if (typeof entry !== "object")
+                    return false;
+                return Object.entries(entry).every(([k, v]) => k !== "__proto__" && k !== "prototype" && k !== "constructor" && visit(v));
+            };
+            return visit(parsed) ? parsed : null;
+        }
+        catch {
+            return null;
+        }
+    }
+    const validText = (value, max = 90) => typeof value === "string" && value.trim().length > 0 && value.length <= max;
+    function validMetadata(m) {
+        return !!m && TOKEN.test(m.id) && m.id.length <= 80 && SEMVER.test(m.version)
+            && validText(m.name) && validText(m.description, 240);
+    }
+    function validDefs(defs) {
+        if (!Array.isArray(defs) || defs.length > 20)
+            return false;
+        const ids = new Set();
+        return defs.every(d => !!d && TOKEN.test(d.id) && d.id.length <= 64 && !ids.has(d.id) && (ids.add(d.id), true)
+            && validText(d.name) && validText(d.description, 240) && typeof d.requiresSelection === "boolean");
+    }
+    function validReading(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return false;
+        const v = value;
+        return validText(v.label) && typeof v.value === "number" && Number.isFinite(v.value)
+            && typeof v.unit === "string" && v.unit.length <= 24;
+    }
+    function parseExtensionSession(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+            return null;
+        const s = value;
+        if (s.schemaVersion !== 1 || !Array.isArray(s.records) || s.records.length > MAX_RECORDS
+            || !(s.extensionId === null || (typeof s.extensionId === "string" && TOKEN.test(s.extensionId)))
+            || !(s.extensionVersion === null || (typeof s.extensionVersion === "string" && SEMVER.test(s.extensionVersion)))
+            || (s.extensionId === null) !== (s.extensionVersion === null))
+            return null;
+        const state = safeJSON(s.state);
+        if (state === null && s.state !== null)
+            return null;
+        let last = 0;
+        for (const rawRecord of s.records) {
+            const record = rawRecord;
+            if (!validReading(record) || !TOKEN.test(record.extensionId) || !TOKEN.test(record.instrumentId)
+                || !(record.entityId === null || (validText(record.entityId, 80)))
+                || !Number.isSafeInteger(record.sequence) || record.sequence <= last)
+                return null;
+            last = record.sequence;
+        }
+        return { schemaVersion: 1, extensionId: s.extensionId, extensionVersion: s.extensionVersion, state,
+            records: s.records.map(r => ({ ...r })) };
+    }
+    BaseDemoSI.parseExtensionSession = parseExtensionSession;
+    /** Runtime injetável: testes e extensões não dependem da interface gráfica. */
+    function createExtensionRuntime(scene, io) {
+        const registry = new Map();
+        const subscribers = new Set();
+        const tell = () => { for (const listener of [...subscribers])
+            listener(); };
+        let saved = null;
+        try {
+            const raw = io.read(SESSION_KEY);
+            saved = raw === null ? null : parseExtensionSession(JSON.parse(raw));
+        }
+        catch {
+            saved = null;
+        }
+        let activeId = null;
+        let engineState = null;
+        let records = saved?.records.map(r => ({ ...r })) ?? [];
+        let sequence = records.reduce((m, r) => Math.max(m, r.sequence), 0);
+        const current = () => activeId === null ? null : registry.get(activeId) ?? null;
+        function persist() {
+            io.write(SESSION_KEY, JSON.stringify({ schemaVersion: 1, extensionId: activeId,
+                extensionVersion: current()?.metadata.version ?? null, state: engineState, records }));
+        }
+        function context() {
+            const snapshot = scene.getSnapshot();
+            return { scene: snapshot, selected: snapshot.entities.find(e => e.id === snapshot.selectedId) ?? null,
+                state: safeJSON(engineState) };
+        }
+        const failure = (message) => ({ ok: false, message });
+        return {
+            register(extension) {
+                if (!extension || !validMetadata(extension.metadata) || registry.has(extension.metadata.id)
+                    || !validDefs(extension.tools) || !validDefs(extension.instruments)
+                    || typeof extension.initialState !== "function" || typeof extension.isState !== "function"
+                    || extension.tools.some(t => typeof t.run !== "function")
+                    || extension.instruments.some(t => typeof t.read !== "function"))
+                    return false;
+                let init;
+                try {
+                    init = safeJSON(extension.initialState());
+                    if (init === null || !extension.isState(init))
+                        return false;
+                }
+                catch {
+                    return false;
+                }
+                registry.set(extension.metadata.id, extension);
+                // Restaurar apenas se a versão da extensão continua compatível.
+                if (saved?.extensionId === extension.metadata.id && saved.extensionVersion === extension.metadata.version
+                    && extension.isState(saved.state)) {
+                    activeId = extension.metadata.id;
+                    engineState = safeJSON(saved.state);
+                }
+                tell();
+                return true;
+            },
+            available: () => [...registry.values()].map(extension => ({ ...extension.metadata })),
+            active: () => current(),
+            activate(id) {
+                if (id !== null && !registry.has(id))
+                    return false;
+                const extension = id === null ? null : registry.get(id);
+                if (activeId === id)
+                    return true;
+                let next = null;
+                if (extension) {
+                    try {
+                        next = safeJSON(extension.initialState());
+                        if (next === null || !extension.isState(next))
+                            return false;
+                    }
+                    catch {
+                        return false;
+                    }
+                }
+                activeId = id;
+                engineState = next;
+                persist();
+                tell();
+                return true;
+            },
+            runTool(id) {
+                const extension = current();
+                if (!extension)
+                    return failure("Ative uma extensão antes de utilizar ferramentas.");
+                const tool = extension.tools.find(t => t.id === id);
+                if (!tool)
+                    return failure("Ferramenta não registrada.");
+                const ctx = context();
+                if (tool.requiresSelection && !ctx.selected)
+                    return failure("Selecione um objeto para utilizar esta ferramenta.");
+                try {
+                    const action = tool.run(ctx);
+                    if (!action || !validText(action.message, 240))
+                        return failure("A ferramenta retornou uma resposta inválida.");
+                    let next = engineState;
+                    if (Object.prototype.hasOwnProperty.call(action, "nextState")) {
+                        next = safeJSON(action.nextState);
+                        if (next === null || !extension.isState(next))
+                            return failure("Estado da extensão rejeitado pela validação.");
+                    }
+                    // Não registrar estado da extensão se o comando de cena for recusado.
+                    if (action.command && !scene.dispatch(action.command))
+                        return failure("O comando não pôde ser aplicado à cena.");
+                    engineState = next;
+                    persist();
+                    tell();
+                    return { ok: true, message: action.message };
+                }
+                catch {
+                    return failure("A ferramenta falhou; a operação foi interrompida.");
+                }
+            },
+            measure(id) {
+                const extension = current();
+                if (!extension)
+                    return failure("Ative uma extensão antes de realizar leituras.");
+                const instrument = extension.instruments.find(t => t.id === id);
+                if (!instrument)
+                    return failure("Instrumento não registrado.");
+                const ctx = context();
+                if (instrument.requiresSelection && !ctx.selected)
+                    return failure("Selecione um objeto para medir.");
+                try {
+                    const value = instrument.read(ctx);
+                    if (!validReading(value))
+                        return failure("Leitura inválida; nenhuma medição registrada.");
+                    const reading = { ...value, extensionId: extension.metadata.id, instrumentId: id,
+                        entityId: ctx.selected?.id ?? null, sequence: ++sequence };
+                    records = [...records, reading].slice(-MAX_RECORDS);
+                    persist();
+                    tell();
+                    return { ok: true, message: `${value.label}: ${value.value} ${value.unit}`.trim(), reading: { ...reading } };
+                }
+                catch {
+                    return failure("Falha de leitura; nenhum registro foi criado.");
+                }
+            },
+            getRecords: () => records.map(r => ({ ...r })),
+            getState: () => safeJSON(engineState),
+            subscribe(listener) { subscribers.add(listener); return () => { subscribers.delete(listener); }; }
+        };
+    }
+    BaseDemoSI.createExtensionRuntime = createExtensionRuntime;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    BaseDemoSI.neutralDemoExtension = {
+        metadata: { id: "demo.neutral", name: "Operações neutras", version: "1.0.0",
+            description: "Demonstra ações sobre objetos e leitura de propriedades sem qualquer modelo científico." },
+        initialState: () => ({ actions: 0 }),
+        isState: (value) => {
+            if (!value || typeof value !== "object" || Array.isArray(value))
+                return false;
+            const v = value;
+            return Number.isSafeInteger(v.actions) && typeof v.actions === "number" && v.actions >= 0 && v.actions <= 1000000;
+        },
+        tools: [
+            { id: "step", name: "Avançar posição", description: "Desloca o objeto selecionado 2% para a direita, respeitando os limites.", requiresSelection: true,
+                run: ({ selected, state }) => {
+                    if (!selected)
+                        throw Error("Nenhum objeto selecionado");
+                    const position = Math.min(100 - selected.width / 2, selected.x + 2);
+                    return { command: { type: "update", id: selected.id, changes: { x: position } }, nextState: { actions: state.actions + 1 },
+                        message: "Posição avançada em até 2 pontos percentuais." };
+                } },
+            { id: "tone", name: "Alternar aparência", description: "Alterna a cor do objeto selecionado.", requiresSelection: true,
+                run: ({ selected, state }) => {
+                    if (!selected)
+                        throw Error("Nenhum objeto selecionado");
+                    const colors = ["teal", "blue", "amber"];
+                    const tone = colors[(colors.indexOf(selected.tone) + 1) % colors.length];
+                    return { command: { type: "update", id: selected.id, changes: { tone } }, nextState: { actions: state.actions + 1 },
+                        message: "A aparência do objeto foi alternada." };
+                } }
+        ],
+        instruments: [
+            { id: "position", name: "Posição X", description: "Lê a coordenada horizontal percentual do objeto.", requiresSelection: true,
+                read: ({ selected }) => ({ label: "Posição X", value: selected?.x ?? 0, unit: "%" }) },
+            { id: "quantity", name: "Quantidade", description: "Lê a quantidade atual de objetos na cena.", requiresSelection: false,
+                read: ({ scene }) => ({ label: "Quantidade de objetos", value: scene.entities.length, unit: "objetos" }) },
+            { id: "operations", name: "Operações", description: "Lê o contador de ferramentas desta extensão.", requiresSelection: false,
+                read: ({ state }) => ({ label: "Operações executadas", value: state.actions, unit: "ações" }) }
+        ]
+    };
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -783,6 +1043,119 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    let runtime;
+    let extensionsReady = false;
+    const find = (id) => document.getElementById(id);
+    function descriptor(text) {
+        const p = document.createElement("p");
+        p.textContent = text;
+        return p;
+    }
+    function showFeedback(result) {
+        const status = find("extension-status");
+        if (status)
+            status.textContent = result.message;
+        BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+    }
+    function renderExtensions(snapshot) {
+        if (!extensionsReady)
+            return;
+        const extension = runtime.active();
+        const choices = find("extension-choice");
+        if (choices)
+            choices.value = extension?.metadata.id ?? "";
+        const information = find("extension-descriptor");
+        if (information)
+            information.textContent = extension ? `${extension.metadata.name} · v${extension.metadata.version}. ${extension.metadata.description}` :
+                "Nenhuma extensão ativa. Os controles básicos da cena continuam disponíveis.";
+        for (const [rootId, definitions, mode] of [
+            ["extension-tools", extension?.tools ?? [], "tool"],
+            ["extension-instruments", extension?.instruments ?? [], "instrument"]
+        ]) {
+            const target = find(rootId);
+            if (!target)
+                continue;
+            target.replaceChildren();
+            if (!definitions.length) {
+                target.append(descriptor("Nenhum recurso conectado."));
+                continue;
+            }
+            for (const item of definitions) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "button outline si-extension-action";
+                button.textContent = item.name;
+                button.title = item.description;
+                button.disabled = item.requiresSelection && !snapshot.selectedId;
+                button.setAttribute("aria-label", `${item.name}. ${item.description}`);
+                button.addEventListener("click", () => showFeedback(mode === "tool" ? runtime.runTool(item.id) : runtime.measure(item.id)));
+                target.append(button);
+            }
+        }
+        const log = find("extension-records");
+        if (log) {
+            log.replaceChildren();
+            const rows = runtime.getRecords();
+            if (!rows.length) {
+                log.append(descriptor("Nenhuma leitura registrada nesta instalação."));
+            }
+            else {
+                const list = document.createElement("ol");
+                list.className = "si-extension-log";
+                for (const record of [...rows].reverse().slice(0, 10)) {
+                    const li = document.createElement("li");
+                    const strong = document.createElement("strong");
+                    strong.textContent = record.label;
+                    const value = document.createElement("span");
+                    value.textContent = `${record.value} ${record.unit}`.trim();
+                    const metadata = document.createElement("small");
+                    metadata.textContent = `Leitura #${record.sequence} · ${record.entityId ? "Objeto selecionado" : "Cena"}`;
+                    li.append(strong, value, metadata);
+                    list.append(li);
+                }
+                log.append(list);
+            }
+        }
+    }
+    BaseDemoSI.renderExtensions = renderExtensions;
+    function setupExtensions(scene) {
+        if (extensionsReady)
+            return;
+        runtime = BaseDemoSI.createExtensionRuntime(scene, BaseDemoSI.storage);
+        runtime.register(BaseDemoSI.neutralDemoExtension);
+        // Primeira instalação: ativação explícita na base, sem alterar documentos já persistidos.
+        if (BaseDemoSI.storage.read("extension-session-v1") === null)
+            runtime.activate(BaseDemoSI.neutralDemoExtension.metadata.id);
+        extensionsReady = true;
+        const select = find("extension-choice");
+        if (select) {
+            select.replaceChildren();
+            const none = document.createElement("option");
+            none.value = "";
+            none.textContent = "Nenhuma extensão";
+            select.append(none);
+            for (const item of runtime.available()) {
+                const option = document.createElement("option");
+                option.value = item.id;
+                option.textContent = item.name;
+                select.append(option);
+            }
+            select.addEventListener("change", () => {
+                const result = runtime.activate(select.value || null);
+                if (!result)
+                    BaseDemoSI.notify("Não foi possível ativar a extensão.", "warning");
+                else
+                    BaseDemoSI.notify(select.value ? "Extensão local ativada." : "Extensão desativada.", "info");
+                renderExtensions(scene.getSnapshot());
+            });
+        }
+        runtime.subscribe(() => renderExtensions(scene.getSnapshot()));
+        renderExtensions(scene.getSnapshot());
+    }
+    BaseDemoSI.setupExtensions = setupExtensions;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const projectKey = "scene-project-v1";
     let store;
     let serial = 0;
@@ -867,6 +1240,7 @@ var BaseDemoSI;
             noSelection.hidden = !!snap.selectedId;
         const entity = selected();
         BaseDemoSI.renderWorkspaceContent(snap);
+        BaseDemoSI.renderExtensions(snap);
         if (entity) {
             const field = get("object-label");
             const tone = get("object-tone");
@@ -906,6 +1280,7 @@ var BaseDemoSI;
         store.subscribe(event => { render(); if (event !== "selection")
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
+        BaseDemoSI.setupExtensions(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;

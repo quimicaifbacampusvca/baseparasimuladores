@@ -1,42 +1,46 @@
-# Base Demo Oficial - SI · 0.4.0
+# Base Demo Oficial - SI · 0.5.0
 
-Base universal de simuladores — versão **0.4.0 (Componentes operacionais)**.
+Plataforma universal de simuladores, **versão 0.5.0 — Infraestrutura de extensões**.
 
-## Execução
+## Executar
 
-Abrir `index.html` com navegador moderno, sem servidor ou conexão obrigatória. A distribuição PWA necessita de `HTTPS` ou `localhost` para instalar Service Worker; a versão local permanece utilizável mesmo quando não pode ser instalada.
+Abra `index.html` num navegador atual para utilizar a interface local. Nenhuma CDN, API remota, biblioteca remota ou conta de usuário é necessária para executar a aplicação. A instalação PWA e seu Service Worker exigem HTTPS ou localhost. A distribuição standalone tem comportamento de cache distinto da PWA.
 
-## Capacidades verificáveis
+## O que esta versão implementa
 
-- Foco e Visão geral de uma cena de objetos genéricos.
-- Docas **Montagem**, **Ver** e **Dados**, com fechamento, alternância e expansão do painel de informações em desktop.
-- Desktop: painéis laterais sobrepostos à área experimental, preservando a cena; em viewport compacto, uma doca por vez.
-- Mobile: botões fixos inferiores, docas como folhas inferiores modais, backdrop, Escape e retorno de foco.
-- Histórico, persistência local, seleção e edição de objetos preservados da 0.2.0.
-- Biblioteca interna de componentes: menu de ações, confirmações, notificações locais e estados visuais.
-- Menus operáveis por teclado e modais com foco controlado e retorno ao acionador.
-- Operações destrutivas com confirmação explícita; atualizações não intrusivas na tela.
-- Sem motor científico e sem serviços externos obrigatórios.
+- Mantém as camadas anteriores: navegação, preferências, objetos universais, comandos, seleção, histórico, docas, foco/visão geral, menus e notificações.
+- Introduz um **registro tipado de extensões locais**, desacoplado do HTML e do funcionamento do workspace.
+- Permite ativar/desativar uma extensão sem apagar o conteúdo da cena.
+- Define contratos para ferramentas que produzem comandos universais e estados internos validados, e instrumentos que produzem leituras numéricas identificadas.
+- Mantém a persistência das extensões e até 40 leituras recentes no armazenamento local, em documento separado do projeto da cena.
+- Permite a extensões operar com cenas e objetos selecionados mediante contextos de leitura isolados.
+- Inclui uma **extensão neutra demonstrativa**, composta por duas ferramentas (deslocar posição e alternar aparência) e três instrumentos (posição X, quantidade e operações).
+- Expõe ferramentas na doca **Montagem → Ajustes**, instrumentos na doca **Ver** e registros na doca **Dados**.
+- Valida identificadores, versões, estados serializáveis, leituras e comandos antes da aplicação; recusa resultados inválidos.
 
-## Desenvolvimento
+## Limites desta etapa
 
-```sh
-npm install  # apenas desenvolvimento, quando dependências de build não estão disponíveis
-npm run check
-```
+- A extensão demonstrativa não representa fenômenos científicos e não pretende substituir um motor de simulação especializado.
+- A versão aceita extensões **incorporadas ao pacote na etapa de desenvolvimento**; não executa plugins arbitrários recebidos do usuário nem JavaScript remoto. O registro executa código confiável já integrado à distribuição.
+- Desfazer/refazer recupera **comandos de cena**. O contador de operações da extensão e o histórico de medições são registros independentes e não são revertidos pelo histórico da cena. Transações unificadas permanecem fora do escopo da 0.5.0.
+- A interface utiliza um renderizador de demonstração. Renderizadores científicos especializados serão definidos em versões subsequentes.
+- A homologação de navegador real em Firefox, Safari/WebKit, PWA instalado e `file://` será registrada separadamente conforme executada.
 
-Para compilar sem instalar dependências caso exista `tsc` disponível:
+## Compilar e testar
 
 ```sh
 tsc -p tsconfig.json
-node tests/foundation.test.cjs
-node tests/scene.test.cjs
-node tests/workspace.test.cjs
-node tests/components.test.cjs
+npm test
 ```
 
-## Critérios e limites
+O compilador TypeScript é usado **apenas no desenvolvimento**. `index.html` usa `app.js` compilado e CSS local, sem exigir npm/Node.js para execução.
 
-Ver `docs/ACEITE-0.4.0.md` e `docs/PLANO-DE-CONSTRUCAO.md`. A 0.4.0 entrega os componentes operacionais sobre o workspace já construído; não inclui instrumentos reais, simulação científica, roteiros ou sistema de professor. Homologação real em navegadores e dispositivos é requisito das versões subsequentes.
+## Organização dos contratos
 
-Licença: GPL-3.0, conforme `LICENSE` do repositório oficial.
+- `src/extension-contracts.ts` — interfaces tipadas de extensão, ferramenta, instrumento, contexto e medição.
+- `src/extensions.ts` — registro, ativação, execução, validação, persistência e leitura.
+- `src/extensions-demo.ts` — extensão neutra autocontida de demonstração.
+- `src/extensions-ui.ts` e `extensions.css` — integração às docas existentes, sem recriar o workspace.
+- `docs/ACEITE-0.5.0.md` — critérios técnicos e limites.
+
+Licença do repositório: GPL-3.0, conforme `LICENSE`.

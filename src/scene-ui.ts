@@ -59,6 +59,7 @@ namespace BaseDemoSI {
     const noSelection = get("no-selection"); if (noSelection) noSelection.hidden = !!snap.selectedId;
     const entity = selected();
     renderWorkspaceContent(snap);
+    renderExtensions(snap);
     if (entity) {
       const field = get("object-label") as HTMLInputElement | null;
       const tone = get("object-tone") as HTMLSelectElement | null;
@@ -85,6 +86,7 @@ namespace BaseDemoSI {
     store = createSceneStore(initial);
     store.subscribe(event => { render(); if (event !== "selection") save(); });
     setupWorkspace(() => store.getSnapshot(), id => store.select(id));
+    setupExtensions(store);
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-add-kind]")) {
       button.addEventListener("click", () => {
         const kind = button.dataset.addKind as EntityKind;

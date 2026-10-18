@@ -20,10 +20,14 @@
     "src/storage.ts",
     "src/router.ts",
     "src/preferences.ts",
+    "src/extension-contracts.ts",
+    "src/extensions.ts",
+    "src/extensions-demo.ts",
     "src/scene.ts",
     "src/workspace.ts",
     "src/workspace-ui.ts",
     "src/components.ts",
+    "src/extensions-ui.ts",
     "src/scene-ui.ts",
     "src/app.ts"
   ]

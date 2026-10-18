@@ -9,8 +9,9 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./app.css">
-  <link rel="stylesheet" href="./workspace.css"
+  <link rel="stylesheet" href="./workspace.css">
   <link rel="stylesheet" href="./components.css">
+  <link rel="stylesheet" href="./extensions.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
@@ -28,28 +29,28 @@
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.4.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.5.0</span></small></div>
     </aside>
 
     <div class="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Componentes operacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.4.0</span></span>
+        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Extensões e instrumentos</strong></div>
+        <span class="version-pill">v<span data-app-version>0.5.0</span></span>
       </header>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 04 · COMPONENTES</p>
-            <h1 id="home-title">Um ambiente consistente, em cada interação.</h1>
-            <p>A plataforma integra menus de ações, confirmações acessíveis, notificações e estados de interação sem alterar o núcleo de objetos ou a organização do workspace.</p>
+            <p class="eyebrow">ETAPA 05 · EXTENSÕES</p>
+            <h1 id="home-title">Uma base, múltiplos mecanismos conectáveis.</h1>
+            <p>A plataforma passa a aceitar extensões locais com ferramentas, instrumentos e estados próprios, preservando a cena universal e as docas.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
           </div>
           <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
           <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Componentes universais</h3><p>Menus, avisos e diálogos reutilizáveis, com navegação por teclado.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Comandos seguros</h3><p>Confirmação antes de operações destrutivas, mantendo desfazer e refazer.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Experiência responsiva</h3><p>Interações adequadas ao desktop e às superfícies de toque.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Contratos universais</h3><p>Extensões tipadas com motores, ferramentas e instrumentos.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Extensões validadas</h3><p>Registro controlado e validação dos resultados antes de alterar a cena.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Integração responsiva</h3><p>Ferramentas nas docas e instrumentos no painel Ver.</p><span class="mini-state">Implementado</span></article>
             <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Recursos locais</h3><p>Sem CDNs nem serviços necessários para operar.</p><span class="mini-state">Implementado</span></article>
           </div>
         </section>
@@ -126,7 +127,11 @@
                     <button type="button" id="scene-delete" class="button outline scene-danger">Excluir objeto</button>
                   </div>
                 </div>
-                <div data-left-panel="ajustes" hidden><h3>Configurações de cena</h3><p>Estrutura preparada para receber parâmetros de cada simulador sem alterar o workspace.</p><p class="si-dock-hint">As propriedades disponíveis serão definidas pelas extensões instaladas.</p></div>
+                <div data-left-panel="ajustes" hidden><h3>Configurações de cena</h3><p>Selecione uma extensão instalada localmente.</p>
+                  <label for="extension-choice">Extensão ativa</label><select id="extension-choice"><option value="">Nenhuma extensão</option></select>
+                  <p id="extension-descriptor" class="si-extension-description">As extensões são executadas localmente.</p>
+                  <h3>Ferramentas conectadas</h3><div id="extension-tools" class="si-extension-buttons"></div>
+                  <p id="extension-status" role="status" aria-live="polite" class="si-dock-hint">Pronto para conectar recursos.</p></div>
               </div>
             </aside>
             <aside id="si-dock-right" class="si-dock si-dock-right" aria-label="Ver" role="region" hidden data-presentation="standard">
@@ -135,8 +140,8 @@
                 <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
               </nav>
               <div class="si-dock-scroll">
-                <div data-right-panel="ver"><h3>Observação</h3><div id="si-observation" class="si-observation"></div></div>
-                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div></div>
+                <div data-right-panel="ver"><h3>Observação</h3><div id="si-observation" class="si-observation"></div><h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div></div>
+                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div></div>
               </div>
             </aside>
             <div id="si-sheet-backdrop" class="si-sheet-backdrop" hidden></div>
@@ -153,10 +158,10 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.4.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.5.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.4.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.5.0</span></span></footer>
     </div>
   </div>
   <div id="si-notifications" class="si-notifications" aria-label="Notificações" aria-live="polite" aria-atomic="false"></div>

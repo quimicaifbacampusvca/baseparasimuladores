@@ -11,10 +11,10 @@ const sw = read("sw.js");
 const manifest = JSON.parse(read("manifest.webmanifest"));
 const localRefs = [...html.matchAll(/(?:src|href)="(\.\/[^"#?]+)"/g)].map(m=>m[1]);
 for (const ref of localRefs) assert(fs.existsSync(path.join(root,ref)), `Arquivo local ausente: ${ref}`);
-for (const ref of ["index.html","app.css","workspace.css","components.css","app.js","manifest.webmanifest","assets/icon.svg"])
+for (const ref of ["index.html","app.css","workspace.css","components.css","extensions.css","app.js","manifest.webmanifest","assets/icon.svg"])
   assert(sw.includes(`"./${ref}"`),`Precache não cobre ${ref}`);
 assert.equal(manifest.name,"Base Demo Oficial - SI");
-assert.equal(JSON.parse(read("package.json")).version,"0.4.0");
+assert.equal(JSON.parse(read("package.json")).version,"0.5.0");
 assert(!/https?:\/\//.test(html.replace(/http-equiv="Content-Security-Policy"/g,"")),"HTML tem URL remota");
 assert(!/@import|url\(\s*['"]?https?:\/\//i.test(css),"CSS tem dependência remota");
 assert(!/\b(fetch|XMLHttpRequest)\s*\(/.test(js),"Núcleo requisita rede");
@@ -29,4 +29,4 @@ assert.equal(sandbox.BaseDemoSI.currentRoute("#/ambiente"),"ambiente");
 assert.equal(sandbox.BaseDemoSI.currentRoute("#/rota-inexistente"),"inicio");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("invalido"),"sistema");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("escuro"),"escuro");
-console.log(`OK: fundação preservada na 0.4.0, ${localRefs.length} referências HTML, 7 arquivos no precache, contratos e ausência de dependências remotas.`);
+console.log(`OK: fundação preservada na 0.5.0, ${localRefs.length} referências HTML, 8 arquivos no precache, contratos e ausência de dependências remotas.`);
