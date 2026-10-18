@@ -4,12 +4,12 @@ namespace BaseDemoSI {
     id: "base-demo-oficial-si",
     name: "Base Demo Oficial - SI",
     shortName: "SI",
-    version: "0.2.0",
+    version: "0.3.0",
     language: "pt-BR",
     requiresNetwork: false,
     routes: Object.freeze<RouteDefinition[]>([
-      { id: "inicio", title: "Início", subtitle: "Colunas estruturais" },
-      { id: "ambiente", title: "Ambiente", subtitle: "Cena e objetos universais" },
+      { id: "inicio", title: "Início", subtitle: "Workspace universal" },
+      { id: "ambiente", title: "Ambiente", subtitle: "Docas, foco e visão geral" },
       { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
       { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
     ])

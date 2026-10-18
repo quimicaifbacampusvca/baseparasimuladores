@@ -6,7 +6,7 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(prefers-contrast:more){:root{--border:#657888;--muted:#3f5364}:root[data-theme="escuro"]{--border:#b5c7d4;--muted:#d1dfe7}.card,.hero,.button{border-width:2px}}
 
-/* 0.2.0 — demonstração de entidade, sem fixar a arquitetura final do workspace */
+/* 0.2.x — estilos básicos do sistema de objetos (compatibilidade preservada). */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .scene-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 14px}.scene-toolbar .button{cursor:pointer}.scene-toolbar .button:disabled{opacity:.42;cursor:not-allowed}.scene-count{margin-left:auto;font-size:12px;color:var(--muted);font-weight:700}
 .workspace-interactive{grid-template-columns:minmax(160px,1fr) minmax(280px,2.6fr) minmax(170px,1fr);min-height:435px}.workspace-interactive .preview-dock{min-width:0;padding:18px}.workspace-interactive .preview-dock h2{font-size:15px;margin-bottom:8px}.workspace-interactive .preview-dock p{font-size:12px;color:var(--muted)}

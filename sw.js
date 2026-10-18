@@ -1,6 +1,6 @@
-/* Base Demo Oficial - SI 0.2.0 — recursos de execução locais. */
-const CACHE = "base-demo-si-v0.2.0";
-const FILES = ["./", "./index.html", "./app.css", "./app.js", "./manifest.webmanifest", "./assets/icon.svg"];
+/* Base Demo Oficial - SI 0.3.0 — recursos de execução locais. */
+const CACHE = "base-demo-si-v0.3.0";
+const FILES = ["./", "./index.html", "./app.css", "./workspace.css", "./app.js", "./manifest.webmanifest", "./assets/icon.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));
 });

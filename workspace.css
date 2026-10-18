@@ -1,0 +1,104 @@
+/* Base Demo Oficial - SI | workspace 0.3.0 | plano de apresentação universal */
+:root{--si-dock-left:clamp(280px,23vw,320px);--si-dock-right:clamp(300px,26vw,360px);--si-launcher-h:62px}
+body.route-ambiente{overflow:hidden}
+body.route-ambiente .app-shell{display:block;min-height:100dvh}
+body.route-ambiente .side{display:none!important}
+body.route-ambiente .main-column{width:100%;height:100dvh;min-height:0;overflow:hidden}
+body.route-ambiente .topbar{height:60px;min-height:60px;padding:8px 18px}
+body.route-ambiente main{padding:0;max-width:none;margin:0;height:calc(100dvh - 60px);flex:1;min-height:0;overflow:hidden}
+body.route-ambiente .footer{display:none}
+body.route-ambiente .menu-toggle{display:block}
+body.route-ambiente .side{z-index:100}
+/* Menu global abre na cena sem bloquear renderização da bancada */
+body.route-ambiente.nav-open .side{display:flex!important;position:fixed;inset:0 auto 0 0;width:263px;visibility:visible;transform:none;box-shadow:0 0 0 100vmax #0008}
+.si-environment{height:100%;min-height:0}
+.si-workspace{position:relative;display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden;background:var(--bg);isolation:isolate}
+.si-workspace [hidden]{display:none!important}
+.si-workspace-toolbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 15px;border-bottom:1px solid var(--border);background:var(--surface);min-height:58px;z-index:4}
+.si-view-tabs,.si-launchers{display:flex;align-items:center;gap:7px;min-width:0}
+.si-view-tabs button,.si-launchers button,.si-dock-header button,.si-dock-tabs button{font:inherit;font-size:12px;font-weight:700;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;cursor:pointer;min-height:44px;padding:8px 13px}
+.si-view-tabs button[aria-pressed=true],.si-launchers button[aria-expanded=true],.si-dock-tabs button[aria-pressed=true]{border-color:var(--accent);background:var(--tint);box-shadow:inset 0 -2px 0 var(--accent)}
+.si-launchers button{display:flex;align-items:center;justify-content:center;gap:6px}
+.si-launchers button span{font-size:16px}
+.si-scene-region{flex:1 1 0;min-height:0;overflow:auto;position:relative;scroll-padding:0;overflow-anchor:none;background:radial-gradient(ellipse at 50% 55%,var(--surface) 0%,var(--bg) 75%)}
+.si-focus-view{display:flex;flex-direction:column;align-items:stretch;min-height:100%;height:100%;padding:12px 18px 8px;gap:8px;overflow:hidden;overflow-anchor:none}
+.si-stage-name{text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;flex:none;min-height:48px}
+.si-stage-name strong{font-size:16px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.si-stage-name small{font-size:11px;color:var(--muted)}
+.si-stage-canvas{position:relative;flex:1 1 0;min-height:150px;max-width:1200px;width:100%;margin:0 auto;border-radius:12px;background:linear-gradient(90deg,transparent calc(50% - 1px),var(--border) 50%,transparent calc(50% + 1px)),linear-gradient(transparent calc(50% - 1px),var(--border) 50%,transparent calc(50% + 1px));border:1px dashed color-mix(in srgb,var(--border) 70%,transparent);overflow:hidden}
+.si-stage-canvas .scene-objects{inset:16px}
+.si-stage-canvas .scene-entity{min-width:44px;min-height:44px}
+.si-stage-footnote{flex:none;text-align:center;min-height:18px;font-size:11px;color:var(--muted)}
+.si-overview-view{padding:24px clamp(18px,3vw,40px) 30px;min-height:100%}
+.si-overview-view h2{margin:0;font-size:20px}
+.si-overview-view>p{font-size:13px;color:var(--muted);margin:5px 0 20px}
+.si-overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.si-overview-item,.si-strip-item{font:inherit;cursor:pointer;display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);padding:10px;text-align:left;min-width:0}
+.si-overview-item{min-height:94px;flex-wrap:wrap;align-content:center}
+.si-overview-item strong{width:calc(100% - 36px)}
+.si-overview-item small{margin-left:30px}
+.si-overview-item[aria-pressed=true],.si-strip-item[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.si-overview-item strong,.si-strip-item strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.si-overview-item small,.si-strip-item small{font-size:10px;color:var(--muted)}
+.si-swatch{width:20px;height:20px;flex:none;border-radius:7px;background:#3c9d9c;border:1px solid #245c65}
+.si-swatch.tone-blue{background:#4c85d8;border-color:#23518c}.si-swatch.tone-amber{background:#c7943a;border-color:#956e28}
+.si-actionbar{flex:none;min-height:55px;display:flex;align-items:center;justify-content:center;gap:8px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);padding:6px 14px;z-index:3}
+.si-actionbar button{cursor:pointer}.si-actionbar button:disabled{opacity:.45;cursor:not-allowed}
+.si-actionbar .scene-count{margin-left:18px}
+.si-item-strip{display:flex;align-items:center;gap:8px;flex:0 0 66px;padding:8px 16px;min-height:0;overflow:auto hidden;background:var(--surface);scrollbar-width:thin;overscroll-behavior-x:contain;z-index:3}
+.si-strip-item{flex:0 0 146px;max-width:146px;padding:7px 8px;min-height:48px;display:grid;grid-template-columns:18px 1fr;gap:1px 8px}
+.si-strip-item .si-swatch{grid-row:1 / span 2;width:18px;height:18px}
+.si-strip-item strong{grid-column:2}.si-strip-item small{grid-column:2}
+.si-strip-placeholder{font-size:12px;color:var(--muted)}
+.si-dock{position:absolute;z-index:30;top:70px;bottom:136px;display:flex;flex-direction:column;width:var(--si-dock-left);max-width:calc(100% - 24px);border:1px solid var(--border);border-radius:14px;background:var(--surface);box-shadow:0 8px 26px #0002;overflow:hidden}
+.si-dock-left{left:12px}.si-dock-right{right:12px;width:var(--si-dock-right)}
+.si-dock-header{display:flex;gap:6px;align-items:center;min-height:59px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface)}
+.si-dock-header h2{flex:1;min-width:0;font-size:15px;margin:0}
+.si-dock-header button{min-width:44px;padding:7px;font-size:11px}
+.si-dock-tabs{flex:none;display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.si-dock-tabs button{flex:1;min-width:0;padding:7px 4px;min-height:42px}
+.si-dock-scroll{flex:1 1 auto;min-height:0;overflow:auto;padding:16px;overscroll-behavior:contain;overflow-anchor:none}
+.si-dock-scroll h3{font-size:15px;margin:0 0 8px}.si-dock-scroll p{font-size:12px;color:var(--muted)}
+.si-dock-scroll .tool-stack{display:flex;flex-direction:column}.si-dock-scroll .tool-stack button{justify-content:flex-start;white-space:normal}
+.si-dock-hint{margin-top:18px;padding:10px;background:var(--tint);border-left:3px solid var(--accent);border-radius:4px}
+.si-observation dl,.si-data-summary dl{display:grid;gap:10px;margin:16px 0}
+.si-observation dl div,.si-data-summary dl div{display:flex;justify-content:space-between;align-items:start;gap:10px;border-bottom:1px solid var(--border);padding-bottom:9px;font-size:12px}
+.si-observation dt,.si-data-summary dt{color:var(--muted)}.si-observation dd,.si-data-summary dd{margin:0;overflow-wrap:anywhere;text-align:right}
+.si-sheet-backdrop{display:none}
+.si-workspace.si-workspace-fullscreen .si-scene-region{visibility:hidden}
+.si-dock-right[data-presentation=fullscreen]{inset:12px;width:auto!important;max-width:none;bottom:12px;z-index:40}
+.si-dock-right[data-presentation=fullscreen] .si-dock-scroll{padding:20px clamp(20px,5vw,90px)}
+@media(min-width:1280px){.si-workspace[data-left-open=true] .si-focus-view{padding-left:calc(var(--si-dock-left) + 25px)}.si-workspace[data-right-open=true] .si-focus-view{padding-right:calc(var(--si-dock-right) + 25px)}.si-workspace[data-right-open=true] .si-dock-right[data-presentation=fullscreen]~.si-sheet-backdrop{display:none}}
+@media(min-width:901px) and (max-width:1279px){:root{--si-dock-left:280px;--si-dock-right:310px}}
+@media(max-width:900px){
+ :root{--si-launcher-h:calc(61px + env(safe-area-inset-bottom))}
+ body.route-ambiente .topbar{height:58px;min-height:58px}
+ body.route-ambiente main{height:calc(100dvh - 58px)}
+ .si-workspace{height:100%;padding-bottom:var(--si-launcher-h)}
+ .si-workspace-toolbar{min-height:53px;padding:4px 12px;justify-content:center}
+ .si-view-tabs{width:100%;gap:8px}.si-view-tabs button{flex:1;min-width:0}
+ .si-launchers{position:fixed;bottom:0;left:0;right:0;z-index:45;display:flex;gap:7px;padding:6px max(9px,env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--surface);height:var(--si-launcher-h)}
+ .si-launchers button{flex:1;min-width:0;padding:7px 5px;font-size:12px;min-height:44px}
+ .si-focus-view{padding:8px 12px 5px;min-height:100%;overflow:hidden}
+ .si-stage-name{min-height:38px}.si-stage-name strong{font-size:14px;max-width:95%}
+ .si-stage-canvas{min-height:0;flex:1 1 0;overflow:hidden}.si-stage-canvas .scene-objects{inset:8px}
+ .si-stage-footnote{font-size:10px;min-height:14px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+ .si-actionbar{min-height:51px;gap:5px;padding:5px 8px;flex-wrap:nowrap}
+ .si-actionbar .button{padding:6px 8px;min-height:40px;font-size:11px;white-space:nowrap}
+ .si-actionbar .scene-count{font-size:10px;margin-left:auto;white-space:nowrap}
+ .si-item-strip{flex-basis:61px;padding:5px 10px}
+ .si-dock.si-bottom-sheet{position:fixed;z-index:71;top:auto;left:0;right:0;bottom:var(--si-launcher-h);width:100%;max-width:none;height:min(78dvh,650px);border-radius:18px 18px 0 0;border-bottom:0;box-shadow:0 -7px 36px #0005;transform:none;overflow:hidden}
+ .si-dock.si-bottom-sheet .si-dock-scroll{padding:15px max(16px,env(safe-area-inset-left))}
+ .si-sheet-backdrop:not([hidden]){display:block;position:fixed;z-index:69;inset:0;background:#0008}
+ body.si-sheet-active .si-launchers{z-index:73}
+ .si-dock-expand{display:none!important}
+ .si-overview-view{padding:16px}.si-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .si-overview-item{min-height:80px;padding:8px;gap:5px}
+}
+@media(max-width:360px){.si-actionbar .scene-count{font-size:9px}.si-actionbar .button{padding:5px 6px;font-size:10px}.si-launchers button{font-size:11px}}
+@media(max-height:500px) and (max-width:900px) and (orientation:landscape){.si-dock.si-bottom-sheet{height:min(78dvh,420px)}.si-stage-name{min-height:30px}.si-stage-footnote{display:none}.si-item-strip{flex-basis:51px}}
+@media(prefers-reduced-motion:reduce){.si-dock,.si-launchers,.si-focus-view{transition:none!important;animation:none!important}}
+@media(forced-colors:active){.si-dock,.si-launchers button,.si-view-tabs button{border:2px solid CanvasText!important}}
+@media print{.si-dock,.si-launchers,.si-actionbar,.si-item-strip{display:none!important}body.route-ambiente{overflow:visible}body.route-ambiente .main-column{height:auto}body.route-ambiente main{height:auto}.si-workspace{height:auto}}
+/* O backdrop preserva a barra inferior operável com uma sheet aberta. */
+@media(max-width:900px){.si-sheet-backdrop:not([hidden]){inset:0 0 var(--si-launcher-h) 0}}

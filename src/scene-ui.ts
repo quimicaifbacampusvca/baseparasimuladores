@@ -28,6 +28,7 @@ namespace BaseDemoSI {
       button.type = "button"; button.className = "scene-entity";
       button.classList.add(`entity-${e.kind}`, `tone-${e.tone}`);
       if (e.id === snap.selectedId) button.classList.add("is-selected");
+      button.hidden = snap.selectedId !== null && e.id !== snap.selectedId;
       button.dataset.entityId = e.id;
       button.style.left = `${e.x}%`; button.style.top = `${e.y}%`;
       button.style.width = `${e.width}%`; button.style.height = `${e.height}%`;
@@ -57,6 +58,7 @@ namespace BaseDemoSI {
     if (inspector) inspector.hidden = !snap.selectedId;
     const noSelection = get("no-selection"); if (noSelection) noSelection.hidden = !!snap.selectedId;
     const entity = selected();
+    renderWorkspaceContent(snap);
     if (entity) {
       const field = get("object-label") as HTMLInputElement | null;
       const tone = get("object-tone") as HTMLSelectElement | null;
@@ -82,6 +84,7 @@ namespace BaseDemoSI {
     }
     store = createSceneStore(initial);
     store.subscribe(event => { render(); if (event !== "selection") save(); });
+    setupWorkspace(() => store.getSnapshot(), id => store.select(id));
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-add-kind]")) {
       button.addEventListener("click", () => {
         const kind = button.dataset.addKind as EntityKind;

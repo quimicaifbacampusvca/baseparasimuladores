@@ -21,6 +21,8 @@
     "src/router.ts",
     "src/preferences.ts",
     "src/scene.ts",
+    "src/workspace.ts",
+    "src/workspace-ui.ts",
     "src/scene-ui.ts",
     "src/app.ts"
   ]
