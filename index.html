@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#13273b">
+  <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./app.css">
+  <script src="./app.js" defer></script>
+  <title>Base Demo Oficial - SI</title>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <div class="app-shell">
+    <aside class="side" id="sidebar" aria-label="Navegação principal">
+      <a href="#/inicio" class="identity" aria-label="Base Demo Oficial - SI, início">
+        <img src="./assets/icon.svg" width="48" height="48" alt="">
+        <span><strong>Base Demo Oficial</strong><small>SI · Plataforma de simuladores</small></span>
+      </a>
+      <nav class="nav" aria-label="Seções">
+        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span> Início</a>
+        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span> Ambiente</a>
+        <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
+        <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
+      </nav>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Fundação <span data-app-version>0.1.0</span></small></div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
+        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Fundação da plataforma</strong></div>
+        <span class="version-pill">v<span data-app-version>0.1.0</span></span>
+      </header>
+      <main id="conteudo" tabindex="-1">
+        <section class="view" data-view="inicio" aria-labelledby="home-title">
+          <div class="hero">
+            <p class="eyebrow">ETAPA 01 · FUNDAÇÕES</p>
+            <h1 id="home-title">Uma estrutura pronta para crescer.</h1>
+            <p>Estamos construindo o núcleo operacional de uma plataforma universal para simuladores. A arquitetura será independente de motores científicos e terá funcionamento local desde a origem.</p>
+            <div class="hero-actions"><a class="button primary" href="#/ambiente">Conhecer o ambiente</a><a class="button outline" href="#/sobre">Ver arquitetura</a></div>
+          </div>
+          <div class="section-heading"><h2>O que já existe nesta fundação</h2><p>Capacidades reais da versão 0.1.0; os módulos futuros não são apresentados como concluídos.</p></div>
+          <div class="card-grid">
+            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Estrutura de aplicação</h3><p>Shell responsivo, rotas internas, páginas e hierarquia visual.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Identidade configurada</h3><p>Nome, versão, identificador e idioma isolados em um manifesto.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Preferências locais</h3><p>Tema claro, escuro ou automático com fallback seguro.</p><span class="mini-state">Implementado</span></article>
+            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Base autocontida</h3><p>Nenhuma biblioteca, fonte, API ou CDN externa necessária para abrir.</p><span class="mini-state">Implementado</span></article>
+          </div>
+        </section>
+
+        <section class="view" data-view="ambiente" aria-labelledby="environment-title" hidden>
+          <div class="section-heading"><p class="eyebrow">ESTRUTURA PREPARATÓRIA</p><h1 id="environment-title">Ambiente universal</h1><p>Esta é a reserva de espaço do futuro workspace. Nenhum motor científico ou objeto está carregado nesta etapa.</p></div>
+          <div class="workspace-preview" aria-label="Prévia estrutural do espaço de simulação, ainda sem controles funcionais">
+            <div class="preview-dock"><strong>Preparar</strong><span>Ferramentas e recursos serão registrados aqui.</span></div>
+            <div class="preview-scene"><div class="empty-symbol" aria-hidden="true">◇</div><strong>Cena sem conteúdo</strong><span>Os elementos interativos serão introduzidos na fase de entidades e workspace.</span></div>
+            <div class="preview-dock"><strong>Ver e analisar</strong><span>Instrumentos e visualizações entrarão como extensões.</span></div>
+          </div>
+          <p class="notice" id="offline-status">Este aplicativo não precisa de conexão com a internet para executar seus arquivos locais.</p>
+        </section>
+
+        <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
+          <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
+          <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
+          <p class="notice">O contraste e a redução de movimento respeitam, nesta etapa, as preferências do navegador. Controles adicionais virão na camada de acessibilidade.</p>
+        </section>
+
+        <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
+          <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Fidelidade:</strong> a equivalência com os fluxos do SIAB será alcançada e testada por etapas, não presumida nesta fundação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.1.0</strong>.</p></article>
+        </section>
+      </main>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.1.0</span></span></footer>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Marca SI">
+ <rect width="192" height="192" rx="38" fill="#15344a"/>
+ <path d="M35 61 95 29l61 32v69l-61 33-60-33z" fill="none" stroke="#91dbd3" stroke-width="7" stroke-linejoin="round"/>
+ <path d="M35 61 95 95l61-34M95 95v68" fill="none" stroke="#91dbd3" stroke-width="5" opacity=".65"/>
+ <text x="95" y="113" text-anchor="middle" font-family="sans-serif" font-size="43" font-weight="800" fill="#fff">SI</text>
+</svg>

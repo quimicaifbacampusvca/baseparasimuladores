@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "none",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "outFile": "app.js",
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "removeComments": false
+  },
+  "files": [
+    "src/contracts.ts",
+    "src/config.ts",
+    "src/storage.ts",
+    "src/router.ts",
+    "src/preferences.ts",
+    "src/app.ts"
+  ]
+}

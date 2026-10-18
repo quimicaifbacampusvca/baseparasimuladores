@@ -1,18 +1,18 @@
-# ignore ModelSim generated files and directories (temp files and so on)
-[_@]*
+# Base Demo Oficial - SI
+node_modules/
+.DS_Store
+*.log
+coverage/
 
-# ignore compilation output of ModelSim
+# Regras legadas preservadas do repositório inicial (sem bloquear HTML de publicação)
+[_@]*
 *.mti
 *.dat
 *.dbs
 *.psm
 *.bak
 *.cmp
-*.jpg
-*.html
 *.bsf
-
-# ignore simulation output of ModelSim
 wlf*
 *.wlf
 *.vstf

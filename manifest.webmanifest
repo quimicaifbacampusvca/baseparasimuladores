@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Base Demo Oficial - SI",
+  "short_name": "Base SI",
+  "description": "Plataforma-base universal para simuladores educacionais.",
+  "start_url": "./index.html#/inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#13273b",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "./assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
