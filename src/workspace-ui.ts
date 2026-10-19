@@ -65,7 +65,8 @@ namespace BaseDemoSI {
     for(const panel of document.querySelectorAll<HTMLElement>("[data-right-panel]"))panel.hidden=panel.dataset.rightPanel!==workspaceState.rightTab;
     const lh=node("si-left-title");if(lh)lh.textContent={resumo:"Montagem",preparo:"Preparo",objetos:"Recipientes",modulo:"Módulo",missao:"Missão"}[workspaceState.leftTab];
     const detail=viewerLevel==="detail"&&workspaceState.rightTab==="ver";
-    const rh=node("si-right-title");if(rh)rh.textContent=workspaceState.rightTab==="dados"?"Dados":detail?"Investigar":"Ver";
+    const rh=node("si-right-title");if(rh)rh.textContent=workspaceState.rightTab==="dados"?"Dados":detail?(activeViewer()?.title??"Ver"):"Ver";
+    const instruments=node("si-viewer-instruments");if(instruments)instruments.hidden=!(detail&&activeViewer()?.capability==="measure"&&moduleAllows("measure"));
     const back=node("si-dock-viewer-back");if(back)back.hidden=!detail;
     const catalog=node("si-viewer-catalog");if(catalog)catalog.hidden=detail;
     const view=node("si-viewer-detail");if(view)view.hidden=!detail;
@@ -162,13 +163,14 @@ namespace BaseDemoSI {
       changeWorkspace({type:"left-tab",tab});
       const container=node("si-left-scroll");if(container)container.scrollTop=0;
     }));
-    document.querySelectorAll<HTMLElement>("[data-right-tab]").forEach(b=>b.addEventListener("click",()=>{
-      viewerLevel="catalog";changeWorkspace({type:"right-tab",tab:b.dataset.rightTab as WorkspaceRightTab});
-      const container=node("si-right-scroll");if(container)container.scrollTop=0;
-    }));
     node("si-dock-viewer-back")?.addEventListener("click",()=>{
       viewerLevel="catalog";renderWorkspace();node("si-right-scroll")!.scrollTop=0;
-      node("si-viewer-buttons")?.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus({preventScroll:true});
+      (node("si-viewer-buttons")?.querySelector<HTMLElement>('[aria-pressed="true"]')
+        ??node("si-viewer-buttons")?.querySelector<HTMLElement>("button"))?.focus({preventScroll:true});
+    });
+    window.addEventListener("si-viewer-family-selected",()=>{
+      viewerLevel="catalog";renderWorkspace();
+      const scroll=node("si-right-scroll");if(scroll)scroll.scrollTop=0;
     });
     window.addEventListener("si-viewer-selected",()=>{
       viewerLevel="detail";
@@ -179,7 +181,9 @@ namespace BaseDemoSI {
     });
     node("si-expand")?.addEventListener("click",()=>changeWorkspace({type:"expand"}));
     node("si-sheet-backdrop")?.addEventListener("click",()=>{const side=activeSide();if(side)closeWorkspace(side);});
-    window.addEventListener("si-module-change",()=>{renderWorkspace();persistWorkspace();});
+    window.addEventListener("si-module-change",()=>{
+      viewerLevel="catalog";renderWorkspace();persistWorkspace();
+    });
     document.addEventListener("keydown",keyboardHandler);
     window.addEventListener("resize",updateViewport);
     window.visualViewport?.addEventListener("resize",updateViewport);

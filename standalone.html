@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-GkBa18zayp2kis3sV9Jw5xbPS7u1vasZw194Pj8abJk='; script-src 'sha256-xFvzNPKeqLsSQUinCUm+GaKFxCfeXhJR8iqUeCPEq2s='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-DeTDzBmux+Q3WIvrjrzumt0wDaCHiqb0StrrNbbhJJ8='; script-src 'sha256-EqJ/nXUURTiOermBfuYjaA+h789qCma+8/qIlctLEc8='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -197,6 +197,45 @@ body.route-ambiente.nav-open .side{display:flex!important;position:fixed;inset:0
  .si-dock.si-bottom-sheet .si-dock-scroll{padding:12px 16px 18px}
 }
 @media(max-width:360px){.si-dock-left .si-dock-tabs{gap:3px;padding-inline:7px}.si-dock-left .si-dock-tabs button{font-size:10px;padding-inline:2px}}
+
+/* 0.9.7 — Estrutura dos painéis Ver e Dados: famílias, ferramentas e dados. */
+.si-dock-right .si-dock-scroll{min-width:0}
+.si-dock-right .si-viewer-family-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:12px 0}
+.si-viewer-family-tab{font:inherit;font-size:11px;font-weight:700;min-height:44px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);padding:7px 3px;cursor:pointer;white-space:normal;min-width:0}
+.si-viewer-family-tab[aria-selected="true"]{background:var(--tint);border-color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+.si-viewer-family-tab:focus-visible,.si-viewer-item:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.si-viewer-family-panel{min-width:0;padding-top:4px}
+.si-viewer-caption{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 12px}
+.si-viewer-item-tabs{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.si-viewer-item{font:inherit;min-height:46px;min-width:0;width:100%;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);padding:10px 12px;text-align:left;font-size:12px;font-weight:650;cursor:pointer;overflow-wrap:anywhere}
+.si-viewer-item:hover,.si-viewer-item[aria-pressed="true"]{border-color:var(--accent);background:var(--tint)}
+.si-viewer-output{min-width:0;overflow-wrap:anywhere}
+.si-viewer-output dl,.si-data-summary dl{display:grid;gap:7px;margin:12px 0 16px}
+.si-viewer-output dl>div,.si-data-summary dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border);padding:9px 0}
+.si-viewer-output dt,.si-data-summary dt{font-size:12px;color:var(--muted)}
+.si-viewer-output dd,.si-data-summary dd{font-weight:700;font-size:13px;color:var(--text);margin:0;text-align:right;overflow-wrap:anywhere}
+.si-viewer-instrument-section{border-top:1px solid var(--border);margin-top:18px;padding-top:16px}
+.si-viewer-instrument-section .si-extension-buttons{display:grid;gap:8px}
+.si-viewer-instrument-section .button{display:flex;width:100%;min-height:44px;align-items:center;justify-content:flex-start;text-align:left;white-space:normal}
+.si-data-records{min-width:0}
+.si-data-records .si-extension-log{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.si-data-records .si-extension-log li{border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:grid;gap:3px;background:var(--surface);overflow-wrap:anywhere}
+.si-data-records .si-extension-log strong{font-size:12px;color:var(--text)}
+.si-data-records .si-extension-log span{font-size:14px;font-weight:700;color:var(--text)}
+.si-data-records .si-extension-log small{font-size:11px;color:var(--muted)}
+.si-dock-data-actions .button{flex:1 1 120px;font:inherit;font-size:12px;font-weight:650;border-radius:9px;padding:10px 12px;justify-content:center;text-align:center}
+@media(max-width:900px){.si-dock-right .si-dock-scroll{padding:12px 16px 18px}.si-viewer-family-tab{font-size:11px}}
+@media(max-width:360px){.si-dock-right .si-viewer-family-tabs{gap:3px}.si-viewer-family-tab{font-size:10px;padding:7px 2px}}
+@media(forced-colors:active){.si-viewer-family-tab[aria-selected="true"],.si-viewer-item[aria-pressed="true"]{border:2px solid Highlight}}
+
+/* Prioridade sobre a estilização legada de controles de visualização. */
+.si-viewer-controls>#si-viewer-families{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;margin:12px 0;gap:5px}
+.si-viewer-controls>#si-viewer-family-panel{display:block;width:100%;margin:0;min-width:0}
+.si-viewer-controls #si-viewer-buttons{display:grid;grid-template-columns:minmax(0,1fr);width:100%;gap:8px;margin:12px 0}
+.si-viewer-controls #si-viewer-buttons .si-viewer-item{width:100%;min-width:0;min-height:46px}
+.si-viewer-controls .si-viewer-item[aria-pressed="true"]{outline:none;border:1px solid var(--accent);background:var(--tint)}
+.si-viewer-family-tab{display:flex;justify-content:center;align-items:center;gap:5px;flex-wrap:wrap}
+.si-viewer-family-icon{width:17px;height:17px;flex:0 0 17px;stroke:currentColor}
 
 /* Componentes universais · 0.4.0 · sem dependência de bibliotecas remotas. */
 .si-actionbar .si-toolmenu-wrap{position:relative;display:flex;flex:0 0 auto}
@@ -928,22 +967,25 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
             </aside>
             <aside id="si-dock-right" class="si-dock si-dock-right" aria-label="Ver" role="region" hidden data-presentation="standard">
               <header class="si-dock-header"><button id="si-dock-viewer-back" type="button" class="si-dock-back" aria-label="Voltar às visualizações" hidden>← Ver</button><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-expanded="false">Expandir</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">✕</button></header>
-              <nav class="si-dock-tabs" role="group" aria-label="Fontes de informação">
-                <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
-              </nav>
               <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
                   <div class="si-viewer-controls" id="si-viewer-catalog" role="group" aria-label="Tipo de visualização">
-                    <h3>Investigar</h3><p>Escolha uma visualização para examinar a cena.</p>
-                    <div id="si-viewer-buttons"></div>
+                    <h3>Visualizações</h3><p>Escolha uma família e, em seguida, a visualização desejada.</p>
+                    <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
+                    <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
+                      <p id="si-viewer-family-description" class="si-viewer-caption"></p>
+                      <div id="si-viewer-buttons" class="si-viewer-item-tabs" role="group" aria-label="Visualizações disponíveis"></div>
+                    </div>
                   </div>
                   <section id="si-viewer-detail" aria-label="Visualização selecionada" hidden>
                   <div id="si-viewer-output" class="si-viewer-output" aria-live="polite"></div>
                   <div id="si-observation" class="si-observation" hidden></div>
-                  <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                  <section id="si-viewer-instruments" class="si-viewer-instrument-section" aria-label="Instrumentos conectados" hidden>
+                    <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                  </section>
                   </section>
                 </div>
-                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div>
+                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records" class="si-data-records"></div>
                   <div class="si-dock-data-actions"><a href="#/caderno" class="button outline">Abrir Caderno</a><a href="#/relatorios" class="button outline">Abrir Relatórios</a></div>
                 </div>
               </div>
@@ -1133,7 +1175,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.6",
+        version: "0.9.7",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2596,7 +2638,10 @@ var BaseDemoSI;
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
-            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : detail ? "Investigar" : "Ver";
+            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : detail ? (BaseDemoSI.activeViewer()?.title ?? "Ver") : "Ver";
+        const instruments = node("si-viewer-instruments");
+        if (instruments)
+            instruments.hidden = !(detail && BaseDemoSI.activeViewer()?.capability === "measure" && BaseDemoSI.moduleAllows("measure"));
         const back = node("si-dock-viewer-back");
         if (back)
             back.hidden = !detail;
@@ -2830,18 +2875,19 @@ var BaseDemoSI;
             if (container)
                 container.scrollTop = 0;
         }));
-        document.querySelectorAll("[data-right-tab]").forEach(b => b.addEventListener("click", () => {
-            viewerLevel = "catalog";
-            changeWorkspace({ type: "right-tab", tab: b.dataset.rightTab });
-            const container = node("si-right-scroll");
-            if (container)
-                container.scrollTop = 0;
-        }));
         node("si-dock-viewer-back")?.addEventListener("click", () => {
             viewerLevel = "catalog";
             renderWorkspace();
             node("si-right-scroll").scrollTop = 0;
-            node("si-viewer-buttons")?.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true });
+            (node("si-viewer-buttons")?.querySelector('[aria-pressed="true"]')
+                ?? node("si-viewer-buttons")?.querySelector("button"))?.focus({ preventScroll: true });
+        });
+        window.addEventListener("si-viewer-family-selected", () => {
+            viewerLevel = "catalog";
+            renderWorkspace();
+            const scroll = node("si-right-scroll");
+            if (scroll)
+                scroll.scrollTop = 0;
         });
         window.addEventListener("si-viewer-selected", () => {
             viewerLevel = "detail";
@@ -2854,7 +2900,11 @@ var BaseDemoSI;
         node("si-expand")?.addEventListener("click", () => changeWorkspace({ type: "expand" }));
         node("si-sheet-backdrop")?.addEventListener("click", () => { const side = activeSide(); if (side)
             closeWorkspace(side); });
-        window.addEventListener("si-module-change", () => { renderWorkspace(); persistWorkspace(); });
+        window.addEventListener("si-module-change", () => {
+            viewerLevel = "catalog";
+            renderWorkspace();
+            persistWorkspace();
+        });
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);
@@ -3168,8 +3218,48 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    const familyNames = { observar: "Observar", medir: "Medir", analisar: "Analisar" };
+    // Ícones vetoriais próprios do contrato de navegação da família (SVGs locais).
+    const familyIcons = {
+        observar: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
+        medir: "M4 17 17 4l3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2",
+        analisar: "M4 3v17h17M7 16l4-5 4 2 5-8"
+    };
+    const familyDescriptions = {
+        observar: "Representações e propriedades dos objetos em foco.",
+        medir: "Instrumentos disponíveis e leituras da investigação.",
+        analisar: "Comparações e interpretações dos dados da cena."
+    };
     const viewerRegistry = new Map();
     let selectedViewer = "observacao";
+    let selectedFamily = "observar";
+    const viewerFamilyKey = "viewer-family-selection-v1";
+    function viewerFamily(capability) {
+        return capability === "measure" ? "medir" : capability === "analyze" ? "analisar" : "observar";
+    }
+    BaseDemoSI.viewerFamily = viewerFamily;
+    function activeViewer() {
+        const viewer = viewerRegistry.get(selectedViewer);
+        return viewer && BaseDemoSI.moduleAllows(viewer.capability) ? viewer : null;
+    }
+    BaseDemoSI.activeViewer = activeViewer;
+    function availableViewerFamilies() {
+        const choices = new Set([...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability)).map(v => viewerFamily(v.capability)));
+        return Object.keys(familyNames).filter(id => choices.has(id));
+    }
+    BaseDemoSI.availableViewerFamilies = availableViewerFamilies;
+    function currentViewerFamily() { return selectedFamily; }
+    BaseDemoSI.currentViewerFamily = currentViewerFamily;
+    function chooseViewerFamily(id) {
+        if (!availableViewerFamilies().includes(id))
+            return false;
+        selectedFamily = id;
+        BaseDemoSI.storage.write(viewerFamilyKey, id);
+        renderViewers(viewerScene?.());
+        window.dispatchEvent(new Event("si-viewer-family-selected"));
+        return true;
+    }
+    BaseDemoSI.chooseViewerFamily = chooseViewerFamily;
     let viewerScene;
     const viewerKey = "viewer-selection-v1";
     const label = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
@@ -3190,7 +3280,9 @@ var BaseDemoSI;
         if (!viewer || !BaseDemoSI.moduleAllows(viewer.capability))
             return false;
         selectedViewer = id;
+        selectedFamily = viewerFamily(viewer.capability);
         BaseDemoSI.storage.write(viewerKey, id);
+        BaseDemoSI.storage.write(viewerFamilyKey, selectedFamily);
         renderViewers(viewerScene?.());
         return true;
     }
@@ -3199,16 +3291,58 @@ var BaseDemoSI;
         if (!snapshot)
             return;
         const buttons = document.getElementById("si-viewer-buttons"), output = document.getElementById("si-viewer-output");
-        if (!buttons || !output)
+        const tabs = document.getElementById("si-viewer-families"), description = document.getElementById("si-viewer-family-description");
+        const panel = document.getElementById("si-viewer-family-panel");
+        if (!buttons || !output || !tabs || !description || !panel)
             return;
         const allowed = [...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability));
+        const families = availableViewerFamilies();
+        if (!families.includes(selectedFamily))
+            selectedFamily = families[0] ?? "observar";
         if (!allowed.some(v => v.id === selectedViewer))
-            selectedViewer = allowed[0]?.id ?? "";
+            selectedViewer = allowed.find(v => viewerFamily(v.capability) === selectedFamily)?.id ?? "";
+        tabs.replaceChildren();
+        for (const family of families) {
+            const tab = document.createElement("button");
+            tab.type = "button";
+            tab.className = "si-viewer-family-tab";
+            const svgNs = "http:" + "//www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNs, "svg");
+            svg.setAttribute("viewBox", "0 0 24 24");
+            svg.setAttribute("fill", "none");
+            svg.setAttribute("stroke", "currentColor");
+            svg.setAttribute("stroke-width", "1.8");
+            svg.setAttribute("stroke-linecap", "round");
+            svg.setAttribute("stroke-linejoin", "round");
+            svg.setAttribute("aria-hidden", "true");
+            svg.classList.add("si-viewer-family-icon");
+            const shape = document.createElementNS(svgNs, "path");
+            shape.setAttribute("d", familyIcons[family]);
+            svg.append(shape);
+            tab.append(svg, label("span", familyNames[family]));
+            tab.setAttribute("role", "tab");
+            tab.setAttribute("aria-selected", String(family === selectedFamily));
+            tab.tabIndex = family === selectedFamily ? 0 : -1;
+            tab.setAttribute("aria-controls", "si-viewer-family-panel");
+            tab.addEventListener("click", () => chooseViewerFamily(family));
+            tab.addEventListener("keydown", ev => {
+                if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft" && ev.key !== "Home" && ev.key !== "End")
+                    return;
+                ev.preventDefault();
+                const i = families.indexOf(family);
+                const next = ev.key === "Home" ? families[0] : ev.key === "End" ? families[families.length - 1] : families[(i + (ev.key === "ArrowRight" ? 1 : -1) + families.length) % families.length];
+                chooseViewerFamily(next);
+                tabs.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true });
+            });
+            tabs.append(tab);
+        }
+        panel.setAttribute("aria-label", `${familyNames[selectedFamily]} — ferramentas`);
+        description.textContent = families.length ? familyDescriptions[selectedFamily] : "Nenhuma família disponível neste módulo.";
         buttons.replaceChildren();
-        for (const v of allowed) {
+        for (const v of allowed.filter(v => viewerFamily(v.capability) === selectedFamily)) {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "button outline";
+            btn.className = "si-viewer-item";
             btn.textContent = v.title;
             btn.setAttribute("aria-pressed", String(selectedViewer === v.id));
             btn.addEventListener("click", () => { if (chooseViewer(v.id))
@@ -3216,7 +3350,7 @@ var BaseDemoSI;
             buttons.append(btn);
         }
         output.replaceChildren();
-        const chosen = viewerRegistry.get(selectedViewer);
+        const chosen = activeViewer();
         if (!chosen) {
             output.append(label("p", "Não há visualizadores habilitados neste módulo."));
             return;
@@ -3231,7 +3365,7 @@ var BaseDemoSI;
     BaseDemoSI.renderViewers = renderViewers;
     function setupViewers(scene) {
         viewerScene = scene;
-        registerViewer({ id: "observacao", title: "Observar", capability: "observe", render(s, _, out) {
+        registerViewer({ id: "observacao", title: "Propriedades da cena", capability: "observe", render(s, _, out) {
                 const selected = s.entities.find(e => e.id === s.selectedId);
                 out.append(label("h3", "Observação"), label("p", selected ? `Objeto em foco: ${selected.label}` : "Selecione um objeto na cena."));
                 if (selected) {
@@ -3244,7 +3378,7 @@ var BaseDemoSI;
                     out.append(dl);
                 }
             } });
-        registerViewer({ id: "medicao", title: "Medir", capability: "measure", render(_, records, out) {
+        registerViewer({ id: "medicao", title: "Leituras registradas", capability: "measure", render(_, records, out) {
                 out.append(label("h3", "Medições"));
                 if (!records.length) {
                     out.append(label("p", "Nenhuma leitura registrada."));
@@ -3255,7 +3389,7 @@ var BaseDemoSI;
                     list.append(label("li", `${entry.label}: ${entry.value} ${entry.unit}`.trim()));
                 out.append(list);
             } });
-        registerViewer({ id: "analise", title: "Analisar", capability: "analyze", render(s, records, out) {
+        registerViewer({ id: "analise", title: "Distribuição dos objetos", capability: "analyze", render(s, records, out) {
                 out.append(label("h3", "Análise da cena"));
                 const kinds = { block: 0, circle: 0, label: 0 };
                 for (const e of s.entities)
@@ -3271,6 +3405,11 @@ var BaseDemoSI;
         const stored = BaseDemoSI.storage.read(viewerKey);
         if (stored && viewerRegistry.has(stored))
             selectedViewer = stored;
+        const family = BaseDemoSI.storage.read(viewerFamilyKey);
+        if (family && ["observar", "medir", "analisar"].includes(family))
+            selectedFamily = family;
+        else
+            selectedFamily = viewerRegistry.has(selectedViewer) ? viewerFamily(viewerRegistry.get(selectedViewer).capability) : "observar";
         window.addEventListener("si-module-change", () => renderViewers(scene()));
         window.addEventListener("si-education-observation", () => renderViewers(scene()));
         renderViewers(scene());

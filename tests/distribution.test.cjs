@@ -40,4 +40,4 @@ assert(!resources.test(script));
 assert(!/\b(fetch|XMLHttpRequest)\s*\(/.test(read('app.js')));
 const tests = ['docs/ACEITE-0.9.3.md','README.md','docs/PLANO-DE-CONSTRUCAO.md'];
 for(const t of tests) assert(!/SIAB/i.test(read(t)),'Documento possui referência a outro simulador: '+t);
-console.log(`OK: distribuição 0.9.6, ${precache.length} recursos pré-cache, ícones PNG, standalone único com CSP hashes, sem links remotos.`);
+console.log(`OK: distribuição 0.9.7, ${precache.length} recursos pré-cache, ícones PNG, standalone único com CSP hashes, sem links remotos.`);

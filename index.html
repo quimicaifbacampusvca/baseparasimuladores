@@ -250,22 +250,25 @@
             </aside>
             <aside id="si-dock-right" class="si-dock si-dock-right" aria-label="Ver" role="region" hidden data-presentation="standard">
               <header class="si-dock-header"><button id="si-dock-viewer-back" type="button" class="si-dock-back" aria-label="Voltar às visualizações" hidden>← Ver</button><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-expanded="false">Expandir</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">✕</button></header>
-              <nav class="si-dock-tabs" role="group" aria-label="Fontes de informação">
-                <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
-              </nav>
               <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
                   <div class="si-viewer-controls" id="si-viewer-catalog" role="group" aria-label="Tipo de visualização">
-                    <h3>Investigar</h3><p>Escolha uma visualização para examinar a cena.</p>
-                    <div id="si-viewer-buttons"></div>
+                    <h3>Visualizações</h3><p>Escolha uma família e, em seguida, a visualização desejada.</p>
+                    <div id="si-viewer-families" class="si-viewer-family-tabs" role="tablist" aria-label="Famílias do painel Ver"></div>
+                    <div id="si-viewer-family-panel" class="si-viewer-family-panel" role="tabpanel" aria-label="Ferramentas da família escolhida">
+                      <p id="si-viewer-family-description" class="si-viewer-caption"></p>
+                      <div id="si-viewer-buttons" class="si-viewer-item-tabs" role="group" aria-label="Visualizações disponíveis"></div>
+                    </div>
                   </div>
                   <section id="si-viewer-detail" aria-label="Visualização selecionada" hidden>
                   <div id="si-viewer-output" class="si-viewer-output" aria-live="polite"></div>
                   <div id="si-observation" class="si-observation" hidden></div>
-                  <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                  <section id="si-viewer-instruments" class="si-viewer-instrument-section" aria-label="Instrumentos conectados" hidden>
+                    <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                  </section>
                   </section>
                 </div>
-                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div>
+                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records" class="si-data-records"></div>
                   <div class="si-dock-data-actions"><a href="#/caderno" class="button outline">Abrir Caderno</a><a href="#/relatorios" class="button outline">Abrir Relatórios</a></div>
                 </div>
               </div>

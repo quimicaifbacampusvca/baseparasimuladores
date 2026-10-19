@@ -29,4 +29,4 @@ assert.equal(sandbox.BaseDemoSI.currentRoute("#/ambiente"),"ambiente");
 assert.equal(sandbox.BaseDemoSI.currentRoute("#/rota-inexistente"),"inicio");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("invalido"),"sistema");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("escuro"),"escuro");
-console.log(`OK: fundação preservada na 0.9.6, ${localRefs.length} referências HTML, 17 arquivos no precache, contratos e ausência de dependências remotas.`);
+console.log(`OK: fundação preservada na 0.9.7, ${localRefs.length} referências HTML, 17 arquivos no precache, contratos e ausência de dependências remotas.`);

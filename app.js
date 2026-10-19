@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.6",
+        version: "0.9.7",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1469,7 +1469,10 @@ var BaseDemoSI;
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
-            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : detail ? "Investigar" : "Ver";
+            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : detail ? (BaseDemoSI.activeViewer()?.title ?? "Ver") : "Ver";
+        const instruments = node("si-viewer-instruments");
+        if (instruments)
+            instruments.hidden = !(detail && BaseDemoSI.activeViewer()?.capability === "measure" && BaseDemoSI.moduleAllows("measure"));
         const back = node("si-dock-viewer-back");
         if (back)
             back.hidden = !detail;
@@ -1703,18 +1706,19 @@ var BaseDemoSI;
             if (container)
                 container.scrollTop = 0;
         }));
-        document.querySelectorAll("[data-right-tab]").forEach(b => b.addEventListener("click", () => {
-            viewerLevel = "catalog";
-            changeWorkspace({ type: "right-tab", tab: b.dataset.rightTab });
-            const container = node("si-right-scroll");
-            if (container)
-                container.scrollTop = 0;
-        }));
         node("si-dock-viewer-back")?.addEventListener("click", () => {
             viewerLevel = "catalog";
             renderWorkspace();
             node("si-right-scroll").scrollTop = 0;
-            node("si-viewer-buttons")?.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true });
+            (node("si-viewer-buttons")?.querySelector('[aria-pressed="true"]')
+                ?? node("si-viewer-buttons")?.querySelector("button"))?.focus({ preventScroll: true });
+        });
+        window.addEventListener("si-viewer-family-selected", () => {
+            viewerLevel = "catalog";
+            renderWorkspace();
+            const scroll = node("si-right-scroll");
+            if (scroll)
+                scroll.scrollTop = 0;
         });
         window.addEventListener("si-viewer-selected", () => {
             viewerLevel = "detail";
@@ -1727,7 +1731,11 @@ var BaseDemoSI;
         node("si-expand")?.addEventListener("click", () => changeWorkspace({ type: "expand" }));
         node("si-sheet-backdrop")?.addEventListener("click", () => { const side = activeSide(); if (side)
             closeWorkspace(side); });
-        window.addEventListener("si-module-change", () => { renderWorkspace(); persistWorkspace(); });
+        window.addEventListener("si-module-change", () => {
+            viewerLevel = "catalog";
+            renderWorkspace();
+            persistWorkspace();
+        });
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);
@@ -2041,8 +2049,48 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    const familyNames = { observar: "Observar", medir: "Medir", analisar: "Analisar" };
+    // Ícones vetoriais próprios do contrato de navegação da família (SVGs locais).
+    const familyIcons = {
+        observar: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
+        medir: "M4 17 17 4l3 3L7 20H4ZM8 13l2 2M11 10l2 2M14 7l2 2",
+        analisar: "M4 3v17h17M7 16l4-5 4 2 5-8"
+    };
+    const familyDescriptions = {
+        observar: "Representações e propriedades dos objetos em foco.",
+        medir: "Instrumentos disponíveis e leituras da investigação.",
+        analisar: "Comparações e interpretações dos dados da cena."
+    };
     const viewerRegistry = new Map();
     let selectedViewer = "observacao";
+    let selectedFamily = "observar";
+    const viewerFamilyKey = "viewer-family-selection-v1";
+    function viewerFamily(capability) {
+        return capability === "measure" ? "medir" : capability === "analyze" ? "analisar" : "observar";
+    }
+    BaseDemoSI.viewerFamily = viewerFamily;
+    function activeViewer() {
+        const viewer = viewerRegistry.get(selectedViewer);
+        return viewer && BaseDemoSI.moduleAllows(viewer.capability) ? viewer : null;
+    }
+    BaseDemoSI.activeViewer = activeViewer;
+    function availableViewerFamilies() {
+        const choices = new Set([...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability)).map(v => viewerFamily(v.capability)));
+        return Object.keys(familyNames).filter(id => choices.has(id));
+    }
+    BaseDemoSI.availableViewerFamilies = availableViewerFamilies;
+    function currentViewerFamily() { return selectedFamily; }
+    BaseDemoSI.currentViewerFamily = currentViewerFamily;
+    function chooseViewerFamily(id) {
+        if (!availableViewerFamilies().includes(id))
+            return false;
+        selectedFamily = id;
+        BaseDemoSI.storage.write(viewerFamilyKey, id);
+        renderViewers(viewerScene?.());
+        window.dispatchEvent(new Event("si-viewer-family-selected"));
+        return true;
+    }
+    BaseDemoSI.chooseViewerFamily = chooseViewerFamily;
     let viewerScene;
     const viewerKey = "viewer-selection-v1";
     const label = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
@@ -2063,7 +2111,9 @@ var BaseDemoSI;
         if (!viewer || !BaseDemoSI.moduleAllows(viewer.capability))
             return false;
         selectedViewer = id;
+        selectedFamily = viewerFamily(viewer.capability);
         BaseDemoSI.storage.write(viewerKey, id);
+        BaseDemoSI.storage.write(viewerFamilyKey, selectedFamily);
         renderViewers(viewerScene?.());
         return true;
     }
@@ -2072,16 +2122,58 @@ var BaseDemoSI;
         if (!snapshot)
             return;
         const buttons = document.getElementById("si-viewer-buttons"), output = document.getElementById("si-viewer-output");
-        if (!buttons || !output)
+        const tabs = document.getElementById("si-viewer-families"), description = document.getElementById("si-viewer-family-description");
+        const panel = document.getElementById("si-viewer-family-panel");
+        if (!buttons || !output || !tabs || !description || !panel)
             return;
         const allowed = [...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability));
+        const families = availableViewerFamilies();
+        if (!families.includes(selectedFamily))
+            selectedFamily = families[0] ?? "observar";
         if (!allowed.some(v => v.id === selectedViewer))
-            selectedViewer = allowed[0]?.id ?? "";
+            selectedViewer = allowed.find(v => viewerFamily(v.capability) === selectedFamily)?.id ?? "";
+        tabs.replaceChildren();
+        for (const family of families) {
+            const tab = document.createElement("button");
+            tab.type = "button";
+            tab.className = "si-viewer-family-tab";
+            const svgNs = "http:" + "//www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNs, "svg");
+            svg.setAttribute("viewBox", "0 0 24 24");
+            svg.setAttribute("fill", "none");
+            svg.setAttribute("stroke", "currentColor");
+            svg.setAttribute("stroke-width", "1.8");
+            svg.setAttribute("stroke-linecap", "round");
+            svg.setAttribute("stroke-linejoin", "round");
+            svg.setAttribute("aria-hidden", "true");
+            svg.classList.add("si-viewer-family-icon");
+            const shape = document.createElementNS(svgNs, "path");
+            shape.setAttribute("d", familyIcons[family]);
+            svg.append(shape);
+            tab.append(svg, label("span", familyNames[family]));
+            tab.setAttribute("role", "tab");
+            tab.setAttribute("aria-selected", String(family === selectedFamily));
+            tab.tabIndex = family === selectedFamily ? 0 : -1;
+            tab.setAttribute("aria-controls", "si-viewer-family-panel");
+            tab.addEventListener("click", () => chooseViewerFamily(family));
+            tab.addEventListener("keydown", ev => {
+                if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft" && ev.key !== "Home" && ev.key !== "End")
+                    return;
+                ev.preventDefault();
+                const i = families.indexOf(family);
+                const next = ev.key === "Home" ? families[0] : ev.key === "End" ? families[families.length - 1] : families[(i + (ev.key === "ArrowRight" ? 1 : -1) + families.length) % families.length];
+                chooseViewerFamily(next);
+                tabs.querySelector('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true });
+            });
+            tabs.append(tab);
+        }
+        panel.setAttribute("aria-label", `${familyNames[selectedFamily]} — ferramentas`);
+        description.textContent = families.length ? familyDescriptions[selectedFamily] : "Nenhuma família disponível neste módulo.";
         buttons.replaceChildren();
-        for (const v of allowed) {
+        for (const v of allowed.filter(v => viewerFamily(v.capability) === selectedFamily)) {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "button outline";
+            btn.className = "si-viewer-item";
             btn.textContent = v.title;
             btn.setAttribute("aria-pressed", String(selectedViewer === v.id));
             btn.addEventListener("click", () => { if (chooseViewer(v.id))
@@ -2089,7 +2181,7 @@ var BaseDemoSI;
             buttons.append(btn);
         }
         output.replaceChildren();
-        const chosen = viewerRegistry.get(selectedViewer);
+        const chosen = activeViewer();
         if (!chosen) {
             output.append(label("p", "Não há visualizadores habilitados neste módulo."));
             return;
@@ -2104,7 +2196,7 @@ var BaseDemoSI;
     BaseDemoSI.renderViewers = renderViewers;
     function setupViewers(scene) {
         viewerScene = scene;
-        registerViewer({ id: "observacao", title: "Observar", capability: "observe", render(s, _, out) {
+        registerViewer({ id: "observacao", title: "Propriedades da cena", capability: "observe", render(s, _, out) {
                 const selected = s.entities.find(e => e.id === s.selectedId);
                 out.append(label("h3", "Observação"), label("p", selected ? `Objeto em foco: ${selected.label}` : "Selecione um objeto na cena."));
                 if (selected) {
@@ -2117,7 +2209,7 @@ var BaseDemoSI;
                     out.append(dl);
                 }
             } });
-        registerViewer({ id: "medicao", title: "Medir", capability: "measure", render(_, records, out) {
+        registerViewer({ id: "medicao", title: "Leituras registradas", capability: "measure", render(_, records, out) {
                 out.append(label("h3", "Medições"));
                 if (!records.length) {
                     out.append(label("p", "Nenhuma leitura registrada."));
@@ -2128,7 +2220,7 @@ var BaseDemoSI;
                     list.append(label("li", `${entry.label}: ${entry.value} ${entry.unit}`.trim()));
                 out.append(list);
             } });
-        registerViewer({ id: "analise", title: "Analisar", capability: "analyze", render(s, records, out) {
+        registerViewer({ id: "analise", title: "Distribuição dos objetos", capability: "analyze", render(s, records, out) {
                 out.append(label("h3", "Análise da cena"));
                 const kinds = { block: 0, circle: 0, label: 0 };
                 for (const e of s.entities)
@@ -2144,6 +2236,11 @@ var BaseDemoSI;
         const stored = BaseDemoSI.storage.read(viewerKey);
         if (stored && viewerRegistry.has(stored))
             selectedViewer = stored;
+        const family = BaseDemoSI.storage.read(viewerFamilyKey);
+        if (family && ["observar", "medir", "analisar"].includes(family))
+            selectedFamily = family;
+        else
+            selectedFamily = viewerRegistry.has(selectedViewer) ? viewerFamily(viewerRegistry.get(selectedViewer).capability) : "observar";
         window.addEventListener("si-module-change", () => renderViewers(scene()));
         window.addEventListener("si-education-observation", () => renderViewers(scene()));
         renderViewers(scene());
