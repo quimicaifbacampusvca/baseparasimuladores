@@ -31,6 +31,7 @@
     "src/education.ts",
     "src/records.ts",
     "src/scene.ts",
+    "src/presets.ts",
     "src/scene-interaction.ts",
     "src/workspace.ts",
     "src/workspace-ui.ts",

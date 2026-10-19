@@ -157,6 +157,7 @@ namespace BaseDemoSI {
     setupViewers(()=>store.getSnapshot());
     setupEducation(store);
     setupJournal(store);
+    setupPresets(store);
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-add-kind]")) {
       button.addEventListener("click", () => {
         const kind = button.dataset.addKind as EntityKind;

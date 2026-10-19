@@ -22,7 +22,8 @@ namespace BaseDemoSI {
     | { readonly type: "add"; readonly entity: SceneEntity }
     | { readonly type: "update"; readonly id: string; readonly changes: Partial<Omit<SceneEntity,"id"|"kind">> }
     | { readonly type: "remove"; readonly id: string }
-    | { readonly type: "clear" };
+    | { readonly type: "clear" }
+    | { readonly type: "replace"; readonly snapshot: SceneSnapshot };
   export type SceneEvent = "edit" | "selection" | "history";
   export interface SceneStore {
     getSnapshot(): SceneSnapshot;

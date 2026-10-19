@@ -68,3 +68,31 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 :root.si-simple-reading .si-home-family .si-home-path {font-weight:600}
 :root.si-no-motion *, :root.si-no-motion *::before, :root.si-no-motion *::after {animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
 @media(max-width:640px){:root.si-font-mod .si-drawer-body{overflow-x:hidden}}
+
+/* Revisão 0.9.10: recursos offline do menu */
+.si-preset-dialog{border:1px solid var(--border);border-radius:15px;background:var(--surface);color:var(--text);padding:0;width:min(530px,calc(100vw - 24px));max-height:min(86dvh,760px);box-shadow:0 22px 65px #0007;overflow:auto}
+.si-preset-dialog::backdrop{background:rgba(5,11,22,.7)}
+.si-preset-layout{padding:20px;display:grid;gap:12px}
+.si-preset-layout h2{font-size:1.2rem;margin:0}.si-preset-layout p{font-size:.9rem;color:var(--muted);margin:0}
+.si-preset-list{display:grid;gap:8px;max-height:42dvh;overflow-y:auto;overscroll-behavior:contain}
+.si-preset-entry{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;border:1px solid var(--border);border-radius:10px}
+.si-preset-entry span{flex:1;min-width:135px;font-size:.9rem}
+.si-preset-dialog button{min-height:44px;border-radius:9px;border:1px solid var(--border);color:var(--text);background:var(--tint);padding:8px 12px;cursor:pointer}
+.si-preset-dialog button:hover:not(:disabled){border-color:var(--accent)}.si-preset-dialog button:disabled{opacity:.5;cursor:not-allowed}
+.si-preset-layout label{font-weight:650}.si-preset-layout input{min-height:44px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:8px 12px}
+.si-preset-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.si-coach-dialog{inset:0;margin:0;padding:0;border:0;background:transparent;color:var(--text);width:100vw;max-width:none;height:100dvh;max-height:none;overflow:hidden}
+.si-coach-dialog::backdrop{background:rgba(2,9,19,.77)}
+.si-coach-ring{position:absolute;box-shadow:0 0 0 2px var(--accent),0 0 20px 2px var(--accent);border:2px solid var(--accent);border-radius:11px;pointer-events:none}
+.si-coach-card{position:absolute;width:min(430px,calc(100vw - 24px));max-height:75dvh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 45px #0008;padding:18px;display:grid;gap:11px}
+.si-coach-step{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:.75rem;margin:0}
+.si-coach-card h2{font-size:1.15rem;margin:0}.si-coach-text{font-size:.9rem;line-height:1.5;margin:0}
+.si-coach-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.si-coach-actions button{min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--tint);cursor:pointer}
+.si-coach-actions button:disabled{opacity:.4;cursor:not-allowed}
+:root.si-color-protanopia #main-column,:root.si-color-protanopia #sidebar{filter:url(#si-color-protanopia)}
+:root.si-color-deuteranopia #main-column,:root.si-color-deuteranopia #sidebar{filter:url(#si-color-deuteranopia)}
+:root.si-color-tritanopia #main-column,:root.si-color-tritanopia #sidebar{filter:url(#si-color-tritanopia)}
+:root.si-color-acromatopsia #main-column,:root.si-color-acromatopsia #sidebar{filter:grayscale(1)}
+@media(max-width:400px){.si-preset-layout{padding:14px}.si-preset-entry button{flex:1}}
+@media(prefers-reduced-motion:reduce){.si-coach-ring{transition:none}}

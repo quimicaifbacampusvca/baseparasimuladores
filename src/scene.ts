@@ -81,6 +81,11 @@ namespace BaseDemoSI {
             if (selectedId === command.id) selectedId = null;
             break;
           }
+          case "replace": {
+            const replacement = parseScene(command.snapshot);
+            if (!replacement) return false;
+            return commit(replacement);
+          }
           case "clear":
             if (!entities.length) return false;
             entities.length = 0; selectedId = null; break;

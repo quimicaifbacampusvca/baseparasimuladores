@@ -36,7 +36,7 @@ namespace BaseDemoSI {
     const startup=menuGet("si-startup-select") as HTMLSelectElement|null;if(startup)startup.value=pref.startup;
     // Acromatopsia é representável por escala cinza. Os demais perfis
     // demandam transformações de cor validadas e permanecem informativos.
-    root.classList.toggle("si-achromatopsia",pref.vision==="acromatopsia");
+    for(const filter of ["protanopia","deuteranopia","tritanopia","acromatopsia"])root.classList.toggle(`si-color-${filter}`,pref.vision===filter);
     root.dataset.siIntro=pref.intro?"on":"off";
   }
   function updatePref<K extends keyof MenuPref>(key:K,value:MenuPref[K]):void {
@@ -85,23 +85,95 @@ namespace BaseDemoSI {
     const trigger=menuGet(triggerId);const panel=menuGet(panelId);if(!panel||!trigger)return;
     panel.hidden=!panel.hidden;trigger.setAttribute("aria-expanded",String(!panel.hidden));
   }
-  function tour():void {
-    window.location.hash="#/ambiente";
+  // Tour em coachmarks: não altera objetos, não interfere com missões e não
+  // ocupa a cena com uma folha inferior que desloque o experimento.
+  export function startWorkspaceTour():void {
+    if(getActivityContext()){
+      notify("O tour está disponível apenas no ambiente livre. Encerre a atividade orientada primeiro.","warning");
+      return;
+    }
+    const steps=[
+      {target:"#si-stage",title:"Conheça o ambiente",content:"Esta é a cena central, onde você seleciona e movimenta objetos."},
+      {target:'[data-open-dock="montagem"]',title:"Prepare a montagem",content:"Abra Montagem para preparar a cena, selecionar objetos e escolher o módulo de trabalho."},
+      {target:'[data-scene-view="overview"]',title:"Foco e visão geral",content:"Alterne entre examinar um objeto selecionado e acompanhar todos os objetos da montagem."},
+      {target:'[data-open-dock="ver"]',title:"Observe e meça",content:"Abra Ver para escolher recursos de Observar, Medir e Analisar compatíveis com o módulo."},
+      {target:'[data-open-dock="dados"]',title:"Consulte seus registros",content:"Em Dados, você encontra o histórico e os atalhos para Caderno e Relatórios."}
+    ];
+    const launch=()=>{
+      // Evitar sobreposição de diálogos ou de folhas inferiores.
+      const previousFocus=document.activeElement as HTMLElement|null;
+      const dialog=document.createElement("dialog");dialog.className="si-coach-dialog";
+      dialog.setAttribute("aria-label","Tour guiado do ambiente");
+      const ring=document.createElement("div");ring.className="si-coach-ring";ring.setAttribute("aria-hidden","true");
+      const card=document.createElement("section");card.className="si-coach-card";
+      const step=document.createElement("p");step.className="si-coach-step";
+      const title=document.createElement("h2");title.id="si-coach-title";
+      const content=document.createElement("p");content.className="si-coach-text";
+      const actions=document.createElement("div");actions.className="si-coach-actions";
+      const back=document.createElement("button"),next=document.createElement("button"),skip=document.createElement("button");
+      for(const button of [back,next,skip])button.type="button";
+      back.textContent="Voltar";skip.textContent="Pular tour";
+      actions.append(skip,back,next);card.append(step,title,content,actions);dialog.append(ring,card);
+      dialog.setAttribute("aria-labelledby",title.id);
+      document.body.append(dialog);
+      let current=0;
+      const position=()=>{
+        const target=document.querySelector<HTMLElement>(steps[current].target);
+        const box=target?.getBoundingClientRect();
+        const vw=window.innerWidth,vh=window.innerHeight;
+        ring.hidden=!box||box.width<=0||box.height<=0;
+        if(box&&!ring.hidden){
+          const x=Math.max(4,box.left-5),y=Math.max(4,box.top-5);
+          ring.style.left=`${x}px`;ring.style.top=`${y}px`;
+          ring.style.width=`${Math.min(vw-4,box.right+5)-x}px`;
+          ring.style.height=`${Math.min(vh-4,box.bottom+5)-y}px`;
+        }
+        const cw=Math.min(430,Math.max(260,vw-24));
+        const ch=card.getBoundingClientRect().height;
+        const freeBottom=box?vh-box.bottom:0;
+        const freeTop=box?box.top:0;
+        let cy=(box&&freeBottom>=ch+22)?box.bottom+12:(box&&freeTop>=ch+22)?box.top-ch-12:vh-ch-12;
+        cy=Math.max(8,Math.min(cy,vh-ch-8));
+        let cx=box?box.left+box.width/2-cw/2:(vw-cw)/2;
+        cx=Math.max(10,Math.min(cx,vw-cw-10));
+        card.style.left=`${cx}px`;card.style.top=`${cy}px`;
+      };
+      const show=(index:number)=>{
+        current=index;step.textContent=`PASSO ${current+1} DE ${steps.length}`;
+        title.textContent=steps[current].title;content.textContent=steps[current].content;
+        back.disabled=index===0;next.textContent=index===steps.length-1?"Concluir":"Próximo";
+        position();next.focus({preventScroll:true});
+      };
+      let cleaned=false;
+      const cleanup=()=>{
+        if(cleaned)return;cleaned=true;
+        window.removeEventListener("resize",position);
+        document.removeEventListener("scroll",position,true);
+        dialog.remove();
+        const returnTarget=previousFocus?.isConnected && !previousFocus.closest("#sidebar")?previousFocus:menuGet("nav-toggle");
+        returnTarget?.focus({preventScroll:true});
+      };
+      dialog.addEventListener("close",cleanup,{once:true});
+      dialog.addEventListener("cancel",event=>{event.preventDefault();dialog.close();});
+      dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close();});
+      skip.addEventListener("click",()=>dialog.close());
+      back.addEventListener("click",()=>show(Math.max(0,current-1)));
+      next.addEventListener("click",()=>{if(current>=steps.length-1)dialog.close();else show(current+1);});
+      dialog.addEventListener("keydown",event=>{
+        if(event.key!=="Tab")return;
+        const buttons=[skip,back,next].filter(button=>!button.disabled);
+        if(event.shiftKey&&document.activeElement===buttons[0]){event.preventDefault();buttons[buttons.length-1].focus();}
+        else if(!event.shiftKey&&document.activeElement===buttons[buttons.length-1]){event.preventDefault();buttons[0].focus();}
+      });
+      window.addEventListener("resize",position);
+      document.addEventListener("scroll",position,true);
+      dialog.showModal();show(0);
+    };
     closeNavigationDrawer(false);
-    const targets=["#si-stage","#si-dock-left","#si-dock-right",".si-actionbar"];
-    const captions=["Esta é a cena principal, que recebe os objetos.","Montagem reúne objetos e ferramentas.","Ver e Dados apresentam visualizações e registros.","A barra de ações reúne operações de edição e histórico."];
-    let index=0;
-    const root=document.createElement("div");root.className="si-tour-overlay";root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");root.setAttribute("aria-label","Tour do ambiente");
-    const card=document.createElement("section");card.className="si-tour-card";
-    const title=document.createElement("h2");const detail=document.createElement("p");const buttons=document.createElement("div");
-    const back=document.createElement("button"),next=document.createElement("button"),exit=document.createElement("button");
-    back.type=next.type=exit.type="button";back.textContent="Anterior";exit.textContent="Encerrar";
-    function done(){document.removeEventListener("keydown",key);root.remove();}
-    function key(ev:KeyboardEvent){if(ev.key==="Escape"){ev.preventDefault();done();}}
-    function render(){title.textContent=`Tour do ambiente · ${index+1}/${captions.length}`;detail.textContent=captions[index];back.disabled=index===0;next.textContent=index===captions.length-1?"Concluir":"Próximo";
-      const item=document.querySelector<HTMLElement>(targets[index]);if(item){item.scrollIntoView({block:"center",behavior:"instant"});}}
-    back.addEventListener("click",()=>{index=Math.max(index-1,0);render();});next.addEventListener("click",()=>{if(index===captions.length-1)done();else{index++;render();}});exit.addEventListener("click",done);
-    buttons.append(back,next,exit);card.append(title,detail,buttons);root.append(card);document.body.append(root);render();next.focus();document.addEventListener("keydown",key);
+    if(currentRoute(window.location.hash)!=="ambiente"){
+      window.location.hash="#/ambiente";
+      window.requestAnimationFrame(()=>window.requestAnimationFrame(launch));
+    }else window.requestAnimationFrame(launch);
   }
   export function setupMenuReview():void {
     try {const value=storage.read(prefKey);if(value){const obj=JSON.parse(value) as Partial<MenuPref>;
@@ -119,14 +191,20 @@ namespace BaseDemoSI {
     menuGet("nav-toggle")?.addEventListener("click",()=>requestAnimationFrame(syncMenuReview));
     window.addEventListener("si-route-changed",syncMenuReview);
     menuGet("si-startup-select")?.addEventListener("change",event=>updatePref("startup",(event.target as HTMLSelectElement).value));
+    menuGet("si-projector")?.addEventListener("click",event=>{
+      if(getActivityContext()){event.preventDefault();notify("O modo projetor não pode ser alterado durante uma atividade orientada.","warning");}
+    });
     for(const [id,key] of [["si-dark","dark"],["si-contrast","contrast"],["si-letter-spacing","spacing"],["si-motion","motion"],["si-intro","intro"],["si-simple","simple"],["si-projector","projector"]] as [string,keyof MenuPref][]){
       menuGet(id)?.addEventListener("change",event=>updatePref(key,(event.target as HTMLInputElement).checked));
     }
     for(const [id,delta] of [["si-font-minus",-.1],["si-font-plus",.1]] as [string,number][]){menuGet(id)?.addEventListener("click",()=>updatePref("font",Math.round(Math.max(.8,Math.min(2,pref.font+delta))*10)/10));}
-    menuGet("si-vision-select")?.addEventListener("change",event=>{const v=(event.target as HTMLSelectElement).value;updatePref("vision",v);if(v!=="none"&&v!=="acromatopsia")notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.","info");});
+    menuGet("si-vision-select")?.addEventListener("change",event=>{
+      const v=(event.target as HTMLSelectElement).value;updatePref("vision",v);
+      if(v!=="none")notify("Simulação aproximada de visão de cores ativada. Consulte também os rótulos textuais.","info");
+    });
     menuGet("si-a11y-reset")?.addEventListener("click",()=>{menuPreferences({...prefDefault});storage.write(prefKey,JSON.stringify(pref));notify("Preferências de acessibilidade restauradas.","success");});
     menuGet("si-drawer-install")?.addEventListener("click",()=>{closeNavigationDrawer(false);menuGet("distribution-install")?.click();});
-    menuGet("si-drawer-tour")?.addEventListener("click",tour);
+    menuGet("si-drawer-tour")?.addEventListener("click",startWorkspaceTour);
     menuGet("si-guide-open")?.addEventListener("click",()=>{closeNavigationDrawer(false);window.location.hash="#/manual";notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.","info");});
     menuGet("si-activity-about")?.addEventListener("click",()=>{if(activityLink){closeNavigationDrawer(false);window.location.hash=activityLink;}});
     menuGet("si-activity-finish")?.addEventListener("click",()=>{

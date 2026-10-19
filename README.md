@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.9
+# Base Demo Oficial - SI · 0.9.10
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.9 — Auditoria funcional do menu e dos controles contextuais.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.10 — Montagens prontas, Tour guiado e preferências de apresentação.**
 
 ## Executar
 
@@ -65,4 +65,15 @@ A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados;
 
 ## Auditoria funcional do menu · 0.9.9
 
-A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Permanecem fora desta rodada Montagens prontas, Libras offline e os perfis de visão de cores sem filtro validado. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
+A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline e o feedback de extensões ainda aguardam implementação compatível. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
+
+## Revisão de menu · 0.9.10
+
+- Montagens prontas neutras, incluindo criação e exclusão de modelos locais (até 8) com validação; substituição da cena com confirmação e uma única operação Desfazer.
+- Tour guiado de cinco etapas com destaque dos controles reais, botões Voltar, Próximo e Pular, ESC e foco devolvido ao comando.
+- Perfis de visão de cores: filtros de simulação aproximada com matrizes locais, não critérios clínicos nem substitutos dos rótulos textuais.
+- Modo projetor e preferência de tela inicial preservados e sem interferir em atividades orientadas.
+- Sonorização, vibração e Libras permanecem indisponíveis sem extensões locais homologadas; a aplicação não importa bibliotecas por CDN.
+- Homologação real de WebKit/Safari, Firefox, PWA instalada e dispositivos físicos continua pendente.
+
+Consulte `docs/AUDITORIA-MENU-0.9.10.md`.

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-VtLWOrjlcaHxZPAR9dx17YbbwAGLIVKQTXzA1ok4GIw='; script-src 'sha256-f5F2Tb+RQpL9gjgk9WNJhX3MRvrXerhvbFAbg4B/OF4='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-dVSE10JaB6pdXQWouF9mP0AfX75dfJ67o9v5K95oHkk='; script-src 'sha256-ldoZb3j70WB3IT+V1Q6seomMsdz7/3TJgp0TaxqPktI='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -751,6 +751,34 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 :root.si-no-motion *, :root.si-no-motion *::before, :root.si-no-motion *::after {animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
 @media(max-width:640px){:root.si-font-mod .si-drawer-body{overflow-x:hidden}}
 
+/* Revisão 0.9.10: recursos offline do menu */
+.si-preset-dialog{border:1px solid var(--border);border-radius:15px;background:var(--surface);color:var(--text);padding:0;width:min(530px,calc(100vw - 24px));max-height:min(86dvh,760px);box-shadow:0 22px 65px #0007;overflow:auto}
+.si-preset-dialog::backdrop{background:rgba(5,11,22,.7)}
+.si-preset-layout{padding:20px;display:grid;gap:12px}
+.si-preset-layout h2{font-size:1.2rem;margin:0}.si-preset-layout p{font-size:.9rem;color:var(--muted);margin:0}
+.si-preset-list{display:grid;gap:8px;max-height:42dvh;overflow-y:auto;overscroll-behavior:contain}
+.si-preset-entry{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px;border:1px solid var(--border);border-radius:10px}
+.si-preset-entry span{flex:1;min-width:135px;font-size:.9rem}
+.si-preset-dialog button{min-height:44px;border-radius:9px;border:1px solid var(--border);color:var(--text);background:var(--tint);padding:8px 12px;cursor:pointer}
+.si-preset-dialog button:hover:not(:disabled){border-color:var(--accent)}.si-preset-dialog button:disabled{opacity:.5;cursor:not-allowed}
+.si-preset-layout label{font-weight:650}.si-preset-layout input{min-height:44px;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:8px 12px}
+.si-preset-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.si-coach-dialog{inset:0;margin:0;padding:0;border:0;background:transparent;color:var(--text);width:100vw;max-width:none;height:100dvh;max-height:none;overflow:hidden}
+.si-coach-dialog::backdrop{background:rgba(2,9,19,.77)}
+.si-coach-ring{position:absolute;box-shadow:0 0 0 2px var(--accent),0 0 20px 2px var(--accent);border:2px solid var(--accent);border-radius:11px;pointer-events:none}
+.si-coach-card{position:absolute;width:min(430px,calc(100vw - 24px));max-height:75dvh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 45px #0008;padding:18px;display:grid;gap:11px}
+.si-coach-step{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:.75rem;margin:0}
+.si-coach-card h2{font-size:1.15rem;margin:0}.si-coach-text{font-size:.9rem;line-height:1.5;margin:0}
+.si-coach-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.si-coach-actions button{min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--tint);cursor:pointer}
+.si-coach-actions button:disabled{opacity:.4;cursor:not-allowed}
+:root.si-color-protanopia #main-column,:root.si-color-protanopia #sidebar{filter:url(#si-color-protanopia)}
+:root.si-color-deuteranopia #main-column,:root.si-color-deuteranopia #sidebar{filter:url(#si-color-deuteranopia)}
+:root.si-color-tritanopia #main-column,:root.si-color-tritanopia #sidebar{filter:url(#si-color-tritanopia)}
+:root.si-color-acromatopsia #main-column,:root.si-color-acromatopsia #sidebar{filter:grayscale(1)}
+@media(max-width:400px){.si-preset-layout{padding:14px}.si-preset-entry button{flex:1}}
+@media(prefers-reduced-motion:reduce){.si-coach-ring{transition:none}}
+
 /* Base Demo Oficial - SI 0.9.8 | contrato mobile, camada final da cascata. */
 /* Este arquivo governa somente a interface compacta; a geometria desktop é preservada. */
 @media (max-width:900px){
@@ -813,6 +841,11 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 </style>
 </head>
 <body>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+<filter id="si-color-protanopia" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".152286 1.052583 -.204868 0 0 .114503 .786281 .099216 0 0 -.003882 -.048116 1.051998 0 0 0 0 0 1 0"/></filter>
+<filter id="si-color-deuteranopia" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".367322 .860646 -.227968 0 0 .280085 .672501 .047413 0 0 -.011820 .042940 .968881 0 0 0 0 0 1 0"/></filter>
+<filter id="si-color-tritanopia" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1.255528 -.076749 -.178779 0 0 -.078411 .930809 .147602 0 0 .004733 .691367 .303900 0 0 0 0 0 1 0"/></filter>
+</defs></svg>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <div class="app-shell">
     <aside class="side si-menu-drawer" id="sidebar" role="dialog" aria-modal="true" aria-labelledby="si-menu-title" aria-hidden="true">
@@ -827,7 +860,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
    <button type="button" class="si-drawer-nav-toggle" id="si-nav-group-toggle" aria-expanded="true" aria-controls="si-nav-main"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Navegar</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
    <nav id="si-nav-main" class="si-drawer-links" aria-label="Destinos da plataforma"><a class="si-drawer-item" href="#/inicio" data-route="inicio"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Início</span></a><a class="si-drawer-item" href="#/aprender" data-route="aprender"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8ZM8 19h8M10 22h4M9 8l3 3 3-3M12 11v5"/></svg><span>Aprender</span></a><a class="si-drawer-item" href="#/missoes" data-route="missoes"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-8-8M16 12a4 4 0 1 1-4-4M12 12l9-9M17 3h4v4"/></svg><span>Missões</span></a><a class="si-drawer-item" href="#/roteiros" data-route="roteiros"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Roteiros Experimentais</span></a><a class="si-drawer-item" href="#/ambiente" data-route="ambiente"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4h8M5 4v14a3 3 0 0 0 6 0V4M5 13h6M18 5c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6Z"/></svg><span>Ambiente</span></a><a class="si-drawer-item" href="#/caderno" data-route="caderno"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3h14v18H6ZM3 7h5M3 12h5M3 17h5M11 7h5M11 11h5M11 15h3"/></svg><span>Caderno</span></a><a class="si-drawer-item" href="#/manual" data-route="manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Manual</span></a></nav>
  </section>
- <section class="si-drawer-section" aria-labelledby="si-resources-title"><h3 id="si-resources-title">Recursos</h3><div class="si-drawer-links"><button class="si-drawer-item si-menu-pending" type="button" disabled title="Aguardando integração funcional" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"/></svg><span>Montagens prontas</span><small>Em integração</small></button><button type="button" class="si-drawer-item" id="si-drawer-tour" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Tour da bancada</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-resources-title"><h3 id="si-resources-title">Recursos</h3><div class="si-drawer-links"><button class="si-drawer-item" type="button" id="si-drawer-presets" aria-haspopup="dialog"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"/></svg><span>Montagens prontas</span></button><button type="button" class="si-drawer-item" id="si-drawer-tour" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Tour da bancada</span></button></div></section>
  <section class="si-drawer-section" aria-labelledby="si-teacher-title"><h3 id="si-teacher-title">Professor</h3><div class="si-drawer-links"><a class="si-drawer-item" href="#/professor" data-route="professor"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M2 20v-5a3 3 0 0 1 6 0v5M13 6h8v15h-9V6h1M14 3h5v5h-5ZM15 12h3M15 16h3"/></svg><span>Área do Professor</span></a><a class="si-drawer-item" href="#/manual" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Apoio pedagógico</span></a><button type="button" class="si-drawer-item" id="si-guide-open" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Ideias para uma aula acessível</span></button></div></section>
  <section class="si-drawer-section" aria-labelledby="si-preferences-title"><h3 id="si-preferences-title">Preferências</h3>
   <button class="si-drawer-nav-toggle" id="si-a11y-toggle" type="button" aria-expanded="false" aria-controls="si-a11y-panel"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Acessibilidade</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -1245,7 +1278,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.9",
+        version: "0.9.10",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1458,7 +1491,8 @@ var BaseDemoSI;
             startup.value = pref.startup;
         // Acromatopsia é representável por escala cinza. Os demais perfis
         // demandam transformações de cor validadas e permanecem informativos.
-        root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+        for (const filter of ["protanopia", "deuteranopia", "tritanopia", "acromatopsia"])
+            root.classList.toggle(`si-color-${filter}`, pref.vision === filter);
         root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
@@ -1530,57 +1564,131 @@ var BaseDemoSI;
         panel.hidden = !panel.hidden;
         trigger.setAttribute("aria-expanded", String(!panel.hidden));
     }
-    function tour() {
-        window.location.hash = "#/ambiente";
-        BaseDemoSI.closeNavigationDrawer(false);
-        const targets = ["#si-stage", "#si-dock-left", "#si-dock-right", ".si-actionbar"];
-        const captions = ["Esta é a cena principal, que recebe os objetos.", "Montagem reúne objetos e ferramentas.", "Ver e Dados apresentam visualizações e registros.", "A barra de ações reúne operações de edição e histórico."];
-        let index = 0;
-        const root = document.createElement("div");
-        root.className = "si-tour-overlay";
-        root.setAttribute("role", "dialog");
-        root.setAttribute("aria-modal", "true");
-        root.setAttribute("aria-label", "Tour do ambiente");
-        const card = document.createElement("section");
-        card.className = "si-tour-card";
-        const title = document.createElement("h2");
-        const detail = document.createElement("p");
-        const buttons = document.createElement("div");
-        const back = document.createElement("button"), next = document.createElement("button"), exit = document.createElement("button");
-        back.type = next.type = exit.type = "button";
-        back.textContent = "Anterior";
-        exit.textContent = "Encerrar";
-        function done() { document.removeEventListener("keydown", key); root.remove(); }
-        function key(ev) { if (ev.key === "Escape") {
-            ev.preventDefault();
-            done();
-        } }
-        function render() {
-            title.textContent = `Tour do ambiente · ${index + 1}/${captions.length}`;
-            detail.textContent = captions[index];
-            back.disabled = index === 0;
-            next.textContent = index === captions.length - 1 ? "Concluir" : "Próximo";
-            const item = document.querySelector(targets[index]);
-            if (item) {
-                item.scrollIntoView({ block: "center", behavior: "instant" });
-            }
+    // Tour em coachmarks: não altera objetos, não interfere com missões e não
+    // ocupa a cena com uma folha inferior que desloque o experimento.
+    function startWorkspaceTour() {
+        if (getActivityContext()) {
+            BaseDemoSI.notify("O tour está disponível apenas no ambiente livre. Encerre a atividade orientada primeiro.", "warning");
+            return;
         }
-        back.addEventListener("click", () => { index = Math.max(index - 1, 0); render(); });
-        next.addEventListener("click", () => { if (index === captions.length - 1)
-            done();
-        else {
-            index++;
-            render();
-        } });
-        exit.addEventListener("click", done);
-        buttons.append(back, next, exit);
-        card.append(title, detail, buttons);
-        root.append(card);
-        document.body.append(root);
-        render();
-        next.focus();
-        document.addEventListener("keydown", key);
+        const steps = [
+            { target: "#si-stage", title: "Conheça o ambiente", content: "Esta é a cena central, onde você seleciona e movimenta objetos." },
+            { target: '[data-open-dock="montagem"]', title: "Prepare a montagem", content: "Abra Montagem para preparar a cena, selecionar objetos e escolher o módulo de trabalho." },
+            { target: '[data-scene-view="overview"]', title: "Foco e visão geral", content: "Alterne entre examinar um objeto selecionado e acompanhar todos os objetos da montagem." },
+            { target: '[data-open-dock="ver"]', title: "Observe e meça", content: "Abra Ver para escolher recursos de Observar, Medir e Analisar compatíveis com o módulo." },
+            { target: '[data-open-dock="dados"]', title: "Consulte seus registros", content: "Em Dados, você encontra o histórico e os atalhos para Caderno e Relatórios." }
+        ];
+        const launch = () => {
+            // Evitar sobreposição de diálogos ou de folhas inferiores.
+            const previousFocus = document.activeElement;
+            const dialog = document.createElement("dialog");
+            dialog.className = "si-coach-dialog";
+            dialog.setAttribute("aria-label", "Tour guiado do ambiente");
+            const ring = document.createElement("div");
+            ring.className = "si-coach-ring";
+            ring.setAttribute("aria-hidden", "true");
+            const card = document.createElement("section");
+            card.className = "si-coach-card";
+            const step = document.createElement("p");
+            step.className = "si-coach-step";
+            const title = document.createElement("h2");
+            title.id = "si-coach-title";
+            const content = document.createElement("p");
+            content.className = "si-coach-text";
+            const actions = document.createElement("div");
+            actions.className = "si-coach-actions";
+            const back = document.createElement("button"), next = document.createElement("button"), skip = document.createElement("button");
+            for (const button of [back, next, skip])
+                button.type = "button";
+            back.textContent = "Voltar";
+            skip.textContent = "Pular tour";
+            actions.append(skip, back, next);
+            card.append(step, title, content, actions);
+            dialog.append(ring, card);
+            dialog.setAttribute("aria-labelledby", title.id);
+            document.body.append(dialog);
+            let current = 0;
+            const position = () => {
+                const target = document.querySelector(steps[current].target);
+                const box = target?.getBoundingClientRect();
+                const vw = window.innerWidth, vh = window.innerHeight;
+                ring.hidden = !box || box.width <= 0 || box.height <= 0;
+                if (box && !ring.hidden) {
+                    const x = Math.max(4, box.left - 5), y = Math.max(4, box.top - 5);
+                    ring.style.left = `${x}px`;
+                    ring.style.top = `${y}px`;
+                    ring.style.width = `${Math.min(vw - 4, box.right + 5) - x}px`;
+                    ring.style.height = `${Math.min(vh - 4, box.bottom + 5) - y}px`;
+                }
+                const cw = Math.min(430, Math.max(260, vw - 24));
+                const ch = card.getBoundingClientRect().height;
+                const freeBottom = box ? vh - box.bottom : 0;
+                const freeTop = box ? box.top : 0;
+                let cy = (box && freeBottom >= ch + 22) ? box.bottom + 12 : (box && freeTop >= ch + 22) ? box.top - ch - 12 : vh - ch - 12;
+                cy = Math.max(8, Math.min(cy, vh - ch - 8));
+                let cx = box ? box.left + box.width / 2 - cw / 2 : (vw - cw) / 2;
+                cx = Math.max(10, Math.min(cx, vw - cw - 10));
+                card.style.left = `${cx}px`;
+                card.style.top = `${cy}px`;
+            };
+            const show = (index) => {
+                current = index;
+                step.textContent = `PASSO ${current + 1} DE ${steps.length}`;
+                title.textContent = steps[current].title;
+                content.textContent = steps[current].content;
+                back.disabled = index === 0;
+                next.textContent = index === steps.length - 1 ? "Concluir" : "Próximo";
+                position();
+                next.focus({ preventScroll: true });
+            };
+            let cleaned = false;
+            const cleanup = () => {
+                if (cleaned)
+                    return;
+                cleaned = true;
+                window.removeEventListener("resize", position);
+                document.removeEventListener("scroll", position, true);
+                dialog.remove();
+                const returnTarget = previousFocus?.isConnected && !previousFocus.closest("#sidebar") ? previousFocus : menuGet("nav-toggle");
+                returnTarget?.focus({ preventScroll: true });
+            };
+            dialog.addEventListener("close", cleanup, { once: true });
+            dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); });
+            dialog.addEventListener("click", event => { if (event.target === dialog)
+                dialog.close(); });
+            skip.addEventListener("click", () => dialog.close());
+            back.addEventListener("click", () => show(Math.max(0, current - 1)));
+            next.addEventListener("click", () => { if (current >= steps.length - 1)
+                dialog.close();
+            else
+                show(current + 1); });
+            dialog.addEventListener("keydown", event => {
+                if (event.key !== "Tab")
+                    return;
+                const buttons = [skip, back, next].filter(button => !button.disabled);
+                if (event.shiftKey && document.activeElement === buttons[0]) {
+                    event.preventDefault();
+                    buttons[buttons.length - 1].focus();
+                }
+                else if (!event.shiftKey && document.activeElement === buttons[buttons.length - 1]) {
+                    event.preventDefault();
+                    buttons[0].focus();
+                }
+            });
+            window.addEventListener("resize", position);
+            document.addEventListener("scroll", position, true);
+            dialog.showModal();
+            show(0);
+        };
+        BaseDemoSI.closeNavigationDrawer(false);
+        if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente") {
+            window.location.hash = "#/ambiente";
+            window.requestAnimationFrame(() => window.requestAnimationFrame(launch));
+        }
+        else
+            window.requestAnimationFrame(launch);
     }
+    BaseDemoSI.startWorkspaceTour = startWorkspaceTour;
     function setupMenuReview() {
         try {
             const value = BaseDemoSI.storage.read(prefKey);
@@ -1610,17 +1718,27 @@ var BaseDemoSI;
         menuGet("nav-toggle")?.addEventListener("click", () => requestAnimationFrame(syncMenuReview));
         window.addEventListener("si-route-changed", syncMenuReview);
         menuGet("si-startup-select")?.addEventListener("change", event => updatePref("startup", event.target.value));
+        menuGet("si-projector")?.addEventListener("click", event => {
+            if (getActivityContext()) {
+                event.preventDefault();
+                BaseDemoSI.notify("O modo projetor não pode ser alterado durante uma atividade orientada.", "warning");
+            }
+        });
         for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
             menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
         }
         for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
             menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
         }
-        menuGet("si-vision-select")?.addEventListener("change", event => { const v = event.target.value; updatePref("vision", v); if (v !== "none" && v !== "acromatopsia")
-            BaseDemoSI.notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.", "info"); });
+        menuGet("si-vision-select")?.addEventListener("change", event => {
+            const v = event.target.value;
+            updatePref("vision", v);
+            if (v !== "none")
+                BaseDemoSI.notify("Simulação aproximada de visão de cores ativada. Consulte também os rótulos textuais.", "info");
+        });
         menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
         menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
-        menuGet("si-drawer-tour")?.addEventListener("click", tour);
+        menuGet("si-drawer-tour")?.addEventListener("click", startWorkspaceTour);
         menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
         menuGet("si-activity-about")?.addEventListener("click", () => { if (activityLink) {
             BaseDemoSI.closeNavigationDrawer(false);
@@ -2523,6 +2641,12 @@ var BaseDemoSI;
                             selectedId = null;
                         break;
                     }
+                    case "replace": {
+                        const replacement = parseScene(command.snapshot);
+                        if (!replacement)
+                            return false;
+                        return commit(replacement);
+                    }
                     case "clear":
                         if (!entities.length)
                             return false;
@@ -2574,6 +2698,196 @@ var BaseDemoSI;
             x: 30 + spread, y: 30 + spread / 2, width, height, tone: "teal" };
     }
     BaseDemoSI.makeEntity = makeEntity;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const key = "si-scene-presets-v1";
+    const builtins = [
+        { id: "modelo-basico", name: "Objeto central", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [{ id: "preset-1", kind: "block", label: "Objeto central", x: 50, y: 50, width: 20, height: 20, tone: "teal" }] } },
+        { id: "modelo-comparacao", name: "Comparação lado a lado", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "circle", label: "Objeto A", x: 32, y: 49, width: 18, height: 18, tone: "blue" },
+                    { id: "preset-2", kind: "circle", label: "Objeto B", x: 68, y: 49, width: 18, height: 18, tone: "amber" }
+                ] } },
+        { id: "modelo-analise", name: "Composição com legenda", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "block", label: "Estrutura", x: 49, y: 39, width: 23, height: 20, tone: "teal" },
+                    { id: "preset-2", kind: "label", label: "Observação", x: 49, y: 72, width: 29, height: 10, tone: "blue" }
+                ] } }
+    ];
+    const validPresetName = (value) => typeof value === "string" && value.trim().length >= 2 && value.trim().length <= 64;
+    function parseCustomPresets(input) {
+        if (!Array.isArray(input) || input.length > 8)
+            return [];
+        const seen = new Set();
+        const result = [];
+        for (const item of input) {
+            if (!item || typeof item !== "object" || Array.isArray(item))
+                return [];
+            const raw = item;
+            if (typeof raw.id !== "string" || !/^user-[a-z0-9-]{1,55}$/.test(raw.id) || seen.has(raw.id) || !validPresetName(raw.name) || raw.builtin !== false)
+                return [];
+            const snapshot = BaseDemoSI.parseScene(raw.snapshot);
+            if (!snapshot || snapshot.entities.length === 0)
+                return [];
+            seen.add(raw.id);
+            result.push({ id: raw.id, name: raw.name.trim(), snapshot, builtin: false });
+        }
+        return result;
+    }
+    BaseDemoSI.parseCustomPresets = parseCustomPresets;
+    let saved = [];
+    let opened = false;
+    const byId = (id) => document.getElementById(id);
+    function setupPresets(sceneStore) {
+        let dirty = false;
+        try {
+            const value = BaseDemoSI.storage.read(key);
+            if (value !== null) {
+                saved = parseCustomPresets(JSON.parse(value));
+                dirty = JSON.parse(value).length !== saved.length;
+            }
+        }
+        catch {
+            saved = [];
+            dirty = true;
+        }
+        const trigger = byId("si-drawer-presets");
+        if (!trigger)
+            return;
+        const dialog = document.createElement("dialog");
+        dialog.className = "si-preset-dialog";
+        dialog.setAttribute("aria-labelledby", "si-preset-title");
+        const container = document.createElement("div");
+        container.className = "si-preset-layout";
+        const heading = document.createElement("h2");
+        heading.id = "si-preset-title";
+        heading.textContent = "Montagens prontas";
+        const description = document.createElement("p");
+        description.textContent = "Escolha uma montagem neutra ou guarde a organização atual para reutilizar nesta instalação.";
+        const list = document.createElement("div");
+        list.className = "si-preset-list";
+        list.setAttribute("role", "group");
+        list.setAttribute("aria-label", "Montagens disponíveis");
+        const label = document.createElement("label");
+        label.textContent = "Nome da montagem atual";
+        label.htmlFor = "si-preset-name";
+        const input = document.createElement("input");
+        input.id = "si-preset-name";
+        input.maxLength = 64;
+        input.placeholder = "Ex.: Investigação 1";
+        const actions = document.createElement("div");
+        actions.className = "si-preset-actions";
+        const save = document.createElement("button");
+        save.type = "button";
+        save.textContent = "Guardar montagem";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.textContent = "Fechar";
+        actions.append(save, close);
+        container.append(heading, description, list, label, input, actions);
+        dialog.append(container);
+        document.body.append(dialog);
+        const closeDialog = () => { if (dialog.open)
+            dialog.close(); };
+        function persist() { return BaseDemoSI.storage.write(key, JSON.stringify(saved)); }
+        function rebuild() {
+            list.replaceChildren();
+            for (const preset of [...builtins, ...saved]) {
+                const row = document.createElement("div");
+                row.className = "si-preset-entry";
+                const info = document.createElement("span");
+                info.textContent = `${preset.name} · ${preset.snapshot.entities.length} objeto(s)`;
+                const load = document.createElement("button");
+                load.type = "button";
+                load.textContent = "Montar";
+                load.disabled = !BaseDemoSI.sceneManipulationAllowed();
+                load.addEventListener("click", async () => {
+                    if (!BaseDemoSI.sceneManipulationAllowed()) {
+                        BaseDemoSI.notify("Este módulo não permite manipular a montagem.", "warning");
+                        return;
+                    }
+                    const current = sceneStore.getSnapshot();
+                    closeDialog();
+                    if (current.entities.length) {
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Substituir montagem atual?", description: "A montagem atual será substituída. Você poderá usar Desfazer para recuperar todos os objetos de uma vez.", confirmText: "Montar", destructive: true });
+                        if (!accepted)
+                            return;
+                    }
+                    if (sceneStore.dispatch({ type: "replace", snapshot: preset.snapshot })) {
+                        BaseDemoSI.closeNavigationDrawer(false);
+                        window.location.hash = "#/ambiente";
+                        BaseDemoSI.notify(`Montagem “${preset.name}” aplicada. Use Desfazer para recuperar a anterior.`, "success");
+                    }
+                    else
+                        BaseDemoSI.notify("A montagem escolhida já está na cena.", "info");
+                });
+                row.append(info, load);
+                if (!preset.builtin) {
+                    const remove = document.createElement("button");
+                    remove.type = "button";
+                    remove.textContent = "Excluir";
+                    remove.setAttribute("aria-label", `Excluir montagem ${preset.name}`);
+                    remove.addEventListener("click", async () => {
+                        closeDialog();
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir montagem guardada?", description: `A montagem “${preset.name}” será excluída do catálogo local.`, confirmText: "Excluir", destructive: true });
+                        if (!accepted)
+                            return;
+                        saved = saved.filter(x => x.id !== preset.id);
+                        if (!persist())
+                            BaseDemoSI.notify("Montagem excluída nesta sessão, mas o armazenamento está bloqueado.", "warning");
+                        rebuild();
+                        dialog.showModal();
+                    });
+                    row.append(remove);
+                }
+                list.append(row);
+            }
+        }
+        trigger.addEventListener("click", () => {
+            if (opened || dialog.open)
+                return;
+            BaseDemoSI.closeNavigationDrawer(false);
+            rebuild();
+            dialog.showModal();
+            input.focus();
+            if (dirty)
+                BaseDemoSI.notify("Algumas montagens locais eram inválidas e não foram carregadas.", "warning");
+            dirty = false;
+        });
+        save.addEventListener("click", () => {
+            const snapshot = sceneStore.getSnapshot();
+            const name = input.value.trim();
+            if (!BaseDemoSI.sceneManipulationAllowed()) {
+                BaseDemoSI.notify("A montagem não pode ser editada neste módulo.", "warning");
+                return;
+            }
+            if (!validPresetName(name)) {
+                BaseDemoSI.notify("Informe um nome entre 2 e 64 caracteres.", "warning");
+                input.focus();
+                return;
+            }
+            if (!snapshot.entities.length) {
+                BaseDemoSI.notify("Adicione um objeto antes de guardar uma montagem.", "warning");
+                return;
+            }
+            if (saved.length >= 8) {
+                BaseDemoSI.notify("Limite de 8 montagens locais atingido.", "warning");
+                return;
+            }
+            const id = `user-${Date.now().toString(36)}-${saved.length}`;
+            saved = [...saved, { id, name, snapshot, builtin: false }];
+            if (!persist())
+                BaseDemoSI.notify("Montagem guardada nesta sessão, mas o armazenamento local está indisponível.", "warning");
+            else
+                BaseDemoSI.notify("Montagem guardada no dispositivo.", "success");
+            input.value = "";
+            rebuild();
+        });
+        close.addEventListener("click", closeDialog);
+        dialog.addEventListener("close", () => { trigger.focus({ preventScroll: true }); });
+        window.addEventListener("si-module-change", () => { if (dialog.open)
+            rebuild(); });
+    }
+    BaseDemoSI.setupPresets = setupPresets;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -4738,6 +5052,7 @@ var BaseDemoSI;
         BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
         BaseDemoSI.setupJournal(store);
+        BaseDemoSI.setupPresets(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;

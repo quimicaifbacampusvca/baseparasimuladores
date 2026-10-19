@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.9",
+        version: "0.9.10",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -219,7 +219,8 @@ var BaseDemoSI;
             startup.value = pref.startup;
         // Acromatopsia é representável por escala cinza. Os demais perfis
         // demandam transformações de cor validadas e permanecem informativos.
-        root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+        for (const filter of ["protanopia", "deuteranopia", "tritanopia", "acromatopsia"])
+            root.classList.toggle(`si-color-${filter}`, pref.vision === filter);
         root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
@@ -291,57 +292,131 @@ var BaseDemoSI;
         panel.hidden = !panel.hidden;
         trigger.setAttribute("aria-expanded", String(!panel.hidden));
     }
-    function tour() {
-        window.location.hash = "#/ambiente";
-        BaseDemoSI.closeNavigationDrawer(false);
-        const targets = ["#si-stage", "#si-dock-left", "#si-dock-right", ".si-actionbar"];
-        const captions = ["Esta é a cena principal, que recebe os objetos.", "Montagem reúne objetos e ferramentas.", "Ver e Dados apresentam visualizações e registros.", "A barra de ações reúne operações de edição e histórico."];
-        let index = 0;
-        const root = document.createElement("div");
-        root.className = "si-tour-overlay";
-        root.setAttribute("role", "dialog");
-        root.setAttribute("aria-modal", "true");
-        root.setAttribute("aria-label", "Tour do ambiente");
-        const card = document.createElement("section");
-        card.className = "si-tour-card";
-        const title = document.createElement("h2");
-        const detail = document.createElement("p");
-        const buttons = document.createElement("div");
-        const back = document.createElement("button"), next = document.createElement("button"), exit = document.createElement("button");
-        back.type = next.type = exit.type = "button";
-        back.textContent = "Anterior";
-        exit.textContent = "Encerrar";
-        function done() { document.removeEventListener("keydown", key); root.remove(); }
-        function key(ev) { if (ev.key === "Escape") {
-            ev.preventDefault();
-            done();
-        } }
-        function render() {
-            title.textContent = `Tour do ambiente · ${index + 1}/${captions.length}`;
-            detail.textContent = captions[index];
-            back.disabled = index === 0;
-            next.textContent = index === captions.length - 1 ? "Concluir" : "Próximo";
-            const item = document.querySelector(targets[index]);
-            if (item) {
-                item.scrollIntoView({ block: "center", behavior: "instant" });
-            }
+    // Tour em coachmarks: não altera objetos, não interfere com missões e não
+    // ocupa a cena com uma folha inferior que desloque o experimento.
+    function startWorkspaceTour() {
+        if (getActivityContext()) {
+            BaseDemoSI.notify("O tour está disponível apenas no ambiente livre. Encerre a atividade orientada primeiro.", "warning");
+            return;
         }
-        back.addEventListener("click", () => { index = Math.max(index - 1, 0); render(); });
-        next.addEventListener("click", () => { if (index === captions.length - 1)
-            done();
-        else {
-            index++;
-            render();
-        } });
-        exit.addEventListener("click", done);
-        buttons.append(back, next, exit);
-        card.append(title, detail, buttons);
-        root.append(card);
-        document.body.append(root);
-        render();
-        next.focus();
-        document.addEventListener("keydown", key);
+        const steps = [
+            { target: "#si-stage", title: "Conheça o ambiente", content: "Esta é a cena central, onde você seleciona e movimenta objetos." },
+            { target: '[data-open-dock="montagem"]', title: "Prepare a montagem", content: "Abra Montagem para preparar a cena, selecionar objetos e escolher o módulo de trabalho." },
+            { target: '[data-scene-view="overview"]', title: "Foco e visão geral", content: "Alterne entre examinar um objeto selecionado e acompanhar todos os objetos da montagem." },
+            { target: '[data-open-dock="ver"]', title: "Observe e meça", content: "Abra Ver para escolher recursos de Observar, Medir e Analisar compatíveis com o módulo." },
+            { target: '[data-open-dock="dados"]', title: "Consulte seus registros", content: "Em Dados, você encontra o histórico e os atalhos para Caderno e Relatórios." }
+        ];
+        const launch = () => {
+            // Evitar sobreposição de diálogos ou de folhas inferiores.
+            const previousFocus = document.activeElement;
+            const dialog = document.createElement("dialog");
+            dialog.className = "si-coach-dialog";
+            dialog.setAttribute("aria-label", "Tour guiado do ambiente");
+            const ring = document.createElement("div");
+            ring.className = "si-coach-ring";
+            ring.setAttribute("aria-hidden", "true");
+            const card = document.createElement("section");
+            card.className = "si-coach-card";
+            const step = document.createElement("p");
+            step.className = "si-coach-step";
+            const title = document.createElement("h2");
+            title.id = "si-coach-title";
+            const content = document.createElement("p");
+            content.className = "si-coach-text";
+            const actions = document.createElement("div");
+            actions.className = "si-coach-actions";
+            const back = document.createElement("button"), next = document.createElement("button"), skip = document.createElement("button");
+            for (const button of [back, next, skip])
+                button.type = "button";
+            back.textContent = "Voltar";
+            skip.textContent = "Pular tour";
+            actions.append(skip, back, next);
+            card.append(step, title, content, actions);
+            dialog.append(ring, card);
+            dialog.setAttribute("aria-labelledby", title.id);
+            document.body.append(dialog);
+            let current = 0;
+            const position = () => {
+                const target = document.querySelector(steps[current].target);
+                const box = target?.getBoundingClientRect();
+                const vw = window.innerWidth, vh = window.innerHeight;
+                ring.hidden = !box || box.width <= 0 || box.height <= 0;
+                if (box && !ring.hidden) {
+                    const x = Math.max(4, box.left - 5), y = Math.max(4, box.top - 5);
+                    ring.style.left = `${x}px`;
+                    ring.style.top = `${y}px`;
+                    ring.style.width = `${Math.min(vw - 4, box.right + 5) - x}px`;
+                    ring.style.height = `${Math.min(vh - 4, box.bottom + 5) - y}px`;
+                }
+                const cw = Math.min(430, Math.max(260, vw - 24));
+                const ch = card.getBoundingClientRect().height;
+                const freeBottom = box ? vh - box.bottom : 0;
+                const freeTop = box ? box.top : 0;
+                let cy = (box && freeBottom >= ch + 22) ? box.bottom + 12 : (box && freeTop >= ch + 22) ? box.top - ch - 12 : vh - ch - 12;
+                cy = Math.max(8, Math.min(cy, vh - ch - 8));
+                let cx = box ? box.left + box.width / 2 - cw / 2 : (vw - cw) / 2;
+                cx = Math.max(10, Math.min(cx, vw - cw - 10));
+                card.style.left = `${cx}px`;
+                card.style.top = `${cy}px`;
+            };
+            const show = (index) => {
+                current = index;
+                step.textContent = `PASSO ${current + 1} DE ${steps.length}`;
+                title.textContent = steps[current].title;
+                content.textContent = steps[current].content;
+                back.disabled = index === 0;
+                next.textContent = index === steps.length - 1 ? "Concluir" : "Próximo";
+                position();
+                next.focus({ preventScroll: true });
+            };
+            let cleaned = false;
+            const cleanup = () => {
+                if (cleaned)
+                    return;
+                cleaned = true;
+                window.removeEventListener("resize", position);
+                document.removeEventListener("scroll", position, true);
+                dialog.remove();
+                const returnTarget = previousFocus?.isConnected && !previousFocus.closest("#sidebar") ? previousFocus : menuGet("nav-toggle");
+                returnTarget?.focus({ preventScroll: true });
+            };
+            dialog.addEventListener("close", cleanup, { once: true });
+            dialog.addEventListener("cancel", event => { event.preventDefault(); dialog.close(); });
+            dialog.addEventListener("click", event => { if (event.target === dialog)
+                dialog.close(); });
+            skip.addEventListener("click", () => dialog.close());
+            back.addEventListener("click", () => show(Math.max(0, current - 1)));
+            next.addEventListener("click", () => { if (current >= steps.length - 1)
+                dialog.close();
+            else
+                show(current + 1); });
+            dialog.addEventListener("keydown", event => {
+                if (event.key !== "Tab")
+                    return;
+                const buttons = [skip, back, next].filter(button => !button.disabled);
+                if (event.shiftKey && document.activeElement === buttons[0]) {
+                    event.preventDefault();
+                    buttons[buttons.length - 1].focus();
+                }
+                else if (!event.shiftKey && document.activeElement === buttons[buttons.length - 1]) {
+                    event.preventDefault();
+                    buttons[0].focus();
+                }
+            });
+            window.addEventListener("resize", position);
+            document.addEventListener("scroll", position, true);
+            dialog.showModal();
+            show(0);
+        };
+        BaseDemoSI.closeNavigationDrawer(false);
+        if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente") {
+            window.location.hash = "#/ambiente";
+            window.requestAnimationFrame(() => window.requestAnimationFrame(launch));
+        }
+        else
+            window.requestAnimationFrame(launch);
     }
+    BaseDemoSI.startWorkspaceTour = startWorkspaceTour;
     function setupMenuReview() {
         try {
             const value = BaseDemoSI.storage.read(prefKey);
@@ -371,17 +446,27 @@ var BaseDemoSI;
         menuGet("nav-toggle")?.addEventListener("click", () => requestAnimationFrame(syncMenuReview));
         window.addEventListener("si-route-changed", syncMenuReview);
         menuGet("si-startup-select")?.addEventListener("change", event => updatePref("startup", event.target.value));
+        menuGet("si-projector")?.addEventListener("click", event => {
+            if (getActivityContext()) {
+                event.preventDefault();
+                BaseDemoSI.notify("O modo projetor não pode ser alterado durante uma atividade orientada.", "warning");
+            }
+        });
         for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
             menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
         }
         for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
             menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
         }
-        menuGet("si-vision-select")?.addEventListener("change", event => { const v = event.target.value; updatePref("vision", v); if (v !== "none" && v !== "acromatopsia")
-            BaseDemoSI.notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.", "info"); });
+        menuGet("si-vision-select")?.addEventListener("change", event => {
+            const v = event.target.value;
+            updatePref("vision", v);
+            if (v !== "none")
+                BaseDemoSI.notify("Simulação aproximada de visão de cores ativada. Consulte também os rótulos textuais.", "info");
+        });
         menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
         menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
-        menuGet("si-drawer-tour")?.addEventListener("click", tour);
+        menuGet("si-drawer-tour")?.addEventListener("click", startWorkspaceTour);
         menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
         menuGet("si-activity-about")?.addEventListener("click", () => { if (activityLink) {
             BaseDemoSI.closeNavigationDrawer(false);
@@ -1284,6 +1369,12 @@ var BaseDemoSI;
                             selectedId = null;
                         break;
                     }
+                    case "replace": {
+                        const replacement = parseScene(command.snapshot);
+                        if (!replacement)
+                            return false;
+                        return commit(replacement);
+                    }
                     case "clear":
                         if (!entities.length)
                             return false;
@@ -1335,6 +1426,196 @@ var BaseDemoSI;
             x: 30 + spread, y: 30 + spread / 2, width, height, tone: "teal" };
     }
     BaseDemoSI.makeEntity = makeEntity;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const key = "si-scene-presets-v1";
+    const builtins = [
+        { id: "modelo-basico", name: "Objeto central", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [{ id: "preset-1", kind: "block", label: "Objeto central", x: 50, y: 50, width: 20, height: 20, tone: "teal" }] } },
+        { id: "modelo-comparacao", name: "Comparação lado a lado", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "circle", label: "Objeto A", x: 32, y: 49, width: 18, height: 18, tone: "blue" },
+                    { id: "preset-2", kind: "circle", label: "Objeto B", x: 68, y: 49, width: 18, height: 18, tone: "amber" }
+                ] } },
+        { id: "modelo-analise", name: "Composição com legenda", builtin: true, snapshot: { schemaVersion: 1, selectedId: null, entities: [
+                    { id: "preset-1", kind: "block", label: "Estrutura", x: 49, y: 39, width: 23, height: 20, tone: "teal" },
+                    { id: "preset-2", kind: "label", label: "Observação", x: 49, y: 72, width: 29, height: 10, tone: "blue" }
+                ] } }
+    ];
+    const validPresetName = (value) => typeof value === "string" && value.trim().length >= 2 && value.trim().length <= 64;
+    function parseCustomPresets(input) {
+        if (!Array.isArray(input) || input.length > 8)
+            return [];
+        const seen = new Set();
+        const result = [];
+        for (const item of input) {
+            if (!item || typeof item !== "object" || Array.isArray(item))
+                return [];
+            const raw = item;
+            if (typeof raw.id !== "string" || !/^user-[a-z0-9-]{1,55}$/.test(raw.id) || seen.has(raw.id) || !validPresetName(raw.name) || raw.builtin !== false)
+                return [];
+            const snapshot = BaseDemoSI.parseScene(raw.snapshot);
+            if (!snapshot || snapshot.entities.length === 0)
+                return [];
+            seen.add(raw.id);
+            result.push({ id: raw.id, name: raw.name.trim(), snapshot, builtin: false });
+        }
+        return result;
+    }
+    BaseDemoSI.parseCustomPresets = parseCustomPresets;
+    let saved = [];
+    let opened = false;
+    const byId = (id) => document.getElementById(id);
+    function setupPresets(sceneStore) {
+        let dirty = false;
+        try {
+            const value = BaseDemoSI.storage.read(key);
+            if (value !== null) {
+                saved = parseCustomPresets(JSON.parse(value));
+                dirty = JSON.parse(value).length !== saved.length;
+            }
+        }
+        catch {
+            saved = [];
+            dirty = true;
+        }
+        const trigger = byId("si-drawer-presets");
+        if (!trigger)
+            return;
+        const dialog = document.createElement("dialog");
+        dialog.className = "si-preset-dialog";
+        dialog.setAttribute("aria-labelledby", "si-preset-title");
+        const container = document.createElement("div");
+        container.className = "si-preset-layout";
+        const heading = document.createElement("h2");
+        heading.id = "si-preset-title";
+        heading.textContent = "Montagens prontas";
+        const description = document.createElement("p");
+        description.textContent = "Escolha uma montagem neutra ou guarde a organização atual para reutilizar nesta instalação.";
+        const list = document.createElement("div");
+        list.className = "si-preset-list";
+        list.setAttribute("role", "group");
+        list.setAttribute("aria-label", "Montagens disponíveis");
+        const label = document.createElement("label");
+        label.textContent = "Nome da montagem atual";
+        label.htmlFor = "si-preset-name";
+        const input = document.createElement("input");
+        input.id = "si-preset-name";
+        input.maxLength = 64;
+        input.placeholder = "Ex.: Investigação 1";
+        const actions = document.createElement("div");
+        actions.className = "si-preset-actions";
+        const save = document.createElement("button");
+        save.type = "button";
+        save.textContent = "Guardar montagem";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.textContent = "Fechar";
+        actions.append(save, close);
+        container.append(heading, description, list, label, input, actions);
+        dialog.append(container);
+        document.body.append(dialog);
+        const closeDialog = () => { if (dialog.open)
+            dialog.close(); };
+        function persist() { return BaseDemoSI.storage.write(key, JSON.stringify(saved)); }
+        function rebuild() {
+            list.replaceChildren();
+            for (const preset of [...builtins, ...saved]) {
+                const row = document.createElement("div");
+                row.className = "si-preset-entry";
+                const info = document.createElement("span");
+                info.textContent = `${preset.name} · ${preset.snapshot.entities.length} objeto(s)`;
+                const load = document.createElement("button");
+                load.type = "button";
+                load.textContent = "Montar";
+                load.disabled = !BaseDemoSI.sceneManipulationAllowed();
+                load.addEventListener("click", async () => {
+                    if (!BaseDemoSI.sceneManipulationAllowed()) {
+                        BaseDemoSI.notify("Este módulo não permite manipular a montagem.", "warning");
+                        return;
+                    }
+                    const current = sceneStore.getSnapshot();
+                    closeDialog();
+                    if (current.entities.length) {
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Substituir montagem atual?", description: "A montagem atual será substituída. Você poderá usar Desfazer para recuperar todos os objetos de uma vez.", confirmText: "Montar", destructive: true });
+                        if (!accepted)
+                            return;
+                    }
+                    if (sceneStore.dispatch({ type: "replace", snapshot: preset.snapshot })) {
+                        BaseDemoSI.closeNavigationDrawer(false);
+                        window.location.hash = "#/ambiente";
+                        BaseDemoSI.notify(`Montagem “${preset.name}” aplicada. Use Desfazer para recuperar a anterior.`, "success");
+                    }
+                    else
+                        BaseDemoSI.notify("A montagem escolhida já está na cena.", "info");
+                });
+                row.append(info, load);
+                if (!preset.builtin) {
+                    const remove = document.createElement("button");
+                    remove.type = "button";
+                    remove.textContent = "Excluir";
+                    remove.setAttribute("aria-label", `Excluir montagem ${preset.name}`);
+                    remove.addEventListener("click", async () => {
+                        closeDialog();
+                        const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir montagem guardada?", description: `A montagem “${preset.name}” será excluída do catálogo local.`, confirmText: "Excluir", destructive: true });
+                        if (!accepted)
+                            return;
+                        saved = saved.filter(x => x.id !== preset.id);
+                        if (!persist())
+                            BaseDemoSI.notify("Montagem excluída nesta sessão, mas o armazenamento está bloqueado.", "warning");
+                        rebuild();
+                        dialog.showModal();
+                    });
+                    row.append(remove);
+                }
+                list.append(row);
+            }
+        }
+        trigger.addEventListener("click", () => {
+            if (opened || dialog.open)
+                return;
+            BaseDemoSI.closeNavigationDrawer(false);
+            rebuild();
+            dialog.showModal();
+            input.focus();
+            if (dirty)
+                BaseDemoSI.notify("Algumas montagens locais eram inválidas e não foram carregadas.", "warning");
+            dirty = false;
+        });
+        save.addEventListener("click", () => {
+            const snapshot = sceneStore.getSnapshot();
+            const name = input.value.trim();
+            if (!BaseDemoSI.sceneManipulationAllowed()) {
+                BaseDemoSI.notify("A montagem não pode ser editada neste módulo.", "warning");
+                return;
+            }
+            if (!validPresetName(name)) {
+                BaseDemoSI.notify("Informe um nome entre 2 e 64 caracteres.", "warning");
+                input.focus();
+                return;
+            }
+            if (!snapshot.entities.length) {
+                BaseDemoSI.notify("Adicione um objeto antes de guardar uma montagem.", "warning");
+                return;
+            }
+            if (saved.length >= 8) {
+                BaseDemoSI.notify("Limite de 8 montagens locais atingido.", "warning");
+                return;
+            }
+            const id = `user-${Date.now().toString(36)}-${saved.length}`;
+            saved = [...saved, { id, name, snapshot, builtin: false }];
+            if (!persist())
+                BaseDemoSI.notify("Montagem guardada nesta sessão, mas o armazenamento local está indisponível.", "warning");
+            else
+                BaseDemoSI.notify("Montagem guardada no dispositivo.", "success");
+            input.value = "";
+            rebuild();
+        });
+        close.addEventListener("click", closeDialog);
+        dialog.addEventListener("close", () => { trigger.focus({ preventScroll: true }); });
+        window.addEventListener("si-module-change", () => { if (dialog.open)
+            rebuild(); });
+    }
+    BaseDemoSI.setupPresets = setupPresets;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -3499,6 +3780,7 @@ var BaseDemoSI;
         BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
         BaseDemoSI.setupJournal(store);
+        BaseDemoSI.setupPresets(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
             button.addEventListener("click", () => {
                 const kind = button.dataset.addKind;
