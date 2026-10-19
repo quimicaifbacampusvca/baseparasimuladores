@@ -4,8 +4,8 @@ namespace BaseDemoSI {
   let workspaceStarted=false;
   let readScene:()=>SceneSnapshot;
   let selectScene:(id:string|null)=>void;
-  let lastTrigger:HTMLElement|null=null;
-  let lastSide:WorkspaceSide="left";
+  const dockTriggers:Partial<Record<WorkspaceSide,HTMLElement>>={};
+  let viewerLevel:"catalog"|"detail"="catalog";
   const node=(id:string)=>document.getElementById(id);
   const mobile=()=>window.matchMedia("(max-width: 900px)").matches;
   const compact=()=>window.innerWidth<1280;
@@ -13,7 +13,8 @@ namespace BaseDemoSI {
   function dock(side:WorkspaceSide):HTMLElement {return node(`si-dock-${side}`)!;}
   function persistWorkspace():void{storage.write(WORKSPACE_KEY,serializeWorkspacePreference(workspaceState));}
   function focusReturn(side:WorkspaceSide):void {
-    const button=lastTrigger?.isConnected ? lastTrigger:document.querySelector<HTMLElement>(`[data-open-dock="${side==="left"?"montagem":workspaceState.rightTab}"]`);
+    const trigger=dockTriggers[side];
+    const button=trigger?.isConnected ? trigger:document.querySelector<HTMLElement>(`[data-open-dock="${side==="left"?"montagem":workspaceState.rightTab}"]`);
     button?.focus({preventScroll:true});
   }
   function renderWorkspace():void {
@@ -45,8 +46,12 @@ namespace BaseDemoSI {
     for(const b of document.querySelectorAll<HTMLElement>("[data-right-tab]"))b.setAttribute("aria-pressed",String(workspaceState.rightTab===b.dataset.rightTab));
     for(const panel of document.querySelectorAll<HTMLElement>("[data-left-panel]"))panel.hidden=panel.dataset.leftPanel!==workspaceState.leftTab;
     for(const panel of document.querySelectorAll<HTMLElement>("[data-right-panel]"))panel.hidden=panel.dataset.rightPanel!==workspaceState.rightTab;
-    const lh=node("si-left-title");if(lh)lh.textContent={montagem:"Montagem",objetos:"Objetos",ajustes:"Ajustes"}[workspaceState.leftTab];
-    const rh=node("si-right-title");if(rh)rh.textContent=workspaceState.rightTab==="dados"?"Dados":"Ver";
+    const lh=node("si-left-title");if(lh)lh.textContent={resumo:"Resumo",montagem:"Preparo",objetos:"Objetos",ajustes:"Módulo",missao:"Missão"}[workspaceState.leftTab];
+    const detail=viewerLevel==="detail"&&workspaceState.rightTab==="ver";
+    const rh=node("si-right-title");if(rh)rh.textContent=workspaceState.rightTab==="dados"?"Dados":detail?"Investigar":"Ver";
+    const back=node("si-dock-viewer-back");if(back)back.hidden=!detail;
+    const catalog=node("si-viewer-catalog");if(catalog)catalog.hidden=detail;
+    const view=node("si-viewer-detail");if(view)view.hidden=!detail;
     const rp=dock("right");rp.dataset.presentation=fullscreen?"fullscreen":"standard";
     const expand=node("si-expand") as HTMLButtonElement|null;
     if(expand){expand.hidden=sheet||workspaceState.rightTab==="dados";expand.textContent=fullscreen?"Restaurar":"Expandir";expand.setAttribute("aria-expanded",String(fullscreen));}
@@ -65,7 +70,8 @@ namespace BaseDemoSI {
   function openWorkspace(side:WorkspaceSide,tab:WorkspaceLeftTab|WorkspaceRightTab,trigger:HTMLElement):void {
     const same=side==="left"?workspaceState.left==="open":workspaceState.right==="open"&&workspaceState.rightTab===tab;
     if(same){closeWorkspace(side);return;}
-    lastTrigger=trigger;lastSide=side;
+    dockTriggers[side]=trigger;
+    if(side==="right" && tab==="ver")viewerLevel="catalog";
     changeWorkspace({type:"open",side,tab});
     dock(side).querySelector<HTMLElement>("[data-close-dock]")?.focus({preventScroll:true});
   }
@@ -82,7 +88,7 @@ namespace BaseDemoSI {
   function keyboardHandler(ev:KeyboardEvent):void {
     if(!document.body.classList.contains("route-ambiente"))return;
     const side=activeSide();if(!side)return;
-    if(ev.key==="Escape") {ev.preventDefault();closeWorkspace(lastSide);return;}
+    if(ev.key==="Escape") {ev.preventDefault();closeWorkspace(side);return;}
     if(ev.key!=="Tab"||!(mobile()||workspaceState.presentation==="fullscreen"))return;
     const items=focusables(dock(side));if(!items.length)return;
     const first=items[0],last=items[items.length-1];
@@ -112,6 +118,14 @@ namespace BaseDemoSI {
     const obs=node("si-observation"),data=node("si-data-summary");
     if(obs){obs.replaceChildren();const p=document.createElement("p");p.textContent=focus?`Objeto: ${focus.label}`:"Selecione um objeto para inspecionar sua representação.";obs.append(p);
       if(focus){const dl=document.createElement("dl");for(const [key,val] of [["Tipo",focus.kind],["Posição",`${focus.x}% × ${focus.y}%`],["Dimensões",`${focus.width}% × ${focus.height}%`],["Cor",focus.tone]]){const d=document.createElement("div"),dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=String(key);dd.textContent=String(val);d.append(dt,dd);dl.append(d);}obs.append(dl);}}
+    const setup=node("si-dock-setup-summary");
+    if(setup){setup.replaceChildren();const heading=document.createElement("p");heading.textContent=`${snap.entities.length} objeto(s) na cena`;
+      const selected=document.createElement("p");selected.textContent=focus?`Em foco: ${focus.label}`:"Nenhum objeto selecionado";setup.append(heading,selected);}
+    const contextLink=node("si-dock-activity-link") as HTMLAnchorElement|null;
+    const contextStatus=node("si-dock-activity-status");const returnLink=node("si-return-activity") as HTMLAnchorElement|null;
+    const activeActivity=!!returnLink&&!returnLink.hidden&&!!returnLink.getAttribute("href");
+    if(contextLink){contextLink.hidden=!activeActivity;if(activeActivity)contextLink.href=returnLink!.href;}
+    if(contextStatus)contextStatus.textContent=activeActivity?"Atividade em andamento. O retorno mantém os objetos da cena.":"Nenhuma atividade orientada em andamento.";
     if(data){data.replaceChildren();const counts={block:0,circle:0,label:0};for(const e of snap.entities)counts[e.kind]++;
       const dl=document.createElement("dl");for(const [key,value] of [["Objetos",snap.entities.length],["Blocos",counts.block],["Círculos",counts.circle],["Etiquetas",counts.label]]){const div=document.createElement("div"),dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=String(key);dd.textContent=String(value);div.append(dt,dd);dl.append(div);}data.append(dl);}
   }
@@ -124,8 +138,25 @@ namespace BaseDemoSI {
       const which=b.dataset.openDock;openWorkspace(which==="montagem"?"left":"right",which==="montagem"?"montagem":which as WorkspaceRightTab,b);
     }));
     document.querySelectorAll<HTMLElement>("[data-close-dock]").forEach(b=>b.addEventListener("click",()=>closeWorkspace(b.dataset.closeDock as WorkspaceSide)));
-    document.querySelectorAll<HTMLElement>("[data-left-tab]").forEach(b=>b.addEventListener("click",()=>changeWorkspace({type:"left-tab",tab:b.dataset.leftTab as WorkspaceLeftTab})));
-    document.querySelectorAll<HTMLElement>("[data-right-tab]").forEach(b=>b.addEventListener("click",()=>changeWorkspace({type:"right-tab",tab:b.dataset.rightTab as WorkspaceRightTab})));
+    document.querySelectorAll<HTMLElement>("[data-left-tab],[data-open-left-category]").forEach(b=>b.addEventListener("click",()=>{
+      changeWorkspace({type:"left-tab",tab:(b.dataset.leftTab??b.dataset.openLeftCategory) as WorkspaceLeftTab});
+      const container=node("si-left-scroll");if(container)container.scrollTop=0;
+    }));
+    document.querySelectorAll<HTMLElement>("[data-right-tab]").forEach(b=>b.addEventListener("click",()=>{
+      viewerLevel="catalog";changeWorkspace({type:"right-tab",tab:b.dataset.rightTab as WorkspaceRightTab});
+      const container=node("si-right-scroll");if(container)container.scrollTop=0;
+    }));
+    node("si-dock-viewer-back")?.addEventListener("click",()=>{
+      viewerLevel="catalog";renderWorkspace();node("si-right-scroll")!.scrollTop=0;
+      node("si-viewer-buttons")?.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus({preventScroll:true});
+    });
+    window.addEventListener("si-viewer-selected",()=>{
+      viewerLevel="detail";
+      if(workspaceState.right==="open"&&workspaceState.rightTab==="ver"){
+        renderWorkspace();node("si-right-scroll")!.scrollTop=0;
+        node("si-dock-viewer-back")?.focus({preventScroll:true});
+      }
+    });
     node("si-expand")?.addEventListener("click",()=>changeWorkspace({type:"expand"}));
     node("si-sheet-backdrop")?.addEventListener("click",()=>{const side=activeSide();if(side)closeWorkspace(side);});
     document.addEventListener("keydown",keyboardHandler);
@@ -133,7 +164,7 @@ namespace BaseDemoSI {
     window.visualViewport?.addEventListener("resize",updateViewport);
     window.addEventListener("si-route-changed",(event:Event)=>{
       if((event as CustomEvent).detail!=="ambiente"){
-        workspaceState={...workspaceState,left:"collapsed",right:"collapsed",presentation:"standard"};
+        workspaceState={...workspaceState,left:"collapsed",right:"collapsed",presentation:"standard"};viewerLevel="catalog";
         renderWorkspace();
       } else updateViewport();
     });

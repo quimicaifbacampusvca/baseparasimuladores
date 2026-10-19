@@ -102,3 +102,24 @@ body.route-ambiente.nav-open .side{display:flex!important;position:fixed;inset:0
 @media print{.si-dock,.si-launchers,.si-actionbar,.si-item-strip{display:none!important}body.route-ambiente{overflow:visible}body.route-ambiente .main-column{height:auto}body.route-ambiente main{height:auto}.si-workspace{height:auto}}
 /* O backdrop preserva a barra inferior operável com uma sheet aberta. */
 @media(max-width:900px){.si-sheet-backdrop:not([hidden]){inset:0 0 var(--si-launcher-h) 0}}
+
+/* Bloco 04 — organização contextual das docas e níveis de investigação */
+.si-dock-tabs{overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain}
+.si-dock-left .si-dock-tabs button{flex:1 0 auto;white-space:nowrap;font-size:11px;min-height:40px;padding:7px 9px}
+.si-dock [hidden]{display:none!important}
+.si-dock-back{flex:0 0 auto;white-space:nowrap}
+.si-dock-summary{border:1px solid var(--border);background:var(--tint);border-radius:10px;padding:10px 12px;margin:12px 0}
+.si-dock-summary p{margin:5px 0;overflow-wrap:anywhere}
+.si-dock [data-left-panel="resumo"] .button{width:100%;margin-top:8px}
+.si-viewer-controls #si-viewer-buttons{display:grid;grid-template-columns:1fr;gap:9px;margin:12px 0}
+.si-viewer-controls #si-viewer-buttons button{min-height:46px;justify-content:flex-start;text-align:left}
+.si-dock-data-actions{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0 4px}
+.si-dock-data-actions .button{min-height:44px;display:flex;align-items:center;text-decoration:none}
+@media(max-width:900px){
+ .si-dock-left .si-dock-tabs{padding:7px 10px;gap:4px}
+ .si-dock-left .si-dock-tabs button{min-height:44px;flex:1 0 auto;padding:7px 10px}
+ .si-dock.si-bottom-sheet{max-height:calc(100dvh - var(--si-launcher-h) - 58px);height:min(73dvh,600px)}
+ .si-dock.si-bottom-sheet .si-dock-header{min-height:52px;flex:0 0 auto}
+ .si-dock.si-bottom-sheet .si-dock-scroll{min-height:0;overflow-y:auto;overflow-anchor:none}
+}
+@media(max-width:900px) and (orientation:landscape){.si-dock.si-bottom-sheet{height:min(75dvh,420px);max-height:calc(100dvh - var(--si-launcher-h) - 20px)}}

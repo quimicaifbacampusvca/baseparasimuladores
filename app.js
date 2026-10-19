@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.4",
+        version: "0.9.5",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -352,12 +352,10 @@ var BaseDemoSI;
         // Apenas na abertura sem destino indicado é aplicada a tela inicial.
         if (!window.location.hash || window.location.hash === "#/")
             window.location.hash = `#/${pref.startup}`;
-        // A lista de destinos deve iniciar expandida em qualquer tamanho de tela.
-        // O usuário pode recolhê-la manualmente sem perder o acesso ao menu.
-        menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded", "true");
+        menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded", String(window.matchMedia("(max-width:900px)").matches));
         const routes = menuGet("si-nav-main");
         if (routes)
-            routes.hidden = false;
+            routes.hidden = !window.matchMedia("(max-width:900px)").matches;
         menuGet("si-a11y-toggle")?.addEventListener("click", () => togglePanel("si-a11y-toggle", "si-a11y-panel"));
         menuGet("si-startup-toggle")?.addEventListener("click", () => togglePanel("si-startup-toggle", "si-startup-panel"));
         menuGet("si-header-access")?.addEventListener("click", openAccessibility);
@@ -1338,7 +1336,7 @@ var BaseDemoSI;
                 const tab = a.tab;
                 if (a.side === "left")
                     return { ...s, left: "open", right: compact ? "collapsed" : s.right, presentation: "standard",
-                        leftTab: tab === "objetos" || tab === "ajustes" ? tab : "montagem" };
+                        leftTab: tab === "resumo" || tab === "objetos" || tab === "ajustes" || tab === "missao" ? tab : "montagem" };
                 return { ...s, right: "open", left: compact ? "collapsed" : s.left,
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
@@ -1366,7 +1364,7 @@ var BaseDemoSI;
         const t = raw;
         if (t.schemaVersion !== 1)
             return null;
-        if (!["focus", "overview"].includes(String(t.view)) || !["montagem", "objetos", "ajustes"].includes(String(t.leftTab)) || !["ver", "dados"].includes(String(t.rightTab)))
+        if (!["focus", "overview"].includes(String(t.view)) || !["resumo", "montagem", "objetos", "ajustes", "missao"].includes(String(t.leftTab)) || !["ver", "dados"].includes(String(t.rightTab)))
             return null;
         // Abrir painéis automaticamente ao recarregar um telefone produz modal inesperado.
         return { ...initialWorkspace(), view: t.view, leftTab: t.leftTab, rightTab: t.rightTab };
@@ -1384,8 +1382,8 @@ var BaseDemoSI;
     let workspaceStarted = false;
     let readScene;
     let selectScene;
-    let lastTrigger = null;
-    let lastSide = "left";
+    const dockTriggers = {};
+    let viewerLevel = "catalog";
     const node = (id) => document.getElementById(id);
     const mobile = () => window.matchMedia("(max-width: 900px)").matches;
     const compact = () => window.innerWidth < 1280;
@@ -1393,7 +1391,8 @@ var BaseDemoSI;
     function dock(side) { return node(`si-dock-${side}`); }
     function persistWorkspace() { BaseDemoSI.storage.write(WORKSPACE_KEY, BaseDemoSI.serializeWorkspacePreference(workspaceState)); }
     function focusReturn(side) {
-        const button = lastTrigger?.isConnected ? lastTrigger : document.querySelector(`[data-open-dock="${side === "left" ? "montagem" : workspaceState.rightTab}"]`);
+        const trigger = dockTriggers[side];
+        const button = trigger?.isConnected ? trigger : document.querySelector(`[data-open-dock="${side === "left" ? "montagem" : workspaceState.rightTab}"]`);
         button?.focus({ preventScroll: true });
     }
     function renderWorkspace() {
@@ -1440,10 +1439,20 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { montagem: "Montagem", objetos: "Objetos", ajustes: "Ajustes" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Resumo", montagem: "Preparo", objetos: "Objetos", ajustes: "Módulo", missao: "Missão" }[workspaceState.leftTab];
+        const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
-            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : "Ver";
+            rh.textContent = workspaceState.rightTab === "dados" ? "Dados" : detail ? "Investigar" : "Ver";
+        const back = node("si-dock-viewer-back");
+        if (back)
+            back.hidden = !detail;
+        const catalog = node("si-viewer-catalog");
+        if (catalog)
+            catalog.hidden = detail;
+        const view = node("si-viewer-detail");
+        if (view)
+            view.hidden = !detail;
         const rp = dock("right");
         rp.dataset.presentation = fullscreen ? "fullscreen" : "standard";
         const expand = node("si-expand");
@@ -1483,8 +1492,9 @@ var BaseDemoSI;
             closeWorkspace(side);
             return;
         }
-        lastTrigger = trigger;
-        lastSide = side;
+        dockTriggers[side] = trigger;
+        if (side === "right" && tab === "ver")
+            viewerLevel = "catalog";
         changeWorkspace({ type: "open", side, tab });
         dock(side).querySelector("[data-close-dock]")?.focus({ preventScroll: true });
     }
@@ -1512,7 +1522,7 @@ var BaseDemoSI;
             return;
         if (ev.key === "Escape") {
             ev.preventDefault();
-            closeWorkspace(lastSide);
+            closeWorkspace(side);
             return;
         }
         if (ev.key !== "Tab" || !(mobile() || workspaceState.presentation === "fullscreen"))
@@ -1598,6 +1608,26 @@ var BaseDemoSI;
                 obs.append(dl);
             }
         }
+        const setup = node("si-dock-setup-summary");
+        if (setup) {
+            setup.replaceChildren();
+            const heading = document.createElement("p");
+            heading.textContent = `${snap.entities.length} objeto(s) na cena`;
+            const selected = document.createElement("p");
+            selected.textContent = focus ? `Em foco: ${focus.label}` : "Nenhum objeto selecionado";
+            setup.append(heading, selected);
+        }
+        const contextLink = node("si-dock-activity-link");
+        const contextStatus = node("si-dock-activity-status");
+        const returnLink = node("si-return-activity");
+        const activeActivity = !!returnLink && !returnLink.hidden && !!returnLink.getAttribute("href");
+        if (contextLink) {
+            contextLink.hidden = !activeActivity;
+            if (activeActivity)
+                contextLink.href = returnLink.href;
+        }
+        if (contextStatus)
+            contextStatus.textContent = activeActivity ? "Atividade em andamento. O retorno mantém os objetos da cena." : "Nenhuma atividade orientada em andamento.";
         if (data) {
             data.replaceChildren();
             const counts = { block: 0, circle: 0, label: 0 };
@@ -1636,8 +1666,33 @@ var BaseDemoSI;
             openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "montagem" : which, b);
         }));
         document.querySelectorAll("[data-close-dock]").forEach(b => b.addEventListener("click", () => closeWorkspace(b.dataset.closeDock)));
-        document.querySelectorAll("[data-left-tab]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "left-tab", tab: b.dataset.leftTab })));
-        document.querySelectorAll("[data-right-tab]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "right-tab", tab: b.dataset.rightTab })));
+        document.querySelectorAll("[data-left-tab],[data-open-left-category]").forEach(b => b.addEventListener("click", () => {
+            changeWorkspace({ type: "left-tab", tab: (b.dataset.leftTab ?? b.dataset.openLeftCategory) });
+            const container = node("si-left-scroll");
+            if (container)
+                container.scrollTop = 0;
+        }));
+        document.querySelectorAll("[data-right-tab]").forEach(b => b.addEventListener("click", () => {
+            viewerLevel = "catalog";
+            changeWorkspace({ type: "right-tab", tab: b.dataset.rightTab });
+            const container = node("si-right-scroll");
+            if (container)
+                container.scrollTop = 0;
+        }));
+        node("si-dock-viewer-back")?.addEventListener("click", () => {
+            viewerLevel = "catalog";
+            renderWorkspace();
+            node("si-right-scroll").scrollTop = 0;
+            node("si-viewer-buttons")?.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true });
+        });
+        window.addEventListener("si-viewer-selected", () => {
+            viewerLevel = "detail";
+            if (workspaceState.right === "open" && workspaceState.rightTab === "ver") {
+                renderWorkspace();
+                node("si-right-scroll").scrollTop = 0;
+                node("si-dock-viewer-back")?.focus({ preventScroll: true });
+            }
+        });
         node("si-expand")?.addEventListener("click", () => changeWorkspace({ type: "expand" }));
         node("si-sheet-backdrop")?.addEventListener("click", () => { const side = activeSide(); if (side)
             closeWorkspace(side); });
@@ -1647,6 +1702,7 @@ var BaseDemoSI;
         window.addEventListener("si-route-changed", (event) => {
             if (event.detail !== "ambiente") {
                 workspaceState = { ...workspaceState, left: "collapsed", right: "collapsed", presentation: "standard" };
+                viewerLevel = "catalog";
                 renderWorkspace();
             }
             else
@@ -1996,7 +2052,8 @@ var BaseDemoSI;
             btn.className = "button outline";
             btn.textContent = v.title;
             btn.setAttribute("aria-pressed", String(selectedViewer === v.id));
-            btn.addEventListener("click", () => { chooseViewer(v.id); });
+            btn.addEventListener("click", () => { if (chooseViewer(v.id))
+                window.dispatchEvent(new CustomEvent("si-viewer-selected", { detail: v.id })); });
             buttons.append(btn);
         }
         output.replaceChildren();

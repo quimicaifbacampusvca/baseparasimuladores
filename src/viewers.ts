@@ -32,7 +32,7 @@ namespace BaseDemoSI {
     buttons.replaceChildren();
     for(const v of allowed){const btn=document.createElement("button");btn.type="button";btn.className="button outline";
       btn.textContent=v.title;btn.setAttribute("aria-pressed",String(selectedViewer===v.id));
-      btn.addEventListener("click",()=>{chooseViewer(v.id);});buttons.append(btn);}
+      btn.addEventListener("click",()=>{if(chooseViewer(v.id))window.dispatchEvent(new CustomEvent("si-viewer-selected",{detail:v.id}));});buttons.append(btn);}
     output.replaceChildren();const chosen=viewerRegistry.get(selectedViewer);
     if(!chosen){output.append(label("p","Não há visualizadores habilitados neste módulo."));return;}
     try{chosen.render(snapshot,extensionGetRecords(),output);}catch{output.replaceChildren(label("p","Visualização indisponível."));}

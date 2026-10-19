@@ -200,11 +200,19 @@
             <aside id="si-dock-left" class="si-dock si-dock-left" aria-label="Montagem" role="region" hidden>
               <header class="si-dock-header"><h2 id="si-left-title">Montagem</h2><button type="button" class="si-dock-close" data-close-dock="left" aria-label="Fechar Montagem">✕</button></header>
               <nav class="si-dock-tabs" role="group" aria-label="Categorias da montagem">
-                <button type="button" data-left-tab="montagem" aria-pressed="true">Montagem</button>
+                <button type="button" data-left-tab="resumo" aria-pressed="false">Resumo</button>
+                <button type="button" data-left-tab="montagem" aria-pressed="true">Preparo</button>
                 <button type="button" data-left-tab="objetos" aria-pressed="false">Objetos</button>
-                <button type="button" data-left-tab="ajustes" aria-pressed="false">Ajustes</button>
+                <button type="button" data-left-tab="ajustes" aria-pressed="false">Módulo</button>
+                <button type="button" data-left-tab="missao" aria-pressed="false">Missão</button>
               </nav>
-              <div class="si-dock-scroll">
+              <div class="si-dock-scroll" id="si-left-scroll">
+                <div data-left-panel="resumo" hidden>
+                  <h3>Resumo da montagem</h3><p>Conferência rápida da cena e do objeto em foco.</p>
+                  <div id="si-dock-setup-summary" class="si-dock-summary" aria-live="polite"></div>
+                  <button type="button" class="button outline" data-open-left-category="montagem">Preparar a cena</button>
+                  <button type="button" class="button outline" data-open-left-category="objetos">Editar objeto</button>
+                </div>
                 <div data-left-panel="montagem">
                   <h3>Adicionar à cena</h3><p>Escolha uma entidade de demonstração.</p>
                   <div class="tool-stack"><button type="button" class="button outline" data-add-kind="block">▣ Adicionar bloco</button><button type="button" class="button outline" data-add-kind="circle">◯ Adicionar círculo</button><button type="button" class="button outline" data-add-kind="label">T Adicionar etiqueta</button></div>
@@ -224,26 +232,40 @@
                     <button type="button" id="scene-delete" class="button outline scene-danger">Excluir objeto</button>
                   </div>
                 </div>
-                <div data-left-panel="ajustes" hidden><h3>Configurações de cena</h3><p>Selecione uma extensão instalada localmente.</p>
+                <div data-left-panel="ajustes" hidden><h3>Módulo e ferramentas</h3><p>Selecione uma extensão instalada localmente.</p>
                   <label for="extension-choice">Extensão ativa</label><select id="extension-choice"><option value="">Nenhuma extensão</option></select>
                   <p id="extension-descriptor" class="si-extension-description">As extensões são executadas localmente.</p>
                   <h3>Ferramentas conectadas</h3><div id="extension-tools" class="si-extension-buttons"></div>
                   <p id="extension-status" role="status" aria-live="polite" class="si-dock-hint">Pronto para conectar recursos.</p></div>
+                <div data-left-panel="missao" hidden>
+                  <h3>Atividade orientada</h3><p>Consulte a atividade vinculada à sessão atual sem perder a montagem.</p>
+                  <p id="si-dock-activity-status" role="status">Nenhuma atividade orientada em andamento.</p>
+                  <a id="si-dock-activity-link" class="button outline" href="#/roteiros" hidden>Retornar ao procedimento</a>
+                  <a href="#/missoes" class="button outline">Ver missões</a>
+                  <a href="#/roteiros" class="button outline">Ver roteiros</a>
+                </div>
               </div>
             </aside>
             <aside id="si-dock-right" class="si-dock si-dock-right" aria-label="Ver" role="region" hidden data-presentation="standard">
-              <header class="si-dock-header"><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-expanded="false">Expandir</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">✕</button></header>
+              <header class="si-dock-header"><button id="si-dock-viewer-back" type="button" class="si-dock-back" aria-label="Voltar às visualizações" hidden>← Ver</button><h2 id="si-right-title">Ver</h2><button id="si-expand" type="button" class="si-dock-expand" aria-expanded="false">Expandir</button><button type="button" class="si-dock-close" data-close-dock="right" aria-label="Fechar painel">✕</button></header>
               <nav class="si-dock-tabs" role="group" aria-label="Fontes de informação">
                 <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
               </nav>
-              <div class="si-dock-scroll">
+              <div class="si-dock-scroll" id="si-right-scroll">
                 <div data-right-panel="ver">
-                  <div class="si-viewer-controls" role="group" aria-label="Tipo de visualização"><div id="si-viewer-buttons"></div></div>
+                  <div class="si-viewer-controls" id="si-viewer-catalog" role="group" aria-label="Tipo de visualização">
+                    <h3>Investigar</h3><p>Escolha uma visualização para examinar a cena.</p>
+                    <div id="si-viewer-buttons"></div>
+                  </div>
+                  <section id="si-viewer-detail" aria-label="Visualização selecionada" hidden>
                   <div id="si-viewer-output" class="si-viewer-output" aria-live="polite"></div>
                   <div id="si-observation" class="si-observation" hidden></div>
                   <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                  </section>
                 </div>
-                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div></div>
+                <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div>
+                  <div class="si-dock-data-actions"><a href="#/caderno" class="button outline">Abrir Caderno</a><a href="#/relatorios" class="button outline">Abrir Relatórios</a></div>
+                </div>
               </div>
             </aside>
             <div id="si-sheet-backdrop" class="si-sheet-backdrop" hidden></div>

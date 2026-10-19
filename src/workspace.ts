@@ -1,7 +1,7 @@
 namespace BaseDemoSI {
   export type WorkspaceView = "focus" | "overview";
   export type WorkspaceSide = "left" | "right";
-  export type WorkspaceLeftTab = "montagem" | "objetos" | "ajustes";
+  export type WorkspaceLeftTab = "resumo" | "montagem" | "objetos" | "ajustes" | "missao";
   export type WorkspaceRightTab = "ver" | "dados";
   export type WorkspacePresentation = "standard" | "fullscreen";
   export interface WorkspaceState {
@@ -31,7 +31,7 @@ namespace BaseDemoSI {
       case "open": {
         const tab=a.tab;
         if(a.side==="left")return {...s,left:"open",right:compact?"collapsed":s.right,presentation:"standard",
-          leftTab:tab==="objetos"||tab==="ajustes"?tab:"montagem"};
+          leftTab:tab==="resumo"||tab==="objetos"||tab==="ajustes"||tab==="missao"?tab:"montagem"};
         return {...s,right:"open",left:compact?"collapsed":s.left,
           rightTab:tab==="dados"?"dados":"ver",presentation:"standard"};
       }
@@ -51,7 +51,7 @@ namespace BaseDemoSI {
     if(!raw||typeof raw!=="object"||Array.isArray(raw))return null;
     const t=raw as Record<string,unknown>;
     if(t.schemaVersion!==1)return null;
-    if(!["focus","overview"].includes(String(t.view))||!["montagem","objetos","ajustes"].includes(String(t.leftTab))||!["ver","dados"].includes(String(t.rightTab)))return null;
+    if(!["focus","overview"].includes(String(t.view))||!["resumo","montagem","objetos","ajustes","missao"].includes(String(t.leftTab))||!["ver","dados"].includes(String(t.rightTab)))return null;
     // Abrir painéis automaticamente ao recarregar um telefone produz modal inesperado.
     return {...initialWorkspace(),view:t.view as WorkspaceView,leftTab:t.leftTab as WorkspaceLeftTab,rightTab:t.rightTab as WorkspaceRightTab};
   }

@@ -1,5 +1,5 @@
-/* Base Demo Oficial - SI 0.9.4. Instalação transacional de recursos locais. */
-const CACHE = "base-demo-si-v0.9.4";
+/* Base Demo Oficial - SI 0.9.5. Instalação transacional de recursos locais. */
+const CACHE = "base-demo-si-v0.9.5";
 const FILES = [
   "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
   "./components.css", "./extensions.css", "./education.css", "./records.css",
