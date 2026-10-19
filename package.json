@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
-  "description": "Distribuição PWA e standalone offline, sem dependências externas de execução.",
+  "description": "Vistoria funcional, correções de acessibilidade e integridade offline da base universal.",
   "scripts": {
     "build": "tsc -p tsconfig.json && python3 scripts/build_standalone.py",
-    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },

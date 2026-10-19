@@ -22,8 +22,6 @@ namespace BaseDemoSI {
     if (heading) heading.textContent = route?.subtitle ?? "";
     document.body.classList.toggle("route-ambiente", selected === "ambiente");
     window.dispatchEvent(new CustomEvent("si-route-changed", { detail: selected }));
-    document.body.classList.remove("nav-open");
-    const navToggle = document.getElementById("nav-toggle");
-    navToggle?.setAttribute("aria-expanded", "false");
+    closeNavigationDrawer(false);
   }
 }

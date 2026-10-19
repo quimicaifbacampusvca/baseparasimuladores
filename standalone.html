@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-i+Qp/19Ca77XJvT6JcBABCnmUF9TroMhLxEAMCWTNG8='; script-src 'sha256-5rUXpG62KgIfCOCTGHS4yCA+c1+1J/BDMHbYet0E0mI='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-sMBYl0AsQasfcX20rQYvItTBJuO+y4nAZg1q1f87ag8='; script-src 'sha256-Bvd2R4QvhwKNVN5RL3Ba8HCmDvHS3YEY3Hq2DBOG2t8='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
+  
   
   
   
@@ -261,6 +262,27 @@ body.si-modal-active{overflow:hidden}
 @media (max-width:420px) { .si-distribution-actions .button { flex:1 1 100%; } .si-distribution-card { padding:18px; } }
 @media print { .si-distribution-card {display:none!important;} }
 .si-distribution-actions button[hidden] { display:none!important; }
+
+/* Vistoria 0.9.0 — correções pontuais sem reconstruir as superfícies. */
+[hidden] {display:none!important;}
+.si-storage-warning {margin:0;padding:12px clamp(16px,4vw,52px);background:#fff1d4;color:#5d3907;border-bottom:2px solid #b77d20;font-size:13px;line-height:1.55;}
+.si-storage-warning strong {margin-right:6px;}
+.nav-backdrop {display:none;}
+@media(max-width:970px) {
+  .nav-backdrop:not([hidden]) {display:block;position:fixed;inset:0;background:rgba(7,21,34,.66);z-index:19;}
+  .nav-open .side {z-index:20;box-shadow:10px 0 30px rgba(7,21,34,.2);}
+}
+@media(prefers-contrast:more) {.si-storage-warning{background:#fff;color:#000;border:3px solid #000;}}
+@media print {.nav-backdrop,.si-storage-warning{display:none!important;}}
+/* A regra legada flex-basis:130px foi projetada para botões lado a lado.
+   Em uma doca vertical criava botões com mais de 130px de altura no mobile. */
+.si-dock-scroll .tool-stack .button {flex:0 0 auto;min-height:44px;padding-block:10px;}
+@media(max-width:900px){
+  /* Avisos não devem cobrir título, fechamento e abas da folha inferior. */
+  .si-sheet-active .si-notice:not(:last-child){display:none!important;}
+  .si-sheet-active .si-notifications{width:min(260px,calc(100vw - 20px));}
+  .si-sheet-active .si-notice{font-size:12px;padding:8px 10px;}
+}
 </style>
 </head>
 <body>
@@ -283,20 +305,25 @@ body.si-modal-active{overflow:hidden}
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.8.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.0</span></small></div>
     </aside>
 
-    <div class="main-column">
+    <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
+
+    <div class="main-column" id="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
         <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.8.0</span></span>
+        <span class="version-pill">v<span data-app-version>0.9.0</span></span>
       </header>
+      <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
+          <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
+        </div>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 08 · ACABAMENTO E DISTRIBUIÇÃO</p>
-            <h1 id="home-title">Uma base universal pronta para experimentar, registrar e trabalhar offline.</h1>
+            <p class="eyebrow">ETAPA 09 · VISTORIA E COMPATIBILIDADE</p>
+            <h1 id="home-title">Uma base universal em vistoria funcional, preparada para uso local.</h1>
             <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
           </div>
@@ -522,10 +549,10 @@ body.si-modal-active{overflow:hidden}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.8.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.8.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.0</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -546,7 +573,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.8.0",
+        version: "0.9.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -569,12 +596,23 @@ var BaseDemoSI;
      * A persistência pode estar bloqueada pelo navegador ou por file://.
      * A falha é controlada e nunca impede abrir a aplicação.
      */
+    let storageWarningIssued = false;
+    function markStorageUnavailable() {
+        if (storageWarningIssued)
+            return;
+        storageWarningIssued = true;
+        const banner = document.getElementById("storage-warning");
+        if (banner)
+            banner.hidden = false;
+    }
+    BaseDemoSI.markStorageUnavailable = markStorageUnavailable;
     BaseDemoSI.storage = {
         read(key) {
             try {
                 return window.localStorage.getItem(`${BaseDemoSI.manifest.id}:${key}`);
             }
             catch {
+                markStorageUnavailable();
                 return null;
             }
         },
@@ -584,10 +622,92 @@ var BaseDemoSI;
                 return true;
             }
             catch {
+                markStorageUnavailable();
                 return false;
             }
         }
     };
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    let drawerStarted = false;
+    const menuButton = () => document.getElementById("nav-toggle");
+    const drawer = () => document.getElementById("sidebar");
+    const backdrop = () => document.getElementById("nav-backdrop");
+    const mainColumn = () => document.getElementById("main-column");
+    const mobileMenu = () => window.matchMedia("(max-width:970px)").matches;
+    const drawerOpen = () => document.body.classList.contains("nav-open");
+    function closeNavigationDrawer(restoreFocus = false) {
+        const wasOpen = drawerOpen();
+        document.body.classList.remove("nav-open");
+        menuButton()?.setAttribute("aria-expanded", "false");
+        const shade = backdrop();
+        if (shade)
+            shade.hidden = true;
+        const page = mainColumn();
+        if (page)
+            page.inert = false;
+        if (restoreFocus && wasOpen)
+            menuButton()?.focus({ preventScroll: true });
+    }
+    BaseDemoSI.closeNavigationDrawer = closeNavigationDrawer;
+    function openNavigationDrawer() {
+        if (!mobileMenu() || BaseDemoSI.isPlatformDialogOpen())
+            return;
+        document.body.classList.add("nav-open");
+        menuButton()?.setAttribute("aria-expanded", "true");
+        const shade = backdrop();
+        if (shade)
+            shade.hidden = false;
+        const page = mainColumn();
+        if (page)
+            page.inert = true;
+        drawer()?.querySelector('.nav a[aria-current="page"],.nav a[href]')?.focus({ preventScroll: true });
+    }
+    function focusableItems() {
+        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled])') ?? [])
+            .filter(item => item.getClientRects().length > 0);
+    }
+    function setupNavigationDrawer() {
+        if (drawerStarted)
+            return;
+        drawerStarted = true;
+        menuButton()?.addEventListener("click", () => drawerOpen() ? closeNavigationDrawer(true) : openNavigationDrawer());
+        backdrop()?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.addEventListener("keydown", event => {
+            if (!drawerOpen())
+                return;
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closeNavigationDrawer(true);
+                return;
+            }
+            if (event.key !== "Tab")
+                return;
+            const items = focusableItems();
+            if (!items.length)
+                return;
+            const first = items[0], last = items[items.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+        window.addEventListener("resize", () => { if (!mobileMenu())
+            closeNavigationDrawer(false); });
+        document.querySelectorAll("#sidebar a[href]").forEach(link => link.addEventListener("click", () => {
+            if (!drawerOpen())
+                return;
+            closeNavigationDrawer(false);
+            // Link navigation has occurred; announce the content destination to keyboard users.
+            window.setTimeout(() => document.getElementById("conteudo")?.focus({ preventScroll: true }), 0);
+        }));
+    }
+    BaseDemoSI.setupNavigationDrawer = setupNavigationDrawer;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -616,9 +736,7 @@ var BaseDemoSI;
             heading.textContent = route?.subtitle ?? "";
         document.body.classList.toggle("route-ambiente", selected === "ambiente");
         window.dispatchEvent(new CustomEvent("si-route-changed", { detail: selected }));
-        document.body.classList.remove("nav-open");
-        const navToggle = document.getElementById("nav-toggle");
-        navToggle?.setAttribute("aria-expanded", "false");
+        BaseDemoSI.closeNavigationDrawer(false);
     }
     BaseDemoSI.updateRoute = updateRoute;
 })(BaseDemoSI || (BaseDemoSI = {}));
@@ -2567,7 +2685,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -2924,17 +3042,7 @@ var BaseDemoSI;
         BaseDemoSI.setupScene();
         BaseDemoSI.updateRoute();
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
-        const toggle = document.getElementById("nav-toggle");
-        toggle?.addEventListener("click", () => {
-            const open = document.body.classList.toggle("nav-open");
-            toggle.setAttribute("aria-expanded", String(open));
-        });
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                document.body.classList.remove("nav-open");
-                toggle?.setAttribute("aria-expanded", "false");
-            }
-        });
+        BaseDemoSI.setupNavigationDrawer();
         BaseDemoSI.setupDistribution();
     }
     BaseDemoSI.initialize = initialize;

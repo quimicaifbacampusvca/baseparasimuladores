@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.8.0",
+        version: "0.9.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -29,12 +29,23 @@ var BaseDemoSI;
      * A persistência pode estar bloqueada pelo navegador ou por file://.
      * A falha é controlada e nunca impede abrir a aplicação.
      */
+    let storageWarningIssued = false;
+    function markStorageUnavailable() {
+        if (storageWarningIssued)
+            return;
+        storageWarningIssued = true;
+        const banner = document.getElementById("storage-warning");
+        if (banner)
+            banner.hidden = false;
+    }
+    BaseDemoSI.markStorageUnavailable = markStorageUnavailable;
     BaseDemoSI.storage = {
         read(key) {
             try {
                 return window.localStorage.getItem(`${BaseDemoSI.manifest.id}:${key}`);
             }
             catch {
+                markStorageUnavailable();
                 return null;
             }
         },
@@ -44,10 +55,92 @@ var BaseDemoSI;
                 return true;
             }
             catch {
+                markStorageUnavailable();
                 return false;
             }
         }
     };
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    let drawerStarted = false;
+    const menuButton = () => document.getElementById("nav-toggle");
+    const drawer = () => document.getElementById("sidebar");
+    const backdrop = () => document.getElementById("nav-backdrop");
+    const mainColumn = () => document.getElementById("main-column");
+    const mobileMenu = () => window.matchMedia("(max-width:970px)").matches;
+    const drawerOpen = () => document.body.classList.contains("nav-open");
+    function closeNavigationDrawer(restoreFocus = false) {
+        const wasOpen = drawerOpen();
+        document.body.classList.remove("nav-open");
+        menuButton()?.setAttribute("aria-expanded", "false");
+        const shade = backdrop();
+        if (shade)
+            shade.hidden = true;
+        const page = mainColumn();
+        if (page)
+            page.inert = false;
+        if (restoreFocus && wasOpen)
+            menuButton()?.focus({ preventScroll: true });
+    }
+    BaseDemoSI.closeNavigationDrawer = closeNavigationDrawer;
+    function openNavigationDrawer() {
+        if (!mobileMenu() || BaseDemoSI.isPlatformDialogOpen())
+            return;
+        document.body.classList.add("nav-open");
+        menuButton()?.setAttribute("aria-expanded", "true");
+        const shade = backdrop();
+        if (shade)
+            shade.hidden = false;
+        const page = mainColumn();
+        if (page)
+            page.inert = true;
+        drawer()?.querySelector('.nav a[aria-current="page"],.nav a[href]')?.focus({ preventScroll: true });
+    }
+    function focusableItems() {
+        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled])') ?? [])
+            .filter(item => item.getClientRects().length > 0);
+    }
+    function setupNavigationDrawer() {
+        if (drawerStarted)
+            return;
+        drawerStarted = true;
+        menuButton()?.addEventListener("click", () => drawerOpen() ? closeNavigationDrawer(true) : openNavigationDrawer());
+        backdrop()?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.addEventListener("keydown", event => {
+            if (!drawerOpen())
+                return;
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closeNavigationDrawer(true);
+                return;
+            }
+            if (event.key !== "Tab")
+                return;
+            const items = focusableItems();
+            if (!items.length)
+                return;
+            const first = items[0], last = items[items.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+        window.addEventListener("resize", () => { if (!mobileMenu())
+            closeNavigationDrawer(false); });
+        document.querySelectorAll("#sidebar a[href]").forEach(link => link.addEventListener("click", () => {
+            if (!drawerOpen())
+                return;
+            closeNavigationDrawer(false);
+            // Link navigation has occurred; announce the content destination to keyboard users.
+            window.setTimeout(() => document.getElementById("conteudo")?.focus({ preventScroll: true }), 0);
+        }));
+    }
+    BaseDemoSI.setupNavigationDrawer = setupNavigationDrawer;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -76,9 +169,7 @@ var BaseDemoSI;
             heading.textContent = route?.subtitle ?? "";
         document.body.classList.toggle("route-ambiente", selected === "ambiente");
         window.dispatchEvent(new CustomEvent("si-route-changed", { detail: selected }));
-        document.body.classList.remove("nav-open");
-        const navToggle = document.getElementById("nav-toggle");
-        navToggle?.setAttribute("aria-expanded", "false");
+        BaseDemoSI.closeNavigationDrawer(false);
     }
     BaseDemoSI.updateRoute = updateRoute;
 })(BaseDemoSI || (BaseDemoSI = {}));
@@ -2027,7 +2118,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -2384,17 +2475,7 @@ var BaseDemoSI;
         BaseDemoSI.setupScene();
         BaseDemoSI.updateRoute();
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
-        const toggle = document.getElementById("nav-toggle");
-        toggle?.addEventListener("click", () => {
-            const open = document.body.classList.toggle("nav-open");
-            toggle.setAttribute("aria-expanded", String(open));
-        });
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                document.body.classList.remove("nav-open");
-                toggle?.setAttribute("aria-expanded", "false");
-            }
-        });
+        BaseDemoSI.setupNavigationDrawer();
         BaseDemoSI.setupDistribution();
     }
     BaseDemoSI.initialize = initialize;

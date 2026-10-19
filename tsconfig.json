@@ -18,6 +18,7 @@
     "src/scene-contracts.ts",
     "src/config.ts",
     "src/storage.ts",
+    "src/navigation.ts",
     "src/router.ts",
     "src/preferences.ts",
     "src/extension-contracts.ts",

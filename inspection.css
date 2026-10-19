@@ -1,0 +1,20 @@
+/* Vistoria 0.9.0 — correções pontuais sem reconstruir as superfícies. */
+[hidden] {display:none!important;}
+.si-storage-warning {margin:0;padding:12px clamp(16px,4vw,52px);background:#fff1d4;color:#5d3907;border-bottom:2px solid #b77d20;font-size:13px;line-height:1.55;}
+.si-storage-warning strong {margin-right:6px;}
+.nav-backdrop {display:none;}
+@media(max-width:970px) {
+  .nav-backdrop:not([hidden]) {display:block;position:fixed;inset:0;background:rgba(7,21,34,.66);z-index:19;}
+  .nav-open .side {z-index:20;box-shadow:10px 0 30px rgba(7,21,34,.2);}
+}
+@media(prefers-contrast:more) {.si-storage-warning{background:#fff;color:#000;border:3px solid #000;}}
+@media print {.nav-backdrop,.si-storage-warning{display:none!important;}}
+/* A regra legada flex-basis:130px foi projetada para botões lado a lado.
+   Em uma doca vertical criava botões com mais de 130px de altura no mobile. */
+.si-dock-scroll .tool-stack .button {flex:0 0 auto;min-height:44px;padding-block:10px;}
+@media(max-width:900px){
+  /* Avisos não devem cobrir título, fechamento e abas da folha inferior. */
+  .si-sheet-active .si-notice:not(:last-child){display:none!important;}
+  .si-sheet-active .si-notifications{width:min(260px,calc(100vw - 20px));}
+  .si-sheet-active .si-notice{font-size:12px;padding:8px 10px;}
+}
