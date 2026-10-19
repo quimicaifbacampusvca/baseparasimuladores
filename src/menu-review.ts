@@ -55,20 +55,10 @@ namespace BaseDemoSI {
     if(!storage.write(prefKey,JSON.stringify(pref)))notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.","warning");
   }
   function getActivityContext():ActiveMenuActivity|null {
-    const route=currentRoute(window.location.hash);
-    let destination=window.location.hash;
-    if(route==="ambiente") {
-      const returnControl=menuGet("si-return-activity") as HTMLAnchorElement|null;
-      if(!returnControl || returnControl.hidden)return null;
-      destination=returnControl.getAttribute("href")??"";
-    }
-    const activityRoute=currentRoute(destination);
-    if(activityRoute!=="missoes" && activityRoute!=="roteiros")return null;
-    const id=new URLSearchParams(destination.split("?")[1]??"").get("item");
-    if(!id)return null;
-    const kind:ActivityKind=activityRoute==="missoes"?"mission":"script";
-    const activity=menuActivity(kind,id);
-    return activity?{id,kind,title:activity.title,url:`#/${activityRoute}?item=${encodeURIComponent(id)}`,steps:activity.steps}:null;
+    const context=guidedActivityContext();
+    if(!context)return null;
+    const activity=menuActivity(context.kind,new URLSearchParams(context.url.split("?")[1]??"").get("item")??"");
+    return activity?{id:activity.id,kind:activity.kind,title:activity.title,url:context.url,steps:activity.steps}:null;
   }
   function syncMenuReview():void {
     const ctx=getActivityContext();activeActivity=ctx;activityLink=ctx?.url??"";
@@ -241,7 +231,7 @@ namespace BaseDemoSI {
     menuGet("si-activity-exit")?.addEventListener("click",async()=>{
       const ctx=activeActivity;
       if(!ctx)return;
-      const decision=await confirmDialog({title:"Encerrar atividade?",description:"Você retornará ao catálogo. O progresso local já registrado será preservado.",confirmText:"Encerrar"});
+      const decision=await confirmDialog({title:"Encerrar atividade?",description:"A bancada livre será restaurada. O progresso já registrado será preservado.",confirmText:"Encerrar"});
       if(!decision)return;
       clearGuidedReturn();
       closeNavigationDrawer(false);

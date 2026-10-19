@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.12",
+        version: "0.9.13",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -303,23 +303,11 @@ var BaseDemoSI;
             BaseDemoSI.notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.", "warning");
     }
     function getActivityContext() {
-        const route = BaseDemoSI.currentRoute(window.location.hash);
-        let destination = window.location.hash;
-        if (route === "ambiente") {
-            const returnControl = menuGet("si-return-activity");
-            if (!returnControl || returnControl.hidden)
-                return null;
-            destination = returnControl.getAttribute("href") ?? "";
-        }
-        const activityRoute = BaseDemoSI.currentRoute(destination);
-        if (activityRoute !== "missoes" && activityRoute !== "roteiros")
+        const context = BaseDemoSI.guidedActivityContext();
+        if (!context)
             return null;
-        const id = new URLSearchParams(destination.split("?")[1] ?? "").get("item");
-        if (!id)
-            return null;
-        const kind = activityRoute === "missoes" ? "mission" : "script";
-        const activity = BaseDemoSI.menuActivity(kind, id);
-        return activity ? { id, kind, title: activity.title, url: `#/${activityRoute}?item=${encodeURIComponent(id)}`, steps: activity.steps } : null;
+        const activity = BaseDemoSI.menuActivity(context.kind, new URLSearchParams(context.url.split("?")[1] ?? "").get("item") ?? "");
+        return activity ? { id: activity.id, kind: activity.kind, title: activity.title, url: context.url, steps: activity.steps } : null;
     }
     function syncMenuReview() {
         const ctx = getActivityContext();
@@ -581,7 +569,7 @@ var BaseDemoSI;
             const ctx = activeActivity;
             if (!ctx)
                 return;
-            const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" });
+            const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "A bancada livre será restaurada. O progresso já registrado será preservado.", confirmText: "Encerrar" });
             if (!decision)
                 return;
             BaseDemoSI.clearGuidedReturn();
@@ -1012,15 +1000,15 @@ var BaseDemoSI;
             paragraphs: ["Uma observação descreve o que aparece na cena. Uma leitura acrescenta um valor, unidade e vínculo com o instrumento que a produziu.", "Conferir resultados implica distinguir ações realizadas, medidas obtidas e interpretações construídas a partir delas."] }
     ]);
     BaseDemoSI.officialActivities = Object.freeze([
-        { id: "mission-create", kind: "mission", origin: "official", title: "Primeira composição", description: "Adicione ao menos dois objetos ao ambiente.", steps: [{ label: "Adicionar dois objetos na cena", requirement: "entities", minimum: 2 }] },
-        { id: "mission-select", kind: "mission", origin: "official", title: "Objeto em foco", description: "Selecione um objeto para examiná-lo.", steps: [{ label: "Manter um objeto selecionado", requirement: "selection", minimum: 1 }] },
-        { id: "mission-read", kind: "mission", origin: "official", title: "Registrar uma leitura", description: "Utilize um instrumento de uma extensão local.", steps: [{ label: "Registrar pelo menos uma leitura", requirement: "readings", minimum: 1 }] },
-        { id: "script-start", kind: "script", origin: "official", title: "Construção orientada", description: "Prepare, selecione e amplie sua primeira montagem.", steps: [
+        { id: "mission-create", kind: "mission", origin: "official", module: "explorar", title: "Primeira composição", description: "Adicione ao menos dois objetos ao ambiente.", steps: [{ label: "Adicionar dois objetos na cena", requirement: "entities", minimum: 2 }] },
+        { id: "mission-select", kind: "mission", origin: "official", module: "explorar", title: "Objeto em foco", description: "Selecione um objeto para examiná-lo.", steps: [{ label: "Manter um objeto selecionado", requirement: "selection", minimum: 1 }] },
+        { id: "mission-read", kind: "mission", origin: "official", module: "medir", title: "Registrar uma leitura", description: "Utilize um instrumento de uma extensão local.", steps: [{ label: "Registrar pelo menos uma leitura", requirement: "readings", minimum: 1 }] },
+        { id: "script-start", kind: "script", origin: "official", module: "explorar", title: "Construção orientada", description: "Prepare, selecione e amplie sua primeira montagem.", steps: [
                 { label: "Adicione o primeiro objeto", requirement: "entities", minimum: 1 },
                 { label: "Selecione o objeto para observação", requirement: "selection", minimum: 1 },
                 { label: "Amplie a montagem para dois objetos", requirement: "entities", minimum: 2 }
             ] },
-        { id: "script-observe", kind: "script", origin: "official", title: "Da observação ao registro", description: "Organize um procedimento de inspeção e medição.", steps: [
+        { id: "script-observe", kind: "script", origin: "official", module: "medir", title: "Da observação ao registro", description: "Organize um procedimento de inspeção e medição.", steps: [
                 { label: "Selecione um objeto no ambiente", requirement: "selection", minimum: 1 },
                 { label: "Utilize um instrumento e registre a leitura", requirement: "readings", minimum: 1 }
             ] }
@@ -1042,6 +1030,7 @@ var BaseDemoSI;
         const a = value;
         return typeof a.id === "string" && ID.test(a.id) && a.id.startsWith("teacher-") && !RESERVED.has(a.id)
             && a.origin === "teacher" && (a.kind === "mission" || a.kind === "script")
+            && (a.module === undefined || BaseDemoSI.validModule(a.module)) // Dados legados continuam importáveis.
             && clean(a.title, 90) && clean(a.description, 300)
             && Array.isArray(a.steps) && a.steps.length >= 1 && a.steps.length <= MAX_STEPS
             && (a.kind !== "mission" || a.steps.length === 1)
@@ -1136,6 +1125,13 @@ var BaseDemoSI;
                 const progress = { ...state.progress, [id]: i + 1 };
                 persist({ ...state, progress });
                 return { ok: true, message: i + 1 === a.steps.length ? "Atividade concluída." : "Etapa registrada. Continue o roteiro." };
+            },
+            resetActivity(id) {
+                if (!get(id))
+                    return false;
+                const progress = { ...state.progress };
+                delete progress[id];
+                return persist({ ...state, progress });
             },
             createActivity(value) {
                 if (!validTeacherActivity(value) || state.teacherActivities.length >= MAX_TEACHER || get(value.id))
@@ -1805,8 +1801,8 @@ var BaseDemoSI;
     const activeSide = () => workspaceState.right === "open" ? "right" : workspaceState.left === "open" ? "left" : null;
     function dock(side) { return node(`si-dock-${side}`); }
     function guidedActivity() {
-        const returnLink = node("si-return-activity");
-        return !!returnLink && !returnLink.hidden && !!returnLink.getAttribute("href");
+        // Estado educacional como fonte de verdade, não o estado momentâneo do link.
+        return !!BaseDemoSI.guidedActivityContext();
     }
     function persistWorkspace() { BaseDemoSI.storage.write(WORKSPACE_KEY, BaseDemoSI.serializeWorkspacePreference(workspaceState)); }
     function focusReturn(side) {
@@ -2068,12 +2064,12 @@ var BaseDemoSI;
         }
         const contextLink = node("si-dock-activity-link");
         const contextStatus = node("si-dock-activity-status");
-        const returnLink = node("si-return-activity");
-        const activeActivity = !!returnLink && !returnLink.hidden && !!returnLink.getAttribute("href");
+        const activity = BaseDemoSI.guidedActivityContext();
+        const activeActivity = !!activity;
         if (contextLink) {
             contextLink.hidden = !activeActivity;
-            if (activeActivity)
-                contextLink.href = returnLink.href;
+            if (activity)
+                contextLink.href = activity.url;
         }
         if (contextStatus)
             contextStatus.textContent = activeActivity ? "Atividade em andamento. O retorno mantém os objetos da cena." : "Nenhuma atividade orientada em andamento.";
@@ -2445,6 +2441,14 @@ var BaseDemoSI;
     BaseDemoSI.extensionGetRecords = extensionGetRecords;
     function extensionRecordCount() { return extensionsReady ? runtime.getRecords().length : 0; }
     BaseDemoSI.extensionRecordCount = extensionRecordCount;
+    /** Sequência crescente; funciona mesmo quando o histórico atinge seu limite de 40 registros. */
+    function extensionRecordSequence() {
+        if (!extensionsReady)
+            return 0;
+        const records = runtime.getRecords();
+        return records.length ? records[records.length - 1].sequence : 0;
+    }
+    BaseDemoSI.extensionRecordSequence = extensionRecordSequence;
     function setupExtensions(scene) {
         if (extensionsReady)
             return;
@@ -2703,11 +2707,39 @@ var BaseDemoSI;
         node.addEventListener("click", action);
         return node;
     }
-    function countReadings() { return BaseDemoSI.extensionRecordCount(); }
-    /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
+    function countReadings() { return BaseDemoSI.extensionRecordSequence(); }
+    /** A leitura do catálogo não inicia uma atividade. A sessão nasce no comando Montar. */
     let returnToActivity = "";
     const guidedKey = "guided-return-v1";
-    /** Vínculo validado sempre contra o catálogo carregado: sem atividade fantasma. */
+    const sessionKey = "guided-session-v1";
+    const checkpointsKey = "guided-checkpoints-v1";
+    let checkpoints = Object.create(null);
+    function restoreCheckpoints() {
+        checkpoints = Object.create(null);
+        try {
+            const saved = BaseDemoSI.storage.read(checkpointsKey);
+            if (!saved)
+                return;
+            const value = JSON.parse(saved);
+            if (value.schemaVersion !== 1 || !value.entries || Array.isArray(value.entries) || typeof value.entries !== "object")
+                return;
+            const entries = Object.entries(value.entries);
+            if (entries.length > 29)
+                return;
+            for (const [url, entry] of entries) {
+                if (!validatedGuidedLink(url) || !entry || !BaseDemoSI.parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline < 0)
+                    return;
+            }
+            for (const [url, entry] of entries)
+                checkpoints[url] = { scene: BaseDemoSI.parseScene(entry.scene), readingsBaseline: entry.readingsBaseline };
+        }
+        catch {
+            checkpoints = Object.create(null);
+        }
+    }
+    function checkpointSave() { BaseDemoSI.storage.write(checkpointsKey, JSON.stringify({ schemaVersion: 1, entries: checkpoints })); }
+    function checkpointDelete(url) { delete checkpoints[url]; checkpointSave(); }
+    let guidedSession = null;
     function validatedGuidedLink(value) {
         const match = /^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
         if (!match || !education)
@@ -2718,17 +2750,105 @@ var BaseDemoSI;
             return null;
         return { url: `#/${match[1]}?item=${encodeURIComponent(activity.id)}`, activity, progress: education.snapshot().progress[activity.id] ?? 0 };
     }
+    function readGuidedSession(value) {
+        if (!value)
+            return null;
+        try {
+            const raw = JSON.parse(value);
+            if (raw.schemaVersion !== 1 || typeof raw.url !== "string" || !validatedGuidedLink(raw.url)
+                || !Number.isSafeInteger(raw.readingsBaseline) || (raw.readingsBaseline ?? -1) < 0
+                || !BaseDemoSI.parseScene(raw.freeScene) || (raw.freeModule !== undefined && !BaseDemoSI.validModule(raw.freeModule)))
+                return null;
+            return { schemaVersion: 1, url: raw.url, freeScene: BaseDemoSI.parseScene(raw.freeScene), readingsBaseline: raw.readingsBaseline, freeModule: raw.freeModule };
+        }
+        catch {
+            return null;
+        }
+    }
     function saveGuidedReturn(value) {
         returnToActivity = value;
         BaseDemoSI.storage.write(guidedKey, value);
         mountReturnLink();
         window.dispatchEvent(new Event("si-guided-context-changed"));
     }
+    function saveSession(session) {
+        guidedSession = session;
+        BaseDemoSI.storage.write(sessionKey, session ? JSON.stringify(session) : "");
+        saveGuidedReturn(session?.url ?? "");
+    }
     function guidedActivityContext() {
-        const result = validatedGuidedLink(returnToActivity);
-        return result ? { url: result.url, title: result.activity.title, kind: result.activity.kind, progress: result.progress, total: result.activity.steps.length } : null;
+        const valid = guidedSession && validatedGuidedLink(guidedSession.url);
+        return valid ? { url: valid.url, title: valid.activity.title, kind: valid.activity.kind, progress: valid.progress, total: valid.activity.steps.length } : null;
     }
     BaseDemoSI.guidedActivityContext = guidedActivityContext;
+    function sessionFor(id) { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`) ?? false; }
+    function scopedReadings() { return Math.max(0, countReadings() - (guidedSession?.readingsBaseline ?? 0)); }
+    function beginGuidedActivity(id, kind) {
+        const activity = education.list(kind).find(a => a.id === id);
+        if (!activity)
+            return false;
+        const url = `#/${kind === "mission" ? "missoes" : "roteiros"}?item=${encodeURIComponent(id)}`;
+        if (guidedSession) {
+            if (guidedSession.url !== url) {
+                BaseDemoSI.notify("Encerre a atividade em andamento antes de iniciar outra.", "warning");
+                return false;
+            }
+            window.location.hash = "#/ambiente";
+            return true;
+        }
+        if ((education.snapshot().progress[id] ?? 0) >= activity.steps.length) {
+            BaseDemoSI.notify("Atividade concluída. Inicie uma nova tentativa para refazê-la.", "info");
+            return false;
+        }
+        const original = educationScene.getSnapshot();
+        const checkpoint = checkpoints[url];
+        const run = { schemaVersion: 1, url, freeScene: original,
+            readingsBaseline: checkpoint?.readingsBaseline ?? countReadings(), freeModule: BaseDemoSI.currentModule() };
+        // Gravar o vínculo antes da alteração: uma recarga nunca perde a cena livre.
+        saveSession(run);
+        const blank = { schemaVersion: 1, entities: [], selectedId: null };
+        const targetModule = activity.module ?? "livre";
+        BaseDemoSI.selectModule(targetModule);
+        // Medir/Calcular não oferecem criação de entidades; disponibilizar um objeto
+        // neutro e não selecionado para observação, sem substituir a intervenção do aluno.
+        const starter = (targetModule === "medir" || targetModule === "calcular")
+            ? { schemaVersion: 1, entities: [BaseDemoSI.makeEntity("block", `obj-atividade-${id}`)], selectedId: null }
+            : blank;
+        educationScene.dispatch({ type: "replace", snapshot: checkpoint?.scene ?? starter });
+        window.location.hash = "#/ambiente";
+        return true;
+    }
+    BaseDemoSI.beginGuidedActivity = beginGuidedActivity;
+    function endGuidedActivity() {
+        const previous = guidedSession;
+        if (previous) {
+            const valid = validatedGuidedLink(previous.url);
+            if (valid && valid.progress < valid.activity.steps.length) {
+                checkpoints[previous.url] = { scene: educationScene.getSnapshot(), readingsBaseline: previous.readingsBaseline };
+                checkpointSave();
+            }
+            else
+                checkpointDelete(previous.url);
+            educationScene.dispatch({ type: "replace", snapshot: previous.freeScene });
+            if (previous.freeModule)
+                BaseDemoSI.selectModule(previous.freeModule);
+        }
+        saveSession(null);
+        renderAll();
+    }
+    BaseDemoSI.endGuidedActivity = endGuidedActivity;
+    function clearGuidedReturn() { endGuidedActivity(); }
+    BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
+    function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
+    BaseDemoSI.menuActivity = menuActivity;
+    function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
+    BaseDemoSI.menuActivityProgress = menuActivityProgress;
+    function advanceActivityFromMenu(id) {
+        if (!education || !educationScene || !sessionFor(id))
+            return { ok: false, message: "Inicie esta atividade antes de registrar etapas." };
+        return education.advance(id, educationScene.getSnapshot(), scopedReadings());
+    }
+    BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
     const selectedParam = (key) => {
         const search = window.location.hash.split("?")[1] ?? "";
         return new URLSearchParams(search).get(key) ?? "";
@@ -2744,18 +2864,6 @@ var BaseDemoSI;
             document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
         }, 0);
     }
-    function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
-    BaseDemoSI.menuActivity = menuActivity;
-    function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
-    BaseDemoSI.menuActivityProgress = menuActivityProgress;
-    function advanceActivityFromMenu(id) {
-        if (!education || !educationScene)
-            return { ok: false, message: "Nenhuma atividade disponível." };
-        return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
-    }
-    BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
-    function clearGuidedReturn() { saveGuidedReturn(""); }
-    BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)
@@ -2804,6 +2912,13 @@ var BaseDemoSI;
             for (const paragraph of active.paragraphs)
                 article.append(text("p", paragraph));
             detail.append(article);
+            const related = document.createElement("div");
+            related.className = "edu-related";
+            related.append(text("strong", "Pratique este tema"));
+            related.append(button("Explorar na bancada", () => { window.location.hash = "#/ambiente"; }));
+            related.append(button("Ver missões", () => { window.location.hash = "#/missoes"; }));
+            related.append(button("Ver roteiros", () => { window.location.hash = "#/roteiros"; }));
+            detail.append(related);
             detail.append(button(saved.topicsDone.includes(active.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => {
                 education.toggleTopic(active.id);
                 BaseDemoSI.notify("Progresso de leitura atualizado.", "success");
@@ -2830,7 +2945,8 @@ var BaseDemoSI;
             const card = document.createElement("article");
             card.className = "edu-card";
             card.dataset.activityId = activity.id;
-            card.append(text("p", `${activity.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${activity.steps.length} etapas`}`, "edu-kicker"), text("h2", activity.title), text("p", activity.description));
+            const module = BaseDemoSI.moduleDefinitions.find(m => m.id === (activity.module ?? "livre"));
+            card.append(text("p", `${activity.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${module.label} · ${finished ? "Concluído" : `${position}/${activity.steps.length} etapas`}`, "edu-kicker"), text("h2", activity.title), text("p", activity.description));
             const go = button("Ver detalhes", () => openDetail(route, "item", activity.id));
             go.dataset.catalogId = activity.id;
             card.append(go);
@@ -2841,14 +2957,13 @@ var BaseDemoSI;
         if (!active || !detail)
             return;
         const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
-        const nextReturn = `#/${route}?item=${encodeURIComponent(active.id)}`;
-        if (returnToActivity !== nextReturn)
-            saveGuidedReturn(nextReturn);
+        const running = sessionFor(active.id);
         const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
         back.classList.add("si-detail-back");
         const heading = text("h2", active.title);
         heading.tabIndex = -1;
-        detail.append(back, text("p", kind === "mission" ? "MISSÃO · OBJETIVOS" : "ROTEIRO · PROCEDIMENTO", "edu-kicker"), heading, text("p", active.description, "si-detail-lead"));
+        const module = BaseDemoSI.moduleDefinitions.find(m => m.id === (active.module ?? "livre"));
+        detail.append(back, text("p", `${kind === "mission" ? "MISSÃO · OBJETIVOS" : "ROTEIRO · PROCEDIMENTO"} · ${module.label}`, "edu-kicker"), heading, text("p", active.description, "si-detail-lead"));
         const list = document.createElement("ol");
         list.className = "edu-steps si-detail-steps";
         for (let i = 0; i < active.steps.length; i++) {
@@ -2862,24 +2977,46 @@ var BaseDemoSI;
         detail.append(list);
         const actions = document.createElement("div");
         actions.className = "edu-actions";
-        const bench = document.createElement("a");
-        bench.className = "button primary";
-        bench.href = "#/ambiente";
-        bench.textContent = "Montar na bancada";
-        actions.append(bench);
         if (!finished) {
+            const begin = button(running ? "Continuar na bancada" : "Montar na bancada", () => beginGuidedActivity(active.id, kind), "primary");
+            if (guidedSession && !running) {
+                begin.disabled = true;
+                begin.title = "Encerre a atividade atual antes de iniciar outra.";
+            }
+            actions.append(begin);
             const step = active.steps[position];
-            const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
+            const allowed = running && BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), scopedReadings());
             const check = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
-                const outcome = education.advance(active.id, educationScene.getSnapshot(), countReadings());
+                const outcome = advanceActivityFromMenu(active.id);
                 BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
             }, "outline");
             check.disabled = !allowed;
             check.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
             actions.append(check);
         }
-        else
+        else {
             actions.append(text("span", "Atividade concluída", "edu-finished"));
+            const again = button("Iniciar nova tentativa", async () => {
+                if (guidedSession) {
+                    BaseDemoSI.notify("Encerre a atividade atual antes de iniciar outra tentativa.", "warning");
+                    return;
+                }
+                const yes = await BaseDemoSI.confirmDialog({ title: "Reiniciar atividade?", description: "Uma nova tentativa começará do início. O progresso anterior desta atividade será reiniciado.", confirmText: "Iniciar novamente", destructive: true });
+                if (yes && education.resetActivity(active.id)) {
+                    checkpointDelete(`#/${route}?item=${encodeURIComponent(active.id)}`);
+                    beginGuidedActivity(active.id, kind);
+                }
+            });
+            again.disabled = !!guidedSession;
+            actions.append(again);
+        }
+        if (running) {
+            actions.append(button("Encerrar atividade", async () => {
+                const yes = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "A bancada livre será restaurada. As etapas já registradas permanecerão salvas.", confirmText: "Encerrar" });
+                if (yes)
+                    endGuidedActivity();
+            }));
+        }
         detail.append(actions);
         mountReturnLink();
     }
@@ -2901,8 +3038,10 @@ var BaseDemoSI;
             info.append(text("strong", a.title), text("small", `${a.kind === "mission" ? "Missão" : "Roteiro"} · ${a.steps.length} etapa(s)`));
             card.append(info, button("Criar link", () => BaseDemoSI.offerShareLink(a)), button("Excluir", async () => {
                 const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir atividade?", description: `A atividade ${a.title} e seu progresso serão excluídos deste navegador.`, confirmText: "Excluir", destructive: true });
-                if (accepted && education.removeActivity(a.id))
+                if (accepted && education.removeActivity(a.id)) {
+                    checkpointDelete(`#/${a.kind === "mission" ? "missoes" : "roteiros"}?item=${encodeURIComponent(a.id)}`);
                     BaseDemoSI.notify("Atividade removida.", "info");
+                }
             }));
             target.append(card);
         }
@@ -2911,11 +3050,86 @@ var BaseDemoSI;
     const inputValue = (id) => el(id)?.value.trim() ?? "";
     const rule = (id) => el(id).value;
     const step = (prefix) => ({ label: inputValue(`${prefix}-label`), requirement: rule(`${prefix}-rule`), minimum: Number(inputValue(`${prefix}-min`) || 1) });
+    const dynamicStepNames = ["three", "four", "five"];
+    function extraSteps() {
+        return [...document.querySelectorAll("#edu-extra-steps [data-extra-step]")]
+            .map(panel => step(`edu-step-${panel.dataset.extraStep}`));
+    }
+    function createExtraStep() {
+        const host = el("edu-extra-steps");
+        if (!host || host.childElementCount >= 3)
+            return;
+        const count = host.childElementCount + 2, name = dynamicStepNames[count - 2];
+        const panel = document.createElement("fieldset");
+        panel.dataset.extraStep = name;
+        const legend = text("legend", `Etapa ${count + 1}`);
+        panel.append(legend);
+        const label = text("label", "Procedimento");
+        label.setAttribute("for", `edu-step-${name}-label`);
+        const input = document.createElement("input");
+        input.id = `edu-step-${name}-label`;
+        input.maxLength = 140;
+        input.required = true;
+        const row = document.createElement("div");
+        row.className = "edu-form-row";
+        const ruleWrap = document.createElement("div");
+        const ruleLabel = text("label", "Critério");
+        ruleLabel.setAttribute("for", `edu-step-${name}-rule`);
+        const select = document.createElement("select");
+        select.id = `edu-step-${name}-rule`;
+        for (const [value, display] of [["manual", "Confirmação manual"], ["entities", "Quantidade de objetos"], ["selection", "Objeto selecionado"], ["readings", "Quantidade de leituras"]]) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = display;
+            select.append(option);
+        }
+        ruleWrap.append(ruleLabel, select);
+        const minWrap = document.createElement("div");
+        const minLabel = text("label", "Quantidade");
+        minLabel.setAttribute("for", `edu-step-${name}-min`);
+        const min = document.createElement("input");
+        min.id = `edu-step-${name}-min`;
+        min.type = "number";
+        min.min = "1";
+        min.max = "60";
+        min.value = "1";
+        min.required = true;
+        min.disabled = true;
+        select.addEventListener("change", () => { min.disabled = ["manual", "selection"].includes(select.value); if (min.disabled)
+            min.value = "1"; });
+        minWrap.append(minLabel, min);
+        row.append(ruleWrap, minWrap);
+        panel.append(label, input, row);
+        host.append(panel);
+        const remove = el("edu-remove-step");
+        if (remove)
+            remove.hidden = false;
+        const add = el("edu-add-step");
+        if (add)
+            add.disabled = host.childElementCount >= 3;
+    }
+    function resetExtraSteps() {
+        el("edu-extra-steps")?.replaceChildren();
+        const add = el("edu-add-step");
+        if (add)
+            add.disabled = false;
+        const remove = el("edu-remove-step");
+        if (remove)
+            remove.hidden = true;
+    }
     function displayTeacherKind() {
         const show = el("edu-form-kind").value === "script";
         const second = el("edu-second-step");
         if (second)
             second.hidden = !show;
+        const more = el("edu-script-step-actions");
+        if (more)
+            more.hidden = !show;
+        const label = el("edu-step-two-label");
+        if (label)
+            label.required = show;
+        if (!show)
+            resetExtraSteps();
     }
     let currentTeacherStep = 1;
     function teacherStep(step, validate = true) {
@@ -2948,9 +3162,11 @@ var BaseDemoSI;
             preview.replaceChildren();
             preview.append(text("strong", inputValue("edu-form-title") || "Título não informado"), text("p", inputValue("edu-form-description")));
             preview.append(text("p", `Tipo: ${el("edu-form-kind").value === "script" ? "Roteiro" : "Missão"}`));
+            preview.append(text("p", `Módulo: ${el("edu-form-module")?.selectedOptions?.[0]?.textContent ?? "Livre"}`));
             preview.append(text("p", `1. ${inputValue("edu-step-one-label")}`));
-            if (el("edu-form-kind").value === "script")
-                preview.append(text("p", `2. ${inputValue("edu-step-two-label")}`));
+            if (el("edu-form-kind").value === "script") {
+                [inputValue("edu-step-two-label"), ...extraSteps().map(value => value.label)].forEach((label, i) => preview.append(text("p", `${i + 2}. ${label}`)));
+            }
         }
     }
     function setupTeacherForm() {
@@ -2966,6 +3182,17 @@ var BaseDemoSI;
             });
         }
         displayTeacherKind();
+        el("edu-add-step")?.addEventListener("click", createExtraStep);
+        el("edu-remove-step")?.addEventListener("click", () => {
+            const host = el("edu-extra-steps");
+            host?.lastElementChild?.remove();
+            const remove = el("edu-remove-step");
+            if (remove)
+                remove.hidden = !host?.childElementCount;
+            const add = el("edu-add-step");
+            if (add)
+                add.disabled = false;
+        });
         document.querySelectorAll("[data-teacher-next],[data-teacher-previous],[data-teacher-step]").forEach(control => {
             control.addEventListener("click", () => teacherStep(Number(control.dataset.teacherNext ?? control.dataset.teacherPrevious ?? control.dataset.teacherStep)));
         });
@@ -2974,13 +3201,15 @@ var BaseDemoSI;
             event.preventDefault();
             const type = kind?.value;
             const created = { id: `teacher-${Date.now().toString(36)}-${(++teacherSerial).toString(36)}`, kind: type, origin: "teacher",
+                module: el("edu-form-module").value,
                 title: inputValue("edu-form-title"), description: inputValue("edu-form-description"),
-                steps: type === "script" ? [step("edu-step-one"), step("edu-step-two")] : [step("edu-step-one")] };
+                steps: type === "script" ? [step("edu-step-one"), step("edu-step-two"), ...extraSteps()] : [step("edu-step-one")] };
             if (!education.createActivity(created)) {
                 BaseDemoSI.notify("Revise os campos: título, descrição, critérios e etapas são obrigatórios.", "warning");
                 return;
             }
             el("edu-teacher-form").reset();
+            resetExtraSteps();
             displayTeacherKind();
             teacherStep(1, false);
             BaseDemoSI.notify("Atividade personalizada criada.", "success");
@@ -3021,8 +3250,13 @@ var BaseDemoSI;
             const accepted = await BaseDemoSI.confirmDialog({ title: "Importar atividades?", description: "As atividades personalizadas atuais serão substituídas. O progresso dos temas e das atividades oficiais será mantido.", confirmText: "Importar atividades", destructive: true });
             if (!accepted)
                 return;
-            if (education.importTeachers(decoded))
+            if (education.importTeachers(decoded)) {
+                // Uma atividade importada pode manter o mesmo ID e alterar seus critérios.
+                // Não reaproveitar checkpoints de versões anteriores do conteúdo.
+                checkpoints = Object.create(null);
+                checkpointSave();
                 BaseDemoSI.notify("Atividades importadas e validadas.", "success");
+            }
             else
                 BaseDemoSI.notify("Formato incompatível ou conteúdo inválido; nenhuma atividade foi alterada.", "warning");
         });
@@ -3030,14 +3264,22 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        restoreCheckpoints();
         const previous = BaseDemoSI.storage.read(guidedKey) ?? "";
-        returnToActivity = validatedGuidedLink(previous)?.url ?? "";
-        if (previous && !returnToActivity)
-            BaseDemoSI.storage.write(guidedKey, "");
+        guidedSession = readGuidedSession(BaseDemoSI.storage.read(sessionKey));
+        if (!guidedSession && previous && validatedGuidedLink(previous)) {
+            // Compatibilidade com sessões legadas: a cena antiga já é a cena de trabalho.
+            guidedSession = { schemaVersion: 1, url: validatedGuidedLink(previous).url,
+                freeScene: { schemaVersion: 1, entities: [], selectedId: null }, readingsBaseline: 0 };
+            BaseDemoSI.storage.write(sessionKey, JSON.stringify(guidedSession));
+        }
+        returnToActivity = guidedSession?.url ?? "";
+        if (previous !== returnToActivity)
+            BaseDemoSI.storage.write(guidedKey, returnToActivity);
         BaseDemoSI.bindEducationForSharing(education);
         education.subscribe(() => {
-            if (returnToActivity && !validatedGuidedLink(returnToActivity))
-                saveGuidedReturn("");
+            if (guidedSession && !validatedGuidedLink(guidedSession.url))
+                endGuidedActivity();
             renderAll();
             window.dispatchEvent(new Event("si-guided-context-changed"));
         });

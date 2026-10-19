@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.12
+# Base Demo Oficial - SI · 0.9.13
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.12 — Continuidade da Home e navegação contextual de atividades.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.13 — Auditoria do percurso Aprender, Missões, Roteiros e autoria docente.**
 
 ## Executar
 
@@ -81,3 +81,9 @@ Consulte `docs/AUDITORIA-MENU-0.9.10.md`.
 ## Auditoria da Home · 0.9.12
 
 A Home mantém a identidade visual e os cinco caminhos aprovados. Quando existe uma atividade orientada válida, oferece ações para rever ou retomar essa atividade e para voltar à bancada, sempre consultando o catálogo oficial ou local e o progresso registrado. O vínculo é preservado no armazenamento local, validado a cada abertura e apagado ao encerrar a atividade; referências a atividades excluídas são ignoradas. O resumo de objetos é calculado a partir do projeto válido salvo, sem criar um segundo estado da cena. A navegação pelo teclado transfere o foco ao destino, e o layout adapta as ações contextualizadas a telefones estreitos. Ver `docs/AUDITORIA-HOME-0.9.12.md`.
+
+## Auditoria dos ambientes educacionais · 0.9.13
+
+Aprender permite consultar os temas e marcar sua revisão sem iniciar uma atividade. Missões e Roteiros possuem detalhe separado do ato de **Montar na bancada**. A sessão orientada preserva a bancada livre, utiliza uma cena própria e mantém seu módulo de execução. O encerramento restaura a cena e o módulo anteriores, enquanto as tentativas incompletas podem retomar sua própria montagem por checkpoints locais. Os critérios de leitura utilizam a sequência de medições para evitar contar dados anteriores à tentativa.
+
+O editor do professor aceita missões de uma etapa e roteiros de duas a cinco etapas, com módulo declarado. Atividades locais já existentes sem o campo de módulo são aceitas por compatibilidade e utilizam a configuração Livre. Consulte `docs/AUDITORIA-EDUCACIONAL-0.9.13.md` para testes, limites e pendências.

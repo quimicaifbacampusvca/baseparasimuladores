@@ -16,6 +16,8 @@ namespace BaseDemoSI {
     readonly id: string;
     readonly kind: ActivityKind;
     readonly origin: "official" | "teacher";
+    /** Ausente somente em atividades legadas (migradas como Livre). */
+    readonly module?: ModuleId;
     readonly title: string;
     readonly description: string;
     readonly steps: readonly LearningStep[];
@@ -31,6 +33,7 @@ namespace BaseDemoSI {
     list(kind: ActivityKind): readonly LearningActivity[];
     toggleTopic(id: string): boolean;
     advance(id: string, scene: SceneSnapshot, count: number): { readonly ok: boolean; readonly message: string };
+    resetActivity(id: string): boolean;
     createActivity(value: unknown): boolean;
     removeActivity(id: string): boolean;
     importTeachers(value: unknown): boolean;

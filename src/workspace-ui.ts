@@ -12,8 +12,8 @@ namespace BaseDemoSI {
   const activeSide=():WorkspaceSide|null=>workspaceState.right==="open"?"right":workspaceState.left==="open"?"left":null;
   function dock(side:WorkspaceSide):HTMLElement {return node(`si-dock-${side}`)!;}
   function guidedActivity():boolean {
-    const returnLink=node("si-return-activity") as HTMLAnchorElement|null;
-    return !!returnLink&&!returnLink.hidden&&!!returnLink.getAttribute("href");
+    // Estado educacional como fonte de verdade, não o estado momentâneo do link.
+    return !!guidedActivityContext();
   }
   function persistWorkspace():void{storage.write(WORKSPACE_KEY,serializeWorkspacePreference(workspaceState));}
   function focusReturn(side:WorkspaceSide):void {
@@ -153,9 +153,9 @@ namespace BaseDemoSI {
     if(setup){setup.replaceChildren();const heading=document.createElement("p");heading.textContent=`${snap.entities.length} objeto(s) na cena`;
       const selected=document.createElement("p");selected.textContent=focus?`Em foco: ${focus.label}`:"Nenhum objeto selecionado";setup.append(heading,selected);}
     const contextLink=node("si-dock-activity-link") as HTMLAnchorElement|null;
-    const contextStatus=node("si-dock-activity-status");const returnLink=node("si-return-activity") as HTMLAnchorElement|null;
-    const activeActivity=!!returnLink&&!returnLink.hidden&&!!returnLink.getAttribute("href");
-    if(contextLink){contextLink.hidden=!activeActivity;if(activeActivity)contextLink.href=returnLink!.href;}
+    const contextStatus=node("si-dock-activity-status");const activity=guidedActivityContext();
+    const activeActivity=!!activity;
+    if(contextLink){contextLink.hidden=!activeActivity;if(activity)contextLink.href=activity.url;}
     if(contextStatus)contextStatus.textContent=activeActivity?"Atividade em andamento. O retorno mantém os objetos da cena.":"Nenhuma atividade orientada em andamento.";
     if(data){data.replaceChildren();const counts={block:0,circle:0,label:0};for(const e of snap.entities)counts[e.kind]++;
       const dl=document.createElement("dl");for(const [key,value] of [["Objetos",snap.entities.length],["Blocos",counts.block],["Círculos",counts.circle],["Etiquetas",counts.label]]){const div=document.createElement("div"),dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=String(key);dd.textContent=String(value);div.append(dt,dd);dl.append(div);}data.append(dl);}

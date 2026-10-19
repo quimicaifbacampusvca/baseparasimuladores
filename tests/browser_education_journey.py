@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Fluxo educacional contextual da 0.9.13, em HTML autocontido, sem rede."""
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+root=Path(__file__).resolve().parent.parent
+html=(root/'standalone.html').read_text(encoding='utf-8')
+with sync_playwright() as p:
+ browser=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium',args=['--no-sandbox','--disable-dev-shm-usage'])
+ for w,h in [(1440,900),(390,844),(320,700)]:
+  context=browser.new_context(viewport={'width':w,'height':h},is_mobile=w<=900,has_touch=w<=900)
+  pg=context.new_page();errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
+  pg.evaluate('''() => {const d=new Map();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>d.get(k)??null,setItem:(k,v)=>d.set(k,String(v)),removeItem:k=>d.delete(k)}})}''')
+  pg.set_content(html,wait_until='domcontentloaded')
+  pg.evaluate('location.hash="#/ambiente"');pg.wait_for_timeout(90)
+  pg.locator('[data-open-dock="montagem"]').click()
+  pg.locator('[data-left-tab="preparo"]').click()
+  pg.locator('[data-add-kind="block"]').click()
+  assert pg.locator('.scene-entity').count()==1,(w,'free scene')
+  pg.locator('[data-close-dock="left"]').click()
+  pg.evaluate('location.hash="#/missoes"');pg.wait_for_timeout(90)
+  pg.locator('#edu-mission-list [data-catalog-id="mission-create"]').click();pg.wait_for_timeout(90)
+  assert pg.locator('#edu-mission-detail').is_visible()
+  assert pg.locator('#si-home-resume').is_hidden(),(w,'preview cannot start session')
+  pg.locator('#edu-mission-detail button:has-text("Montar na bancada")').click();pg.wait_for_timeout(95)
+  assert pg.evaluate('location.hash')=='#/ambiente',(w,'route')
+  assert pg.locator('.scene-entity').count()==0,(w,'free scene leaked')
+  assert pg.locator('#si-return-activity').is_visible()
+  assert not pg.locator('[data-left-tab="missao"]').evaluate('(el) => el.hidden'),(w,'guided category')
+  pg.locator('[data-open-dock="montagem"]').click()
+  pg.locator('[data-left-tab="preparo"]').click()
+  pg.locator('[data-add-kind="block"]').click()
+  pg.locator('[data-add-kind="circle"]').click()
+  assert pg.locator('.scene-entity').count()==2
+  pg.locator('[data-close-dock="left"]').click()
+  pg.locator('#si-return-activity').click();pg.wait_for_timeout(95)
+  confirm=pg.locator('#edu-mission-detail button:has-text("Conferir e registrar")')
+  assert confirm.is_enabled(),(w,'requirement')
+  confirm.click();pg.wait_for_timeout(95)
+  assert 'Concluído' in pg.locator('#edu-mission-list [data-activity-id="mission-create"]').inner_text() if pg.locator('#edu-mission-list').is_visible() else True
+  pg.locator('#edu-mission-detail button:has-text("Encerrar atividade")').click()
+  assert pg.locator('#si-modal').is_visible()
+  pg.locator('#si-modal-confirm').click();pg.wait_for_timeout(110)
+  assert pg.locator('#si-home-resume').is_hidden()
+  pg.evaluate('location.hash="#/ambiente"');pg.wait_for_timeout(90)
+  assert pg.locator('.scene-entity').count()==1,(w,'free scene recovery')
+  assert pg.locator('#si-return-activity').is_hidden()
+  assert pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'),(w,'horizontal overflow')
+  assert not errors,(w,errors)
+  print(f'OK: {w} px — consulta, inicio, isolamento, duas entidades, registro, encerramento e retorno à cena livre')
+  context.close()
+ browser.close()

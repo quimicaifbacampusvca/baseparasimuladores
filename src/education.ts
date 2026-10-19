@@ -14,14 +14,14 @@ namespace BaseDemoSI {
       paragraphs:["Uma observação descreve o que aparece na cena. Uma leitura acrescenta um valor, unidade e vínculo com o instrumento que a produziu.","Conferir resultados implica distinguir ações realizadas, medidas obtidas e interpretações construídas a partir delas."] }
   ]);
   export const officialActivities: readonly LearningActivity[] = Object.freeze([
-    {id:"mission-create",kind:"mission",origin:"official",title:"Primeira composição",description:"Adicione ao menos dois objetos ao ambiente.",steps:[{label:"Adicionar dois objetos na cena",requirement:"entities",minimum:2}]},
-    {id:"mission-select",kind:"mission",origin:"official",title:"Objeto em foco",description:"Selecione um objeto para examiná-lo.",steps:[{label:"Manter um objeto selecionado",requirement:"selection",minimum:1}]},
-    {id:"mission-read",kind:"mission",origin:"official",title:"Registrar uma leitura",description:"Utilize um instrumento de uma extensão local.",steps:[{label:"Registrar pelo menos uma leitura",requirement:"readings",minimum:1}]},
-    {id:"script-start",kind:"script",origin:"official",title:"Construção orientada",description:"Prepare, selecione e amplie sua primeira montagem.",steps:[
+    {id:"mission-create",kind:"mission",origin:"official",module:"explorar",title:"Primeira composição",description:"Adicione ao menos dois objetos ao ambiente.",steps:[{label:"Adicionar dois objetos na cena",requirement:"entities",minimum:2}]},
+    {id:"mission-select",kind:"mission",origin:"official",module:"explorar",title:"Objeto em foco",description:"Selecione um objeto para examiná-lo.",steps:[{label:"Manter um objeto selecionado",requirement:"selection",minimum:1}]},
+    {id:"mission-read",kind:"mission",origin:"official",module:"medir",title:"Registrar uma leitura",description:"Utilize um instrumento de uma extensão local.",steps:[{label:"Registrar pelo menos uma leitura",requirement:"readings",minimum:1}]},
+    {id:"script-start",kind:"script",origin:"official",module:"explorar",title:"Construção orientada",description:"Prepare, selecione e amplie sua primeira montagem.",steps:[
       {label:"Adicione o primeiro objeto",requirement:"entities",minimum:1},
       {label:"Selecione o objeto para observação",requirement:"selection",minimum:1},
       {label:"Amplie a montagem para dois objetos",requirement:"entities",minimum:2}]},
-    {id:"script-observe",kind:"script",origin:"official",title:"Da observação ao registro",description:"Organize um procedimento de inspeção e medição.",steps:[
+    {id:"script-observe",kind:"script",origin:"official",module:"medir",title:"Da observação ao registro",description:"Organize um procedimento de inspeção e medição.",steps:[
       {label:"Selecione um objeto no ambiente",requirement:"selection",minimum:1},
       {label:"Utilize um instrumento e registre a leitura",requirement:"readings",minimum:1}]}
   ]);
@@ -40,6 +40,7 @@ namespace BaseDemoSI {
     const a=value as Partial<LearningActivity>;
     return typeof a.id === "string" && ID.test(a.id) && a.id.startsWith("teacher-") && !RESERVED.has(a.id)
       && a.origin === "teacher" && (a.kind === "mission" || a.kind === "script")
+      && (a.module === undefined || validModule(a.module)) // Dados legados continuam importáveis.
       && clean(a.title,90) && clean(a.description,300)
       && Array.isArray(a.steps) && a.steps.length >= 1 && a.steps.length <= MAX_STEPS
       && (a.kind !== "mission" || a.steps.length === 1)
@@ -96,6 +97,9 @@ namespace BaseDemoSI {
         if(!meetsRequirement(a.steps[i],scene,readingCount))return {ok:false,message:"Critério ainda não atendido na cena."};
         const progress={...state.progress,[id]:i+1};persist({...state,progress});
         return {ok:true,message:i+1===a.steps.length?"Atividade concluída.":"Etapa registrada. Continue o roteiro."};},
+      resetActivity(id){if(!get(id))return false;
+        const progress={...state.progress};delete progress[id];
+        return persist({...state,progress});},
       createActivity(value){if(!validTeacherActivity(value)||state.teacherActivities.length>=MAX_TEACHER||get(value.id))return false;
         return persist({...state,teacherActivities:[...state.teacherActivities,value]});},
       removeActivity(id){if(!state.teacherActivities.some(a=>a.id===id))return false;

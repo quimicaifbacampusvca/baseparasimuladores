@@ -34,15 +34,24 @@ def run():
       pg.locator('[data-left-tab="preparo"]').click()
       pg.locator('[data-add-kind="block"]').click()
       assert pg.locator('.scene-entity').count()==1
-      # Abas dinamicamente contextualizadas; Missão só quando existe atividade real.
-      pg.evaluate('''() => {let l=document.getElementById('si-return-activity');l.hidden=false;l.setAttribute('href','#/roteiros');window.dispatchEvent(new CustomEvent('si-module-change',{detail:'livre'}));}''')
+      # A aba Missão surge apenas após iniciar uma atividade verdadeira.
+      pg.evaluate("location.hash='#/missoes'");pg.wait_for_timeout(70)
+      pg.locator('#edu-mission-list [data-catalog-id="mission-create"]').click()
+      pg.locator('#edu-mission-detail button:has-text("Montar na bancada")').click()
+      pg.wait_for_timeout(90)
+      pg.locator('[data-open-dock="montagem"]').click()
       assert pg.locator('[data-left-tab="missao"]').is_visible(),('mission',w)
       assert pg.locator('[data-left-tab="modulo"]').is_hidden()
       pg.locator('[data-left-tab="missao"]').click()
       assert pg.locator('[data-left-panel="missao"]').is_visible()
-      pg.evaluate('''() => {document.getElementById('si-return-activity').hidden=true;window.dispatchEvent(new CustomEvent('si-module-change',{detail:'livre'}));}''')
+      pg.locator('[data-close-dock="left"]').click()
+      pg.locator('#si-return-activity').click();pg.wait_for_timeout(75)
+      pg.locator('#edu-mission-detail button:has-text("Encerrar atividade")').click()
+      pg.locator('#si-modal-confirm').click();pg.wait_for_timeout(75)
+      pg.evaluate("location.hash='#/ambiente'");pg.wait_for_timeout(75)
+      pg.locator('[data-open-dock="montagem"]').click()
       assert pg.locator('[data-left-tab="missao"]').is_hidden()
-      assert pg.locator('[data-left-panel="resumo"]').is_visible()
+      assert pg.locator('[data-left-tab="modulo"]').is_visible()
       assert abs(pg.locator('#si-canvas').bounding_box()['height']-initial)<2
       assert not pg.evaluate('document.documentElement.scrollWidth > innerWidth + 2'),('overflow',w)
       assert not errors,(w,errors)

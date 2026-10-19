@@ -20,6 +20,9 @@ for width,height in [(1440,900),(390,844),(320,700)]:
 
   page.locator('#edu-mission-list [data-catalog-id="mission-create"]').click()
   page.wait_for_timeout(90)
+  assert page.locator('#si-home-resume').is_hidden(), 'Consultar catálogo não pode iniciar sessão'
+  page.locator('#edu-mission-detail button:has-text("Montar na bancada")').click()
+  page.wait_for_timeout(90)
 
   page.evaluate('location.hash="#/inicio"')
   page.wait_for_timeout(100)
@@ -33,7 +36,7 @@ for width,height in [(1440,900),(390,844),(320,700)]:
   # navigate via Home back to detail, then workbench
   page.locator('#si-home-resume-link').click();page.wait_for_timeout(100)
   assert page.evaluate('location.hash')=='#/missoes?item=mission-create'
-  page.locator('#edu-mission-detail a[href="#/ambiente"]').click();page.wait_for_timeout(100)
+  page.locator('#edu-mission-detail button:has-text("Continuar na bancada")').click();page.wait_for_timeout(100)
   assert page.locator('#si-return-activity').is_visible()
   browser.close()
   print(f'OK: Home → missão → Home → retomar → bancada, foco e responsividade ({width} px)')

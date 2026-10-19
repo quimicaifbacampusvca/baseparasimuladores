@@ -10,7 +10,7 @@ const solo = read('standalone.html');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 const precache = JSON.parse('['+sw.match(/const FILES = \[([\s\S]*?)\];/)[1].replace(/,\s*$/, '')+']');
 assert.equal(manifest.name, 'Base Demo Oficial - SI');
-assert.equal(JSON.parse(read('package.json')).version, '0.9.12');
+assert.equal(JSON.parse(read('package.json')).version, '0.9.13');
 assert(new Set(precache).size === precache.length, 'Recursos duplicados no precache');
 for(const entry of precache) if(entry!=='./') assert(fs.existsSync(path.join(root,entry)),'Faltando: '+entry);
 for(const ref of [...html.matchAll(/(?:src|href)="(\.\/[^"#?]+)"/g)])

@@ -46,6 +46,12 @@ namespace BaseDemoSI {
   }
   export function extensionGetRecords():readonly ReadingRecord[] {return extensionsReady?runtime.getRecords():[];}
   export function extensionRecordCount():number {return extensionsReady?runtime.getRecords().length:0;}
+  /** Sequência crescente; funciona mesmo quando o histórico atinge seu limite de 40 registros. */
+  export function extensionRecordSequence():number {
+    if(!extensionsReady)return 0;
+    const records=runtime.getRecords();
+    return records.length?records[records.length-1].sequence:0;
+  }
   export function setupExtensions(scene:SceneStore):void {
     if(extensionsReady)return;
     runtime=createExtensionRuntime(scene,storage);
