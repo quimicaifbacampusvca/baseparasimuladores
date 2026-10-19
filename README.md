@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.3
+# Base Demo Oficial - SI · 0.9.4
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.3 — Organização interna, menu operacional e contratos compartilhados de interação.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.4 — Organização interna, menu operacional e contratos compartilhados de interação.**
 
 ## Executar
 
@@ -22,15 +22,15 @@ Todas as bibliotecas necessárias à execução e dados de demonstração estão
 
 **Permissões dos links são controles de interface, não segurança ou autenticação.** O conteúdo do endereço pode ser modificado por terceiros; não utilize links como mecanismo para proteger informações confidenciais. Links `file://` não são portáveis entre dispositivos sem distribuir o próprio aplicativo.
 
-A 0.9.3 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-0.9.3.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
+A 0.9.4 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-0.9.4.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
 
 ## Licença
 
 GPL-3.0, conforme `LICENSE`.
 
-## Organização interna — 0.9.3
+## Organização interna — 0.9.4
 
-Catálogos separados de páginas de conteúdo; retorno contextual à bancada; preparação de atividades em três etapas; Manual com índice navegável e ajuda contextual; layout responsivo com estilos locais. Veja `docs/ACEITE-0.9.3.md`.
+Catálogos separados de páginas de conteúdo; retorno contextual à bancada; preparação de atividades em três etapas; Manual com índice navegável e ajuda contextual; layout responsivo com estilos locais. Veja `docs/ACEITE-0.9.4.md`.
 
 ## Padronização entre simuladores
 
@@ -39,3 +39,7 @@ O contrato de menus, manipulação e organização compartilhada está descrito 
 ## Bloco 02 — Home e caminhos de entrada (aprovado)
 
 A Home foi reestruturada segundo o contrato comum de navegação: ambiente de destaque vertical no desktop, quatro acessos secundários à direita, reorganização responsiva em tablets e celulares, indicadores reais do progresso local e atalhos secundários de ajuda. Não foram adicionadas regras científicas. Consulte `docs/REVISAO-BLOCO-02-HOME.md`. O Bloco 01 (menu) permanece em revisão funcional e seus ajustes são publicados progressivamente.
+
+## Bloco 03 — Workspace e manipulação
+
+Controles diretos por mouse/toque, movimento relativo à cena com limites, uma alteração no histórico por arraste e permissões por módulo. Ver `docs/ACEITE-BLOCO-03-0.9.4.md`.

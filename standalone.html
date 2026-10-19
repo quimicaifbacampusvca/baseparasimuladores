@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-Jfd9SclzIRcHAKtRYFTYaM5+mEjwXNlJ+6a4zzukKRk='; script-src 'sha256-vgNnTChLb+ENJWLN2KIysjlmH5QVdQwiA/AATa2HwjU='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-Hww/37EZI4E+xZRyRuvzkN+6NJRBkSfAqB/eEwlX4e0='; script-src 'sha256-t55oNnHoHJw6MR/R5DJi6blQuYPl3RWwWb2kaftjexQ='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -38,7 +38,7 @@
 .tool-stack{display:flex;flex-direction:column;gap:9px}.tool-stack .button{font-size:12px;cursor:pointer;justify-content:flex-start}.scene-danger{color:var(--text)}
 .workspace-interactive .stage{display:block;position:relative;padding:0;min-height:390px;overflow:hidden;background-color:var(--surface);background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px}
 .scene-objects{position:absolute;inset:12px;z-index:2}.scene-empty{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:20px;color:var(--muted)}.scene-empty[hidden]{display:none}.scene-empty span{font-size:48px;color:var(--accent)}.scene-empty strong{color:var(--text);font-size:16px}.scene-empty p{font-size:13px;max-width:190px}
-.scene-entity{--tone:#3c9d9c;position:absolute;transform:translate(-50%,-50%);border:2px solid var(--tone);color:var(--text);background:color-mix(in srgb,var(--tone) 19%,var(--surface));border-radius:12px;cursor:pointer;padding:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:44px;min-height:44px;touch-action:manipulation}.scene-entity span{font-size:12px;overflow-wrap:anywhere;max-height:100%;overflow:hidden}.scene-entity.entity-circle{border-radius:50%}.scene-entity.entity-label{border-radius:7px;border-style:dashed;background:var(--surface)}.scene-entity.tone-blue{--tone:#4c85d8}.scene-entity.tone-amber{--tone:#c7943a}.scene-entity.is-selected{outline:3px solid var(--ring);outline-offset:3px;z-index:3}.scene-entity:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+.scene-entity{--tone:#3c9d9c;position:absolute;transform:translate(-50%,-50%);border:2px solid var(--tone);color:var(--text);background:color-mix(in srgb,var(--tone) 19%,var(--surface));border-radius:12px;cursor:pointer;padding:3px;display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:44px;min-height:44px;touch-action:none;user-select:none;-webkit-user-select:none}.scene-entity span{font-size:12px;overflow-wrap:anywhere;max-height:100%;overflow:hidden}.scene-entity.is-dragging{cursor:grabbing;z-index:4;box-shadow:0 12px 28px #0003;outline:3px solid var(--ring);outline-offset:3px}.scene-entity.entity-circle{border-radius:50%}.scene-entity.entity-label{border-radius:7px;border-style:dashed;background:var(--surface)}.scene-entity.tone-blue{--tone:#4c85d8}.scene-entity.tone-amber{--tone:#c7943a}.scene-entity.is-selected{outline:3px solid var(--ring);outline-offset:3px;z-index:3}.scene-entity:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
 #object-inspector[hidden]{display:none}#object-inspector label{display:block;font-weight:700;font-size:12px;margin:10px 0 4px}#object-inspector input,#object-inspector select{width:100%;max-width:100%;min-height:42px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);padding:8px;font:inherit;font-size:13px}.inspector-type{margin:4px 0 14px}.object-position{margin:13px 0 10px}.move-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:12px 0}.move-grid button{min-height:42px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer}.move-grid [data-move=up]{grid-column:2}.move-grid [data-move=left]{grid-column:1;grid-row:2}.move-grid [data-move=down]{grid-column:2;grid-row:2}.move-grid [data-move=right]{grid-column:3;grid-row:2}.move-grid button:hover,.tool-stack button:hover{background:var(--tint)}#scene-delete{cursor:pointer;width:100%}
 @media(max-width:1000px){.workspace-interactive{grid-template-columns:155px minmax(0,1fr) 170px}.workspace-interactive .preview-dock{padding:12px}}
 @media(max-width:760px){.workspace-interactive{grid-template-columns:1fr}.workspace-interactive .stage{order:0;min-height:340px}.workspace-interactive .preview-dock:first-child{order:1}.workspace-interactive .preview-dock:last-child{order:2}.tool-stack{flex-direction:row;flex-wrap:wrap}.tool-stack .button{flex:1 1 130px}.scene-count{width:100%;margin:0}.workspace-interactive .preview-dock{min-height:0}}
@@ -701,7 +701,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
     <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
   </div>
  </section>
- <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.3</span></p></section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.4</span></p></section>
 </div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -724,7 +724,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         </nav>
         <div class="si-global-actions">
           <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
-          <span class="version-pill">v<span data-app-version>0.9.3</span></span>
+          <span class="version-pill">v<span data-app-version>0.9.4</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -799,10 +799,10 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
                 <div class="si-stage-canvas" id="si-canvas">
-                  <div id="scene-objects" class="scene-objects" aria-label="Objetos interativos: selecione e use as setas para mover"></div>
+                  <div id="scene-objects" class="scene-objects" aria-label="Objetos interativos: toque ou clique para selecionar, arraste para mover, ou use as setas do teclado"></div>
                   <div id="scene-empty" class="scene-empty"><span aria-hidden="true">◇</span><strong>Cena vazia</strong><p>Abra Montagem para adicionar seu primeiro objeto.</p></div>
                 </div>
-                <div class="si-stage-footnote" id="si-stage-footnote">A cena demonstra entidades neutras, sem motor científico.</div>
+                <div class="si-stage-footnote" id="si-stage-footnote">Arraste um objeto para mover ou use as setas. Sem motor científico.</div>
               </section>
               <section id="workspace-overview" class="si-overview-view" aria-label="Visão geral dos objetos" hidden>
                 <h2>Visão geral da cena</h2><p>Selecione um objeto para retornar ao foco.</p>
@@ -1030,7 +1030,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.3</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.4</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -1039,7 +1039,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.3</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.4</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -1060,7 +1060,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.3",
+        version: "0.9.4",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2361,6 +2361,21 @@ var BaseDemoSI;
             x: 30 + spread, y: 30 + spread / 2, width, height, tone: "teal" };
     }
     BaseDemoSI.makeEntity = makeEntity;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    /** Coordenadas independentes de resolução; commit ocorre somente no fim do gesto. */
+    function moveEntityByPixels(entity, deltaX, deltaY, boundsWidth, boundsHeight) {
+        if (![deltaX, deltaY, boundsWidth, boundsHeight].every(Number.isFinite) || boundsWidth <= 0 || boundsHeight <= 0)
+            return null;
+        const clamp = (value, extent) => Math.min(100 - extent / 2, Math.max(extent / 2, value));
+        const round = (value) => Math.round(value * 10) / 10;
+        return { x: round(clamp(entity.x + (deltaX / boundsWidth) * 100, entity.width)), y: round(clamp(entity.y + (deltaY / boundsHeight) * 100, entity.height)) };
+    }
+    BaseDemoSI.moveEntityByPixels = moveEntityByPixels;
+    /** Todo movimento interativo sobre a cena depende da capacidade de manipulação. */
+    function sceneManipulationAllowed() { return BaseDemoSI.moduleAllows("tools"); }
+    BaseDemoSI.sceneManipulationAllowed = sceneManipulationAllowed;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -4109,12 +4124,17 @@ var BaseDemoSI;
             span.textContent = e.label;
             button.append(span);
             button.addEventListener("click", () => store.select(e.id));
+            attachDirectManipulation(button, e, board);
             button.addEventListener("keydown", event => {
                 const moves = { ArrowUp: [0, -2], ArrowDown: [0, 2], ArrowLeft: [-2, 0], ArrowRight: [2, 0] };
                 const delta = moves[event.key];
                 if (!delta || event.altKey || event.ctrlKey || event.metaKey)
                     return;
                 event.preventDefault();
+                if (!BaseDemoSI.sceneManipulationAllowed()) {
+                    announce("Manipulação indisponível no módulo atual.");
+                    return;
+                }
                 move(e.id, delta[0], delta[1]);
                 board.querySelector(`[data-entity-id="${e.id}"]`)?.focus();
             });
@@ -4134,7 +4154,7 @@ var BaseDemoSI;
             redoButton.disabled = !store.canRedo();
         const clearButton = get("scene-clear");
         if (clearButton)
-            clearButton.disabled = !snap.entities.length;
+            clearButton.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
         const inspector = get("object-inspector");
         if (inspector)
             inspector.hidden = !snap.selectedId;
@@ -4142,6 +4162,14 @@ var BaseDemoSI;
         if (noSelection)
             noSelection.hidden = !!snap.selectedId;
         const entity = selected();
+        const canEdit = BaseDemoSI.sceneManipulationAllowed();
+        for (const id of ["object-label", "object-tone", "scene-delete"]) {
+            const input = get(id);
+            if (input)
+                input.disabled = !canEdit || !entity;
+        }
+        for (const btn of document.querySelectorAll("[data-move]"))
+            btn.disabled = !canEdit || !entity;
         BaseDemoSI.renderWorkspaceContent(snap);
         BaseDemoSI.renderExtensions(snap);
         BaseDemoSI.renderViewers(snap);
@@ -4161,7 +4189,76 @@ var BaseDemoSI;
                     entity.kind === "block" ? "Bloco" : entity.kind === "circle" ? "Círculo" : "Etiqueta";
         }
     }
+    /**
+     * Manipulação por ponteiro: atualiza visualmente durante o gesto e confirma
+     * uma única mudança ao soltar, preservando uma única posição no histórico.
+     * A captura é restrita ao próprio objeto para não interceptar a rolagem da cena.
+     */
+    function attachDirectManipulation(button, entity, board) {
+        button.addEventListener("pointerdown", event => {
+            if (!event.isPrimary || event.button !== 0 || !BaseDemoSI.sceneManipulationAllowed())
+                return;
+            const rect = board.getBoundingClientRect();
+            if (!(rect.width > 0 && rect.height > 0))
+                return;
+            const pointerId = event.pointerId, startX = event.clientX, startY = event.clientY;
+            let moved = false, done = false;
+            const movePointer = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                const dx = ev.clientX - startX, dy = ev.clientY - startY;
+                if (!moved && Math.hypot(dx, dy) < 5)
+                    return;
+                moved = true;
+                const pos = BaseDemoSI.moveEntityByPixels(entity, dx, dy, rect.width, rect.height);
+                if (!pos)
+                    return;
+                button.style.left = `${pos.x}%`;
+                button.style.top = `${pos.y}%`;
+                button.classList.add("is-dragging");
+            };
+            const finish = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                done = true;
+                button.removeEventListener("pointermove", movePointer);
+                button.removeEventListener("pointerup", finish);
+                button.removeEventListener("pointercancel", cancel);
+                if (button.hasPointerCapture(pointerId))
+                    button.releasePointerCapture(pointerId);
+                if (!moved || !BaseDemoSI.sceneManipulationAllowed())
+                    return;
+                const pos = BaseDemoSI.moveEntityByPixels(entity, ev.clientX - startX, ev.clientY - startY, rect.width, rect.height);
+                if (pos && store.dispatch({ type: "update", id: entity.id, changes: pos })) {
+                    store.select(entity.id);
+                    announce(`Objeto ${entity.label} reposicionado.`);
+                }
+                else
+                    render();
+                get("scene-objects")?.querySelector(`[data-entity-id="${entity.id}"]`)?.focus({ preventScroll: true });
+            };
+            const cancel = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                done = true;
+                button.removeEventListener("pointermove", movePointer);
+                button.removeEventListener("pointerup", finish);
+                button.removeEventListener("pointercancel", cancel);
+                if (button.hasPointerCapture(pointerId))
+                    button.releasePointerCapture(pointerId);
+                button.classList.remove("is-dragging");
+                button.style.left = `${entity.x}%`;
+                button.style.top = `${entity.y}%`;
+            };
+            button.addEventListener("pointermove", movePointer);
+            button.addEventListener("pointerup", finish);
+            button.addEventListener("pointercancel", cancel);
+            button.setPointerCapture(pointerId);
+        });
+    }
     function move(id, dx, dy) {
+        if (!BaseDemoSI.sceneManipulationAllowed())
+            return;
         const e = store.getSnapshot().entities.find(item => item.id === id);
         if (!e)
             return;
@@ -4184,6 +4281,7 @@ var BaseDemoSI;
         store.subscribe(event => { render(); if (event !== "selection")
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
+        window.addEventListener("si-module-change", render);
         BaseDemoSI.setupExtensions(store);
         BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
@@ -4206,6 +4304,8 @@ var BaseDemoSI;
         get("scene-redo")?.addEventListener("click", () => { if (store.redo())
             BaseDemoSI.notify("Alteração refeita."); });
         get("scene-clear")?.addEventListener("click", async () => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const total = store.getSnapshot().entities.length;
             if (!total)
                 return;
@@ -4215,7 +4315,7 @@ var BaseDemoSI;
         });
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
             if (action === "help") {
-                void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
+                void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
                 return;
             }
             if (!BaseDemoSI.moduleAllows("tools")) {
@@ -4232,11 +4332,15 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Não foi possível adicionar o objeto.", "warning");
         });
         get("scene-delete")?.addEventListener("click", () => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (e && store.dispatch({ type: "remove", id: e.id }))
                 BaseDemoSI.notify("Objeto excluído. A ação pode ser desfeita.", "info");
         });
         get("object-label")?.addEventListener("change", event => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (!e)
                 return;
@@ -4251,6 +4355,8 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Nome do objeto atualizado.", "success");
         });
         get("object-tone")?.addEventListener("change", event => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (!e)
                 return;

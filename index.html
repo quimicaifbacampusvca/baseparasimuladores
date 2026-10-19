@@ -72,7 +72,7 @@
     <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
   </div>
  </section>
- <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.3</span></p></section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.4</span></p></section>
 </div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -95,7 +95,7 @@
         </nav>
         <div class="si-global-actions">
           <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
-          <span class="version-pill">v<span data-app-version>0.9.3</span></span>
+          <span class="version-pill">v<span data-app-version>0.9.4</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -170,10 +170,10 @@
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
                 <div class="si-stage-canvas" id="si-canvas">
-                  <div id="scene-objects" class="scene-objects" aria-label="Objetos interativos: selecione e use as setas para mover"></div>
+                  <div id="scene-objects" class="scene-objects" aria-label="Objetos interativos: toque ou clique para selecionar, arraste para mover, ou use as setas do teclado"></div>
                   <div id="scene-empty" class="scene-empty"><span aria-hidden="true">◇</span><strong>Cena vazia</strong><p>Abra Montagem para adicionar seu primeiro objeto.</p></div>
                 </div>
-                <div class="si-stage-footnote" id="si-stage-footnote">A cena demonstra entidades neutras, sem motor científico.</div>
+                <div class="si-stage-footnote" id="si-stage-footnote">Arraste um objeto para mover ou use as setas. Sem motor científico.</div>
               </section>
               <section id="workspace-overview" class="si-overview-view" aria-label="Visão geral dos objetos" hidden>
                 <h2>Visão geral da cena</h2><p>Selecione um objeto para retornar ao foco.</p>
@@ -401,7 +401,7 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.3</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.4</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -410,7 +410,7 @@
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.3</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.4</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>

@@ -14,7 +14,7 @@ for (const ref of localRefs) assert(fs.existsSync(path.join(root,ref)), `Arquivo
 for (const ref of ["index.html","app.css","workspace.css","components.css","extensions.css","education.css","records.css","distribution.css","inspection.css","completion.css","organization.css","app.js","manifest.webmanifest","assets/icon.svg","assets/icon-192.png","assets/icon-512.png","assets/apple-touch-icon.png"])
   assert(sw.includes(`"./${ref}"`),`Precache não cobre ${ref}`);
 assert.equal(manifest.name,"Base Demo Oficial - SI");
-assert.equal(JSON.parse(read("package.json")).version,"0.9.3");
+assert.equal(JSON.parse(read("package.json")).version,"0.9.4");
 assert(!/https?:\/\//.test(html.replace(/http-equiv="Content-Security-Policy"/g,"")),"HTML tem URL remota");
 assert(!/@import|url\(\s*['"]?https?:\/\//i.test(css),"CSS tem dependência remota");
 assert(!/\b(fetch|XMLHttpRequest)\s*\(/.test(js),"Núcleo requisita rede");
@@ -29,4 +29,4 @@ assert.equal(sandbox.BaseDemoSI.currentRoute("#/ambiente"),"ambiente");
 assert.equal(sandbox.BaseDemoSI.currentRoute("#/rota-inexistente"),"inicio");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("invalido"),"sistema");
 assert.equal(sandbox.BaseDemoSI.normalizeTheme("escuro"),"escuro");
-console.log(`OK: fundação preservada na 0.9.3, ${localRefs.length} referências HTML, 17 arquivos no precache, contratos e ausência de dependências remotas.`);
+console.log(`OK: fundação preservada na 0.9.4, ${localRefs.length} referências HTML, 17 arquivos no precache, contratos e ausência de dependências remotas.`);

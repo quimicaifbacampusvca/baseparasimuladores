@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.3",
+        version: "0.9.4",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1307,6 +1307,21 @@ var BaseDemoSI;
             x: 30 + spread, y: 30 + spread / 2, width, height, tone: "teal" };
     }
     BaseDemoSI.makeEntity = makeEntity;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    /** Coordenadas independentes de resolução; commit ocorre somente no fim do gesto. */
+    function moveEntityByPixels(entity, deltaX, deltaY, boundsWidth, boundsHeight) {
+        if (![deltaX, deltaY, boundsWidth, boundsHeight].every(Number.isFinite) || boundsWidth <= 0 || boundsHeight <= 0)
+            return null;
+        const clamp = (value, extent) => Math.min(100 - extent / 2, Math.max(extent / 2, value));
+        const round = (value) => Math.round(value * 10) / 10;
+        return { x: round(clamp(entity.x + (deltaX / boundsWidth) * 100, entity.width)), y: round(clamp(entity.y + (deltaY / boundsHeight) * 100, entity.height)) };
+    }
+    BaseDemoSI.moveEntityByPixels = moveEntityByPixels;
+    /** Todo movimento interativo sobre a cena depende da capacidade de manipulação. */
+    function sceneManipulationAllowed() { return BaseDemoSI.moduleAllows("tools"); }
+    BaseDemoSI.sceneManipulationAllowed = sceneManipulationAllowed;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -3055,12 +3070,17 @@ var BaseDemoSI;
             span.textContent = e.label;
             button.append(span);
             button.addEventListener("click", () => store.select(e.id));
+            attachDirectManipulation(button, e, board);
             button.addEventListener("keydown", event => {
                 const moves = { ArrowUp: [0, -2], ArrowDown: [0, 2], ArrowLeft: [-2, 0], ArrowRight: [2, 0] };
                 const delta = moves[event.key];
                 if (!delta || event.altKey || event.ctrlKey || event.metaKey)
                     return;
                 event.preventDefault();
+                if (!BaseDemoSI.sceneManipulationAllowed()) {
+                    announce("Manipulação indisponível no módulo atual.");
+                    return;
+                }
                 move(e.id, delta[0], delta[1]);
                 board.querySelector(`[data-entity-id="${e.id}"]`)?.focus();
             });
@@ -3080,7 +3100,7 @@ var BaseDemoSI;
             redoButton.disabled = !store.canRedo();
         const clearButton = get("scene-clear");
         if (clearButton)
-            clearButton.disabled = !snap.entities.length;
+            clearButton.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
         const inspector = get("object-inspector");
         if (inspector)
             inspector.hidden = !snap.selectedId;
@@ -3088,6 +3108,14 @@ var BaseDemoSI;
         if (noSelection)
             noSelection.hidden = !!snap.selectedId;
         const entity = selected();
+        const canEdit = BaseDemoSI.sceneManipulationAllowed();
+        for (const id of ["object-label", "object-tone", "scene-delete"]) {
+            const input = get(id);
+            if (input)
+                input.disabled = !canEdit || !entity;
+        }
+        for (const btn of document.querySelectorAll("[data-move]"))
+            btn.disabled = !canEdit || !entity;
         BaseDemoSI.renderWorkspaceContent(snap);
         BaseDemoSI.renderExtensions(snap);
         BaseDemoSI.renderViewers(snap);
@@ -3107,7 +3135,76 @@ var BaseDemoSI;
                     entity.kind === "block" ? "Bloco" : entity.kind === "circle" ? "Círculo" : "Etiqueta";
         }
     }
+    /**
+     * Manipulação por ponteiro: atualiza visualmente durante o gesto e confirma
+     * uma única mudança ao soltar, preservando uma única posição no histórico.
+     * A captura é restrita ao próprio objeto para não interceptar a rolagem da cena.
+     */
+    function attachDirectManipulation(button, entity, board) {
+        button.addEventListener("pointerdown", event => {
+            if (!event.isPrimary || event.button !== 0 || !BaseDemoSI.sceneManipulationAllowed())
+                return;
+            const rect = board.getBoundingClientRect();
+            if (!(rect.width > 0 && rect.height > 0))
+                return;
+            const pointerId = event.pointerId, startX = event.clientX, startY = event.clientY;
+            let moved = false, done = false;
+            const movePointer = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                const dx = ev.clientX - startX, dy = ev.clientY - startY;
+                if (!moved && Math.hypot(dx, dy) < 5)
+                    return;
+                moved = true;
+                const pos = BaseDemoSI.moveEntityByPixels(entity, dx, dy, rect.width, rect.height);
+                if (!pos)
+                    return;
+                button.style.left = `${pos.x}%`;
+                button.style.top = `${pos.y}%`;
+                button.classList.add("is-dragging");
+            };
+            const finish = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                done = true;
+                button.removeEventListener("pointermove", movePointer);
+                button.removeEventListener("pointerup", finish);
+                button.removeEventListener("pointercancel", cancel);
+                if (button.hasPointerCapture(pointerId))
+                    button.releasePointerCapture(pointerId);
+                if (!moved || !BaseDemoSI.sceneManipulationAllowed())
+                    return;
+                const pos = BaseDemoSI.moveEntityByPixels(entity, ev.clientX - startX, ev.clientY - startY, rect.width, rect.height);
+                if (pos && store.dispatch({ type: "update", id: entity.id, changes: pos })) {
+                    store.select(entity.id);
+                    announce(`Objeto ${entity.label} reposicionado.`);
+                }
+                else
+                    render();
+                get("scene-objects")?.querySelector(`[data-entity-id="${entity.id}"]`)?.focus({ preventScroll: true });
+            };
+            const cancel = (ev) => {
+                if (ev.pointerId !== pointerId || done)
+                    return;
+                done = true;
+                button.removeEventListener("pointermove", movePointer);
+                button.removeEventListener("pointerup", finish);
+                button.removeEventListener("pointercancel", cancel);
+                if (button.hasPointerCapture(pointerId))
+                    button.releasePointerCapture(pointerId);
+                button.classList.remove("is-dragging");
+                button.style.left = `${entity.x}%`;
+                button.style.top = `${entity.y}%`;
+            };
+            button.addEventListener("pointermove", movePointer);
+            button.addEventListener("pointerup", finish);
+            button.addEventListener("pointercancel", cancel);
+            button.setPointerCapture(pointerId);
+        });
+    }
     function move(id, dx, dy) {
+        if (!BaseDemoSI.sceneManipulationAllowed())
+            return;
         const e = store.getSnapshot().entities.find(item => item.id === id);
         if (!e)
             return;
@@ -3130,6 +3227,7 @@ var BaseDemoSI;
         store.subscribe(event => { render(); if (event !== "selection")
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
+        window.addEventListener("si-module-change", render);
         BaseDemoSI.setupExtensions(store);
         BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
@@ -3152,6 +3250,8 @@ var BaseDemoSI;
         get("scene-redo")?.addEventListener("click", () => { if (store.redo())
             BaseDemoSI.notify("Alteração refeita."); });
         get("scene-clear")?.addEventListener("click", async () => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const total = store.getSnapshot().entities.length;
             if (!total)
                 return;
@@ -3161,7 +3261,7 @@ var BaseDemoSI;
         });
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
             if (action === "help") {
-                void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
+                void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
                 return;
             }
             if (!BaseDemoSI.moduleAllows("tools")) {
@@ -3178,11 +3278,15 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Não foi possível adicionar o objeto.", "warning");
         });
         get("scene-delete")?.addEventListener("click", () => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (e && store.dispatch({ type: "remove", id: e.id }))
                 BaseDemoSI.notify("Objeto excluído. A ação pode ser desfeita.", "info");
         });
         get("object-label")?.addEventListener("change", event => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (!e)
                 return;
@@ -3197,6 +3301,8 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Nome do objeto atualizado.", "success");
         });
         get("object-tone")?.addEventListener("change", event => {
+            if (!BaseDemoSI.sceneManipulationAllowed())
+                return;
             const e = selected();
             if (!e)
                 return;

@@ -37,11 +37,14 @@ namespace BaseDemoSI {
       const span = document.createElement("span"); span.textContent = e.label;
       button.append(span);
       button.addEventListener("click", () => store.select(e.id));
+      attachDirectManipulation(button, e, board);
       button.addEventListener("keydown", event => {
         const moves: Record<string, [number,number]> = { ArrowUp:[0,-2], ArrowDown:[0,2], ArrowLeft:[-2,0], ArrowRight:[2,0] };
         const delta = moves[event.key];
         if (!delta || event.altKey || event.ctrlKey || event.metaKey) return;
-        event.preventDefault(); move(e.id, delta[0], delta[1]);
+        event.preventDefault();
+        if (!sceneManipulationAllowed()){announce("Manipulação indisponível no módulo atual.");return;}
+        move(e.id, delta[0], delta[1]);
         board.querySelector<HTMLElement>(`[data-entity-id="${e.id}"]`)?.focus();
       });
       board.append(button);
@@ -53,11 +56,17 @@ namespace BaseDemoSI {
     if (undoButton) undoButton.disabled = !store.canUndo();
     if (redoButton) redoButton.disabled = !store.canRedo();
     const clearButton = get("scene-clear") as HTMLButtonElement | null;
-    if (clearButton) clearButton.disabled = !snap.entities.length;
+    if (clearButton) clearButton.disabled = !snap.entities.length || !sceneManipulationAllowed();
     const inspector = get("object-inspector");
     if (inspector) inspector.hidden = !snap.selectedId;
     const noSelection = get("no-selection"); if (noSelection) noSelection.hidden = !!snap.selectedId;
     const entity = selected();
+    const canEdit=sceneManipulationAllowed();
+    for (const id of ["object-label","object-tone","scene-delete"]){
+      const input=get(id) as HTMLInputElement | HTMLSelectElement | HTMLButtonElement | null;
+      if(input)input.disabled=!canEdit || !entity;
+    }
+    for(const btn of document.querySelectorAll<HTMLButtonElement>("[data-move]"))btn.disabled=!canEdit||!entity;
     renderWorkspaceContent(snap);
     renderExtensions(snap);
     renderViewers(snap);
@@ -71,7 +80,61 @@ namespace BaseDemoSI {
         entity.kind === "block" ? "Bloco" : entity.kind === "circle" ? "Círculo" : "Etiqueta";
     }
   }
+  /**
+   * Manipulação por ponteiro: atualiza visualmente durante o gesto e confirma
+   * uma única mudança ao soltar, preservando uma única posição no histórico.
+   * A captura é restrita ao próprio objeto para não interceptar a rolagem da cena.
+   */
+  function attachDirectManipulation(button:HTMLButtonElement,entity:SceneEntity,board:HTMLElement):void {
+    button.addEventListener("pointerdown",event=>{
+      if (!event.isPrimary||event.button!==0||!sceneManipulationAllowed())return;
+      const rect=board.getBoundingClientRect();
+      if (!(rect.width>0&&rect.height>0))return;
+      const pointerId=event.pointerId,startX=event.clientX,startY=event.clientY;
+      let moved=false,done=false;
+      const movePointer=(ev:PointerEvent):void=>{
+        if(ev.pointerId!==pointerId||done)return;
+        const dx=ev.clientX-startX,dy=ev.clientY-startY;
+        if(!moved&&Math.hypot(dx,dy)<5)return;
+        moved=true;
+        const pos=moveEntityByPixels(entity,dx,dy,rect.width,rect.height);
+        if(!pos)return;
+        button.style.left=`${pos.x}%`;button.style.top=`${pos.y}%`;
+        button.classList.add("is-dragging");
+      };
+      const finish=(ev:PointerEvent):void=>{
+        if(ev.pointerId!==pointerId||done)return;
+        done=true;
+        button.removeEventListener("pointermove",movePointer);
+        button.removeEventListener("pointerup",finish);
+        button.removeEventListener("pointercancel",cancel);
+        if(button.hasPointerCapture(pointerId))button.releasePointerCapture(pointerId);
+        if(!moved||!sceneManipulationAllowed())return;
+        const pos=moveEntityByPixels(entity,ev.clientX-startX,ev.clientY-startY,rect.width,rect.height);
+        if(pos&&store.dispatch({type:"update",id:entity.id,changes:pos})){
+          store.select(entity.id);
+          announce(`Objeto ${entity.label} reposicionado.`);
+        }else render();
+        get("scene-objects")?.querySelector<HTMLElement>(`[data-entity-id="${entity.id}"]`)?.focus({preventScroll:true});
+      };
+      const cancel=(ev:PointerEvent):void=>{
+        if(ev.pointerId!==pointerId||done)return;
+        done=true;
+        button.removeEventListener("pointermove",movePointer);
+        button.removeEventListener("pointerup",finish);
+        button.removeEventListener("pointercancel",cancel);
+        if(button.hasPointerCapture(pointerId))button.releasePointerCapture(pointerId);
+        button.classList.remove("is-dragging");
+        button.style.left=`${entity.x}%`;button.style.top=`${entity.y}%`;
+      };
+      button.addEventListener("pointermove",movePointer);
+      button.addEventListener("pointerup",finish);
+      button.addEventListener("pointercancel",cancel);
+      button.setPointerCapture(pointerId);
+    });
+  }
   function move(id: string, dx: number, dy: number): void {
+    if (!sceneManipulationAllowed())return;
     const e = store.getSnapshot().entities.find(item => item.id === id);
     if (!e) return;
     const x = Math.max(e.width / 2, Math.min(100 - e.width / 2, e.x + dx));
@@ -87,6 +150,7 @@ namespace BaseDemoSI {
     store = createSceneStore(initial);
     store.subscribe(event => { render(); if (event !== "selection") save(); });
     setupWorkspace(() => store.getSnapshot(), id => store.select(id));
+    window.addEventListener("si-module-change",render);
     setupExtensions(store);
     setupViewers(()=>store.getSnapshot());
     setupEducation(store);
@@ -103,6 +167,7 @@ namespace BaseDemoSI {
     get("scene-undo")?.addEventListener("click", () => { if(store.undo())notify("Última alteração desfeita."); });
     get("scene-redo")?.addEventListener("click", () => { if(store.redo())notify("Alteração refeita."); });
     get("scene-clear")?.addEventListener("click", async () => {
+      if (!sceneManipulationAllowed())return;
       const total=store.getSnapshot().entities.length;
       if(!total)return;
       const accepted=await confirmDialog({title:"Limpar cena?",description:`Os ${total} objetos serão removidos. Esta ação pode ser desfeita pelo histórico da sessão.`,confirmText:"Limpar cena",destructive:true});
@@ -110,7 +175,7 @@ namespace BaseDemoSI {
     });
     setupActionMenu("scene-menu-toggle","scene-tools-menu", action=>{
       if(action==="help"){
-        void confirmDialog({title:"Atalhos disponíveis",description:"Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.",confirmText:"Entendi",cancelText:"Fechar"});
+        void confirmDialog({title:"Atalhos disponíveis",description:"Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.",confirmText:"Entendi",cancelText:"Fechar"});
         return;
       }
       if (!moduleAllows("tools")) {notify("A criação de objetos não está disponível neste módulo.","warning");return;}
@@ -121,9 +186,11 @@ namespace BaseDemoSI {
       else notify("Não foi possível adicionar o objeto.","warning");
     });
     get("scene-delete")?.addEventListener("click", () => {
+      if (!sceneManipulationAllowed())return;
       const e = selected(); if (e && store.dispatch({ type:"remove", id:e.id })) notify("Objeto excluído. A ação pode ser desfeita.","info");
     });
     get("object-label")?.addEventListener("change", event => {
+      if (!sceneManipulationAllowed())return;
       const e = selected(); if (!e) return;
       const input = event.currentTarget as HTMLInputElement;
       const label = input.value.trim();
@@ -131,6 +198,7 @@ namespace BaseDemoSI {
       if(store.dispatch({ type:"update", id:e.id, changes:{label} }))notify("Nome do objeto atualizado.","success");
     });
     get("object-tone")?.addEventListener("change", event => {
+      if (!sceneManipulationAllowed())return;
       const e = selected(); if (!e) return;
       const tone = (event.currentTarget as HTMLSelectElement).value as EntityTone;
       if(store.dispatch({ type:"update", id:e.id, changes:{tone} }))notify("Aparência do objeto atualizada.","success");

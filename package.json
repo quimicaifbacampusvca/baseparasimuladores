@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "private": true,
-  "description": "Fluxos pedagógicos organizados em catálogos, detalhes, editor por etapas e índice de ajuda",
+  "description": "Manipulação universal por mouse, toque e teclado, geometria e continuidade das docas",
   "scripts": {
     "build": "tsc -p tsconfig.json && python3 scripts/build_standalone.py",
-    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/scene-interaction.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },
