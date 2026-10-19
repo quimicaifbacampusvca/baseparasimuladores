@@ -16,11 +16,11 @@ def check():
    before_height=page.locator('#si-canvas').bounding_box()['height']
    page.locator('[data-open-dock="montagem"]').click();assert page.locator('#si-dock-left').is_visible()
    assert abs(page.locator('#si-canvas').bounding_box()['height']-before_height)<2,('scene moved',width)
-   for key in ['resumo','montagem','objetos','ajustes','missao']:
+   for key in ['resumo','preparo','objetos','modulo']:
     page.locator(f'[data-left-tab="{key}"]').click();assert page.locator(f'[data-left-panel="{key}"]').is_visible(),(key,width)
    page.locator('[data-left-tab="resumo"]').click()
-   page.locator('[data-open-left-category="montagem"]').click()
-   assert page.locator('[data-left-panel="montagem"]').is_visible()
+   page.locator('[data-open-left-category="preparo"]').click()
+   assert page.locator('[data-left-panel="preparo"]').is_visible()
    page.locator('[data-add-kind="block"]').click()
    assert page.locator('.scene-entity').count()==1
    page.locator('[data-close-dock="left"]').click()

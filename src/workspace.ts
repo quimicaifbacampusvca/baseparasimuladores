@@ -1,7 +1,7 @@
 namespace BaseDemoSI {
   export type WorkspaceView = "focus" | "overview";
   export type WorkspaceSide = "left" | "right";
-  export type WorkspaceLeftTab = "resumo" | "montagem" | "objetos" | "ajustes" | "missao";
+  export type WorkspaceLeftTab = "resumo" | "preparo" | "objetos" | "modulo" | "missao";
   export type WorkspaceRightTab = "ver" | "dados";
   export type WorkspacePresentation = "standard" | "fullscreen";
   export interface WorkspaceState {
@@ -21,7 +21,7 @@ namespace BaseDemoSI {
     | { type:"expand" }
     | { type:"reset" };
   export function initialWorkspace(): WorkspaceState {
-    return {view:"focus",left:"collapsed",right:"collapsed",leftTab:"montagem",rightTab:"ver",presentation:"standard"};
+    return {view:"focus",left:"collapsed",right:"collapsed",leftTab:"preparo",rightTab:"ver",presentation:"standard"};
   }
   /** A dimensão compacta (<1280 px) opera uma doca por vez; <=900 px usa sheet. */
   export function reduceWorkspace(s:WorkspaceState,a:WorkspaceAction,compact:boolean):WorkspaceState {
@@ -31,7 +31,7 @@ namespace BaseDemoSI {
       case "open": {
         const tab=a.tab;
         if(a.side==="left")return {...s,left:"open",right:compact?"collapsed":s.right,presentation:"standard",
-          leftTab:tab==="resumo"||tab==="objetos"||tab==="ajustes"||tab==="missao"?tab:"montagem"};
+          leftTab:tab==="resumo"||tab==="objetos"||tab==="modulo"||tab==="missao"?tab:"preparo"};
         return {...s,right:"open",left:compact?"collapsed":s.left,
           rightTab:tab==="dados"?"dados":"ver",presentation:"standard"};
       }
@@ -47,15 +47,22 @@ namespace BaseDemoSI {
     if(compact&&s.left==="open"&&s.right==="open")return {...s,left:"collapsed"};
     return s;
   }
+  /** Migração explícita dos identificadores internos anteriores da doca. */
+  export function normalizeLeftCategory(value:unknown):WorkspaceLeftTab|null {
+    if(value==="montagem")return "preparo";
+    if(value==="ajustes")return "modulo";
+    return value==="resumo"||value==="preparo"||value==="objetos"||value==="modulo"||value==="missao" ? value : null;
+  }
   export function parseWorkspacePreference(raw:unknown):WorkspaceState|null {
     if(!raw||typeof raw!=="object"||Array.isArray(raw))return null;
     const t=raw as Record<string,unknown>;
-    if(t.schemaVersion!==1)return null;
-    if(!["focus","overview"].includes(String(t.view))||!["resumo","montagem","objetos","ajustes","missao"].includes(String(t.leftTab))||!["ver","dados"].includes(String(t.rightTab)))return null;
-    // Abrir painéis automaticamente ao recarregar um telefone produz modal inesperado.
-    return {...initialWorkspace(),view:t.view as WorkspaceView,leftTab:t.leftTab as WorkspaceLeftTab,rightTab:t.rightTab as WorkspaceRightTab};
+    if(t.schemaVersion!==1&&t.schemaVersion!==2)return null;
+    const category=normalizeLeftCategory(t.leftTab);
+    if(!["focus","overview"].includes(String(t.view))||!category||!["ver","dados"].includes(String(t.rightTab)))return null;
+    return {...initialWorkspace(),view:t.view as WorkspaceView,leftTab:category,rightTab:t.rightTab as WorkspaceRightTab};
   }
   export function serializeWorkspacePreference(s:WorkspaceState):string {
-    return JSON.stringify({schemaVersion:1,view:s.view,leftTab:s.leftTab,rightTab:s.rightTab});
+    return JSON.stringify({schemaVersion:2,view:s.view,leftTab:s.leftTab,rightTab:s.rightTab});
   }
+
 }

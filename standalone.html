@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-EynIhZCPD6zG/ZCu+gft30NBnbLl81x9T3r04jBKD+8='; script-src 'sha256-tqO/rbNFDfhjRs2/v+5AJl4pOyTJYgPJomgM0hksmxo='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-GkBa18zayp2kis3sV9Jw5xbPS7u1vasZw194Pj8abJk='; script-src 'sha256-xFvzNPKeqLsSQUinCUm+GaKFxCfeXhJR8iqUeCPEq2s='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -169,6 +169,34 @@ body.route-ambiente.nav-open .side{display:flex!important;position:fixed;inset:0
  .si-dock.si-bottom-sheet .si-dock-scroll{min-height:0;overflow-y:auto;overflow-anchor:none}
 }
 @media(max-width:900px) and (orientation:landscape){.si-dock.si-bottom-sheet{height:min(75dvh,420px);max-height:calc(100dvh - var(--si-launcher-h) - 20px)}}
+
+/* 0.9.6 — Contrato visual e funcional da doca Montagem.
+   As abas são categorias contextuais, não botões de ação genéricos. */
+.si-dock-tabs button[hidden], .si-dock [hidden]{display:none!important}
+.si-dock-left .si-dock-tabs{display:grid;grid-template-columns:repeat(var(--si-visible-categories,4),minmax(0,1fr));overflow:visible;gap:5px;padding:9px 10px}
+.si-dock-left .si-dock-tabs button{min-width:0;min-height:44px;white-space:normal;overflow-wrap:normal;padding:7px 3px;font-size:clamp(10px,1vw,12px);line-height:1.2}
+.si-dock-left .si-dock-tabs button[aria-pressed="true"]{background:var(--tint);color:var(--text);border-color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+.si-dock-left .si-dock-tabs button:focus-visible{outline:3px solid var(--ring);outline-offset:1px}
+.si-dock-scroll [data-left-panel], .si-dock-scroll [data-right-panel]{min-width:0}
+.si-dock-scroll [data-left-panel] > h3:not(:first-child){margin-top:21px}
+.si-dock-scroll .button,.si-dock-scroll .si-extension-action{font:inherit;font-size:12px;min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.si-dock-scroll .tool-stack{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.si-dock-scroll .tool-stack .button{justify-content:flex-start;gap:8px;text-align:left}
+.si-dock-scroll .si-dock-field label,.si-dock-scroll [data-left-panel="modulo"]>label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px}
+.si-dock-scroll .si-dock-field select,.si-dock-scroll [data-left-panel="modulo"]>select{width:100%;min-width:0;max-width:100%;min-height:44px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:9px;padding:9px 12px;font:inherit;font-size:13px}
+.si-dock-scroll .si-dock-field select:focus-visible,.si-dock-scroll [data-left-panel="modulo"]>select:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.si-dock-scroll [data-left-panel="missao"] a.button{width:100%;margin:8px 0 0;justify-content:flex-start}
+.si-dock-scroll #si-dock-setup-summary p{font-size:12px;color:var(--text)}
+.si-dock-left .si-dock-header{gap:8px}
+.si-launchers button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.si-launchers button .si-launch-icon{width:19px;height:19px;flex:0 0 19px;opacity:.9;stroke:currentColor}
+@media(max-width:900px){
+ .si-dock-left .si-dock-tabs{padding:7px 10px;gap:5px}
+ .si-dock-left .si-dock-tabs button{flex:initial;min-width:0;white-space:normal;font-size:11px;padding:7px 3px}
+ .si-dock-scroll .tool-stack{display:grid;grid-template-columns:minmax(0,1fr)}
+ .si-dock.si-bottom-sheet .si-dock-scroll{padding:12px 16px 18px}
+}
+@media(max-width:360px){.si-dock-left .si-dock-tabs{gap:3px;padding-inline:7px}.si-dock-left .si-dock-tabs button{font-size:10px;padding-inline:2px}}
 
 /* Componentes universais · 0.4.0 · sem dependência de bibliotecas remotas. */
 .si-actionbar .si-toolmenu-wrap{position:relative;display:flex;flex:0 0 auto}
@@ -722,7 +750,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
     <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
   </div>
  </section>
- <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.5</span></p></section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.6</span></p></section>
 </div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -745,7 +773,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         </nav>
         <div class="si-global-actions">
           <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
-          <span class="version-pill">v<span data-app-version>0.9.5</span></span>
+          <span class="version-pill">v<span data-app-version>0.9.6</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -808,11 +836,11 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
                 <button type="button" class="si-tab" data-scene-view="focus" aria-pressed="true">Foco</button>
                 <button type="button" class="si-tab" data-scene-view="overview" aria-pressed="false">Visão geral</button>
               </div>
-              <div class="si-module-control"><label for="si-module-choice">Módulo</label><select id="si-module-choice" aria-describedby="si-module-description"></select></div>
+              
               <div class="si-launchers" role="group" aria-label="Painéis da bancada">
-                <button type="button" data-open-dock="montagem" aria-controls="si-dock-left" aria-expanded="false"><span aria-hidden="true">▤</span> Montagem</button>
-                <button type="button" data-open-dock="ver" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">◉</span> Ver</button>
-                <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">▥</span> Dados</button>
+                <button type="button" data-open-dock="montagem" aria-controls="si-dock-left" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"/></svg> Montagem</button>
+                <button type="button" data-open-dock="ver" aria-controls="si-dock-right" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/></svg> Ver</button>
+                <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><svg aria-hidden="true" class="si-launch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h10l4 4v14H5ZM15 3v5h4M8 12h8M8 16h8"/></svg> Dados</button>
               </div>
             </div>
             <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p><a href="#/roteiros" id="si-return-activity" class="si-return-activity" hidden>← Retornar à atividade orientada</a>
@@ -851,19 +879,19 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
               <header class="si-dock-header"><h2 id="si-left-title">Montagem</h2><button type="button" class="si-dock-close" data-close-dock="left" aria-label="Fechar Montagem">✕</button></header>
               <nav class="si-dock-tabs" role="group" aria-label="Categorias da montagem">
                 <button type="button" data-left-tab="resumo" aria-pressed="false">Resumo</button>
-                <button type="button" data-left-tab="montagem" aria-pressed="true">Preparo</button>
+                <button type="button" data-left-tab="preparo" aria-pressed="true">Preparo</button>
                 <button type="button" data-left-tab="objetos" aria-pressed="false">Objetos</button>
-                <button type="button" data-left-tab="ajustes" aria-pressed="false">Módulo</button>
-                <button type="button" data-left-tab="missao" aria-pressed="false">Missão</button>
+                <button type="button" data-left-tab="modulo" aria-pressed="false">Módulo</button>
+                <button type="button" data-left-tab="missao" aria-pressed="false" hidden>Missão</button>
               </nav>
-              <div class="si-dock-scroll" id="si-left-scroll">
+              <div class="si-dock-scroll" id="si-left-scroll" tabindex="-1">
                 <div data-left-panel="resumo" hidden>
                   <h3>Resumo da montagem</h3><p>Conferência rápida da cena e do objeto em foco.</p>
                   <div id="si-dock-setup-summary" class="si-dock-summary" aria-live="polite"></div>
-                  <button type="button" class="button outline" data-open-left-category="montagem">Preparar a cena</button>
+                  <button type="button" class="button outline" data-open-left-category="preparo">Preparar a cena</button>
                   <button type="button" class="button outline" data-open-left-category="objetos">Editar objeto</button>
                 </div>
-                <div data-left-panel="montagem">
+                <div data-left-panel="preparo">
                   <h3>Adicionar à cena</h3><p>Escolha uma entidade de demonstração.</p>
                   <div class="tool-stack"><button type="button" class="button outline" data-add-kind="block">▣ Adicionar bloco</button><button type="button" class="button outline" data-add-kind="circle">◯ Adicionar círculo</button><button type="button" class="button outline" data-add-kind="label">T Adicionar etiqueta</button></div>
                   <p class="si-dock-hint">A seleção e as ações sobre entidades pertencem ao núcleo universal.</p>
@@ -882,7 +910,9 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
                     <button type="button" id="scene-delete" class="button outline scene-danger">Excluir objeto</button>
                   </div>
                 </div>
-                <div data-left-panel="ajustes" hidden><h3>Módulo e ferramentas</h3><p>Selecione uma extensão instalada localmente.</p>
+                <div data-left-panel="modulo" hidden><h3>Módulo de investigação</h3><p>Defina o modo de trabalho e os recursos conectados.</p>
+                  <div class="si-dock-field"><label for="si-module-choice">Módulo</label><select id="si-module-choice" aria-describedby="si-module-description"></select></div>
+                  <h3>Recursos da extensão</h3><p>Selecione uma extensão instalada localmente.</p>
                   <label for="extension-choice">Extensão ativa</label><select id="extension-choice"><option value="">Nenhuma extensão</option></select>
                   <p id="extension-descriptor" class="si-extension-description">As extensões são executadas localmente.</p>
                   <h3>Ferramentas conectadas</h3><div id="extension-tools" class="si-extension-buttons"></div>
@@ -1073,7 +1103,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.5</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.6</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -1082,7 +1112,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.5</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.6</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -1103,7 +1133,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.5",
+        version: "0.9.6",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2421,7 +2451,7 @@ var BaseDemoSI;
 var BaseDemoSI;
 (function (BaseDemoSI) {
     function initialWorkspace() {
-        return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "montagem", rightTab: "ver", presentation: "standard" };
+        return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "preparo", rightTab: "ver", presentation: "standard" };
     }
     BaseDemoSI.initialWorkspace = initialWorkspace;
     /** A dimensão compacta (<1280 px) opera uma doca por vez; <=900 px usa sheet. */
@@ -2433,7 +2463,7 @@ var BaseDemoSI;
                 const tab = a.tab;
                 if (a.side === "left")
                     return { ...s, left: "open", right: compact ? "collapsed" : s.right, presentation: "standard",
-                        leftTab: tab === "resumo" || tab === "objetos" || tab === "ajustes" || tab === "missao" ? tab : "montagem" };
+                        leftTab: tab === "resumo" || tab === "objetos" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
                 return { ...s, right: "open", left: compact ? "collapsed" : s.left,
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
@@ -2455,20 +2485,29 @@ var BaseDemoSI;
         return s;
     }
     BaseDemoSI.normalizeWorkspace = normalizeWorkspace;
+    /** Migração explícita dos identificadores internos anteriores da doca. */
+    function normalizeLeftCategory(value) {
+        if (value === "montagem")
+            return "preparo";
+        if (value === "ajustes")
+            return "modulo";
+        return value === "resumo" || value === "preparo" || value === "objetos" || value === "modulo" || value === "missao" ? value : null;
+    }
+    BaseDemoSI.normalizeLeftCategory = normalizeLeftCategory;
     function parseWorkspacePreference(raw) {
         if (!raw || typeof raw !== "object" || Array.isArray(raw))
             return null;
         const t = raw;
-        if (t.schemaVersion !== 1)
+        if (t.schemaVersion !== 1 && t.schemaVersion !== 2)
             return null;
-        if (!["focus", "overview"].includes(String(t.view)) || !["resumo", "montagem", "objetos", "ajustes", "missao"].includes(String(t.leftTab)) || !["ver", "dados"].includes(String(t.rightTab)))
+        const category = normalizeLeftCategory(t.leftTab);
+        if (!["focus", "overview"].includes(String(t.view)) || !category || !["ver", "dados"].includes(String(t.rightTab)))
             return null;
-        // Abrir painéis automaticamente ao recarregar um telefone produz modal inesperado.
-        return { ...initialWorkspace(), view: t.view, leftTab: t.leftTab, rightTab: t.rightTab };
+        return { ...initialWorkspace(), view: t.view, leftTab: category, rightTab: t.rightTab };
     }
     BaseDemoSI.parseWorkspacePreference = parseWorkspacePreference;
     function serializeWorkspacePreference(s) {
-        return JSON.stringify({ schemaVersion: 1, view: s.view, leftTab: s.leftTab, rightTab: s.rightTab });
+        return JSON.stringify({ schemaVersion: 2, view: s.view, leftTab: s.leftTab, rightTab: s.rightTab });
     }
     BaseDemoSI.serializeWorkspacePreference = serializeWorkspacePreference;
 })(BaseDemoSI || (BaseDemoSI = {}));
@@ -2486,6 +2525,10 @@ var BaseDemoSI;
     const compact = () => window.innerWidth < 1280;
     const activeSide = () => workspaceState.right === "open" ? "right" : workspaceState.left === "open" ? "left" : null;
     function dock(side) { return node(`si-dock-${side}`); }
+    function guidedActivity() {
+        const returnLink = node("si-return-activity");
+        return !!returnLink && !returnLink.hidden && !!returnLink.getAttribute("href");
+    }
     function persistWorkspace() { BaseDemoSI.storage.write(WORKSPACE_KEY, BaseDemoSI.serializeWorkspacePreference(workspaceState)); }
     function focusReturn(side) {
         const trigger = dockTriggers[side];
@@ -2526,8 +2569,21 @@ var BaseDemoSI;
             const on = target === "montagem" ? workspaceState.left === "open" : workspaceState.right === "open" && workspaceState.rightTab === target;
             button.setAttribute("aria-expanded", String(on));
         }
-        for (const b of document.querySelectorAll("[data-left-tab]"))
-            b.setAttribute("aria-pressed", String(workspaceState.leftTab === b.dataset.leftTab));
+        // Mesma gramática da montagem: abas contextuais, não uma lista fixa de recursos.
+        // Em atividades guiadas o contexto substitui a aba Módulo; em modo sem
+        // edição as áreas de criação e edição de objetos deixam de aparecer.
+        const guided = guidedActivity();
+        const editable = BaseDemoSI.moduleAllows("tools");
+        const available = (tab) => tab === "resumo" || (tab === "missao" ? guided : (tab === "modulo" ? !guided : editable));
+        if (!available(workspaceState.leftTab))
+            workspaceState = { ...workspaceState, leftTab: guided ? "missao" : "resumo" };
+        for (const b of document.querySelectorAll("[data-left-tab]")) {
+            const name = b.dataset.leftTab;
+            b.hidden = !available(name);
+            b.setAttribute("aria-pressed", String(workspaceState.leftTab === name));
+        }
+        const count = [...document.querySelectorAll("[data-left-tab]")].filter(b => !b.hidden).length;
+        dock("left").style.setProperty("--si-visible-categories", String(count));
         for (const b of document.querySelectorAll("[data-right-tab]"))
             b.setAttribute("aria-pressed", String(workspaceState.rightTab === b.dataset.rightTab));
         for (const panel of document.querySelectorAll("[data-left-panel]"))
@@ -2536,7 +2592,7 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { resumo: "Resumo", montagem: "Preparo", objetos: "Objetos", ajustes: "Módulo", missao: "Missão" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Recipientes", modulo: "Módulo", missao: "Missão" }[workspaceState.leftTab];
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
@@ -2760,11 +2816,16 @@ var BaseDemoSI;
         document.querySelectorAll("[data-scene-view]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "view", view: b.dataset.sceneView })));
         document.querySelectorAll("[data-open-dock]").forEach(b => b.addEventListener("click", () => {
             const which = b.dataset.openDock;
-            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "montagem" : which, b);
+            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "preparo" : which, b);
         }));
         document.querySelectorAll("[data-close-dock]").forEach(b => b.addEventListener("click", () => closeWorkspace(b.dataset.closeDock)));
         document.querySelectorAll("[data-left-tab],[data-open-left-category]").forEach(b => b.addEventListener("click", () => {
-            changeWorkspace({ type: "left-tab", tab: (b.dataset.leftTab ?? b.dataset.openLeftCategory) });
+            if (b.hidden || b.closest("[hidden],[inert]"))
+                return;
+            const tab = BaseDemoSI.normalizeLeftCategory(b.dataset.leftTab ?? b.dataset.openLeftCategory);
+            if (!tab)
+                return;
+            changeWorkspace({ type: "left-tab", tab });
             const container = node("si-left-scroll");
             if (container)
                 container.scrollTop = 0;
@@ -2793,6 +2854,7 @@ var BaseDemoSI;
         node("si-expand")?.addEventListener("click", () => changeWorkspace({ type: "expand" }));
         node("si-sheet-backdrop")?.addEventListener("click", () => { const side = activeSide(); if (side)
             closeWorkspace(side); });
+        window.addEventListener("si-module-change", () => { renderWorkspace(); persistWorkspace(); });
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);

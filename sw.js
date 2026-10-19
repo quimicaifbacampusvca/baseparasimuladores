@@ -1,10 +1,10 @@
-/* Base Demo Oficial - SI 0.9.5. Instalação transacional de recursos locais. */
-const CACHE = "base-demo-si-v0.9.5";
+/* Base Demo Oficial - SI 0.9.6. Instalação transacional de recursos locais. */
+const CACHE = "base-demo-si-v0.9.6";
 const FILES = [
   "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
   "./components.css", "./extensions.css", "./education.css", "./records.css",
   "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
-  "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+  "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
 ];
 self.addEventListener("install", event => {
   // addAll falha integralmente caso qualquer recurso esteja ausente.

@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.5",
+        version: "0.9.6",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1324,7 +1324,7 @@ var BaseDemoSI;
 var BaseDemoSI;
 (function (BaseDemoSI) {
     function initialWorkspace() {
-        return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "montagem", rightTab: "ver", presentation: "standard" };
+        return { view: "focus", left: "collapsed", right: "collapsed", leftTab: "preparo", rightTab: "ver", presentation: "standard" };
     }
     BaseDemoSI.initialWorkspace = initialWorkspace;
     /** A dimensão compacta (<1280 px) opera uma doca por vez; <=900 px usa sheet. */
@@ -1336,7 +1336,7 @@ var BaseDemoSI;
                 const tab = a.tab;
                 if (a.side === "left")
                     return { ...s, left: "open", right: compact ? "collapsed" : s.right, presentation: "standard",
-                        leftTab: tab === "resumo" || tab === "objetos" || tab === "ajustes" || tab === "missao" ? tab : "montagem" };
+                        leftTab: tab === "resumo" || tab === "objetos" || tab === "modulo" || tab === "missao" ? tab : "preparo" };
                 return { ...s, right: "open", left: compact ? "collapsed" : s.left,
                     rightTab: tab === "dados" ? "dados" : "ver", presentation: "standard" };
             }
@@ -1358,20 +1358,29 @@ var BaseDemoSI;
         return s;
     }
     BaseDemoSI.normalizeWorkspace = normalizeWorkspace;
+    /** Migração explícita dos identificadores internos anteriores da doca. */
+    function normalizeLeftCategory(value) {
+        if (value === "montagem")
+            return "preparo";
+        if (value === "ajustes")
+            return "modulo";
+        return value === "resumo" || value === "preparo" || value === "objetos" || value === "modulo" || value === "missao" ? value : null;
+    }
+    BaseDemoSI.normalizeLeftCategory = normalizeLeftCategory;
     function parseWorkspacePreference(raw) {
         if (!raw || typeof raw !== "object" || Array.isArray(raw))
             return null;
         const t = raw;
-        if (t.schemaVersion !== 1)
+        if (t.schemaVersion !== 1 && t.schemaVersion !== 2)
             return null;
-        if (!["focus", "overview"].includes(String(t.view)) || !["resumo", "montagem", "objetos", "ajustes", "missao"].includes(String(t.leftTab)) || !["ver", "dados"].includes(String(t.rightTab)))
+        const category = normalizeLeftCategory(t.leftTab);
+        if (!["focus", "overview"].includes(String(t.view)) || !category || !["ver", "dados"].includes(String(t.rightTab)))
             return null;
-        // Abrir painéis automaticamente ao recarregar um telefone produz modal inesperado.
-        return { ...initialWorkspace(), view: t.view, leftTab: t.leftTab, rightTab: t.rightTab };
+        return { ...initialWorkspace(), view: t.view, leftTab: category, rightTab: t.rightTab };
     }
     BaseDemoSI.parseWorkspacePreference = parseWorkspacePreference;
     function serializeWorkspacePreference(s) {
-        return JSON.stringify({ schemaVersion: 1, view: s.view, leftTab: s.leftTab, rightTab: s.rightTab });
+        return JSON.stringify({ schemaVersion: 2, view: s.view, leftTab: s.leftTab, rightTab: s.rightTab });
     }
     BaseDemoSI.serializeWorkspacePreference = serializeWorkspacePreference;
 })(BaseDemoSI || (BaseDemoSI = {}));
@@ -1389,6 +1398,10 @@ var BaseDemoSI;
     const compact = () => window.innerWidth < 1280;
     const activeSide = () => workspaceState.right === "open" ? "right" : workspaceState.left === "open" ? "left" : null;
     function dock(side) { return node(`si-dock-${side}`); }
+    function guidedActivity() {
+        const returnLink = node("si-return-activity");
+        return !!returnLink && !returnLink.hidden && !!returnLink.getAttribute("href");
+    }
     function persistWorkspace() { BaseDemoSI.storage.write(WORKSPACE_KEY, BaseDemoSI.serializeWorkspacePreference(workspaceState)); }
     function focusReturn(side) {
         const trigger = dockTriggers[side];
@@ -1429,8 +1442,21 @@ var BaseDemoSI;
             const on = target === "montagem" ? workspaceState.left === "open" : workspaceState.right === "open" && workspaceState.rightTab === target;
             button.setAttribute("aria-expanded", String(on));
         }
-        for (const b of document.querySelectorAll("[data-left-tab]"))
-            b.setAttribute("aria-pressed", String(workspaceState.leftTab === b.dataset.leftTab));
+        // Mesma gramática da montagem: abas contextuais, não uma lista fixa de recursos.
+        // Em atividades guiadas o contexto substitui a aba Módulo; em modo sem
+        // edição as áreas de criação e edição de objetos deixam de aparecer.
+        const guided = guidedActivity();
+        const editable = BaseDemoSI.moduleAllows("tools");
+        const available = (tab) => tab === "resumo" || (tab === "missao" ? guided : (tab === "modulo" ? !guided : editable));
+        if (!available(workspaceState.leftTab))
+            workspaceState = { ...workspaceState, leftTab: guided ? "missao" : "resumo" };
+        for (const b of document.querySelectorAll("[data-left-tab]")) {
+            const name = b.dataset.leftTab;
+            b.hidden = !available(name);
+            b.setAttribute("aria-pressed", String(workspaceState.leftTab === name));
+        }
+        const count = [...document.querySelectorAll("[data-left-tab]")].filter(b => !b.hidden).length;
+        dock("left").style.setProperty("--si-visible-categories", String(count));
         for (const b of document.querySelectorAll("[data-right-tab]"))
             b.setAttribute("aria-pressed", String(workspaceState.rightTab === b.dataset.rightTab));
         for (const panel of document.querySelectorAll("[data-left-panel]"))
@@ -1439,7 +1465,7 @@ var BaseDemoSI;
             panel.hidden = panel.dataset.rightPanel !== workspaceState.rightTab;
         const lh = node("si-left-title");
         if (lh)
-            lh.textContent = { resumo: "Resumo", montagem: "Preparo", objetos: "Objetos", ajustes: "Módulo", missao: "Missão" }[workspaceState.leftTab];
+            lh.textContent = { resumo: "Montagem", preparo: "Preparo", objetos: "Recipientes", modulo: "Módulo", missao: "Missão" }[workspaceState.leftTab];
         const detail = viewerLevel === "detail" && workspaceState.rightTab === "ver";
         const rh = node("si-right-title");
         if (rh)
@@ -1663,11 +1689,16 @@ var BaseDemoSI;
         document.querySelectorAll("[data-scene-view]").forEach(b => b.addEventListener("click", () => changeWorkspace({ type: "view", view: b.dataset.sceneView })));
         document.querySelectorAll("[data-open-dock]").forEach(b => b.addEventListener("click", () => {
             const which = b.dataset.openDock;
-            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "montagem" : which, b);
+            openWorkspace(which === "montagem" ? "left" : "right", which === "montagem" ? "preparo" : which, b);
         }));
         document.querySelectorAll("[data-close-dock]").forEach(b => b.addEventListener("click", () => closeWorkspace(b.dataset.closeDock)));
         document.querySelectorAll("[data-left-tab],[data-open-left-category]").forEach(b => b.addEventListener("click", () => {
-            changeWorkspace({ type: "left-tab", tab: (b.dataset.leftTab ?? b.dataset.openLeftCategory) });
+            if (b.hidden || b.closest("[hidden],[inert]"))
+                return;
+            const tab = BaseDemoSI.normalizeLeftCategory(b.dataset.leftTab ?? b.dataset.openLeftCategory);
+            if (!tab)
+                return;
+            changeWorkspace({ type: "left-tab", tab });
             const container = node("si-left-scroll");
             if (container)
                 container.scrollTop = 0;
@@ -1696,6 +1727,7 @@ var BaseDemoSI;
         node("si-expand")?.addEventListener("click", () => changeWorkspace({ type: "expand" }));
         node("si-sheet-backdrop")?.addEventListener("click", () => { const side = activeSide(); if (side)
             closeWorkspace(side); });
+        window.addEventListener("si-module-change", () => { renderWorkspace(); persistWorkspace(); });
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);

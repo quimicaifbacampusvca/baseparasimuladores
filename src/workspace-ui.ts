@@ -11,6 +11,10 @@ namespace BaseDemoSI {
   const compact=()=>window.innerWidth<1280;
   const activeSide=():WorkspaceSide|null=>workspaceState.right==="open"?"right":workspaceState.left==="open"?"left":null;
   function dock(side:WorkspaceSide):HTMLElement {return node(`si-dock-${side}`)!;}
+  function guidedActivity():boolean {
+    const returnLink=node("si-return-activity") as HTMLAnchorElement|null;
+    return !!returnLink&&!returnLink.hidden&&!!returnLink.getAttribute("href");
+  }
   function persistWorkspace():void{storage.write(WORKSPACE_KEY,serializeWorkspacePreference(workspaceState));}
   function focusReturn(side:WorkspaceSide):void {
     const trigger=dockTriggers[side];
@@ -42,11 +46,24 @@ namespace BaseDemoSI {
       const on=target==="montagem"?workspaceState.left==="open":workspaceState.right==="open"&&workspaceState.rightTab===target;
       button.setAttribute("aria-expanded",String(on));
     }
-    for(const b of document.querySelectorAll<HTMLElement>("[data-left-tab]"))b.setAttribute("aria-pressed",String(workspaceState.leftTab===b.dataset.leftTab));
+    // Mesma gramática da montagem: abas contextuais, não uma lista fixa de recursos.
+    // Em atividades guiadas o contexto substitui a aba Módulo; em modo sem
+    // edição as áreas de criação e edição de objetos deixam de aparecer.
+    const guided=guidedActivity();
+    const editable=moduleAllows("tools");
+    const available=(tab:WorkspaceLeftTab):boolean=>tab==="resumo" || (tab==="missao" ? guided : (tab==="modulo" ? !guided : editable));
+    if(!available(workspaceState.leftTab))workspaceState={...workspaceState,leftTab:guided?"missao":"resumo"};
+    for(const b of document.querySelectorAll<HTMLButtonElement>("[data-left-tab]")){
+      const name=b.dataset.leftTab as WorkspaceLeftTab;
+      b.hidden=!available(name);
+      b.setAttribute("aria-pressed",String(workspaceState.leftTab===name));
+    }
+    const count=[...document.querySelectorAll<HTMLButtonElement>("[data-left-tab]")].filter(b=>!b.hidden).length;
+    dock("left").style.setProperty("--si-visible-categories",String(count));
     for(const b of document.querySelectorAll<HTMLElement>("[data-right-tab]"))b.setAttribute("aria-pressed",String(workspaceState.rightTab===b.dataset.rightTab));
     for(const panel of document.querySelectorAll<HTMLElement>("[data-left-panel]"))panel.hidden=panel.dataset.leftPanel!==workspaceState.leftTab;
     for(const panel of document.querySelectorAll<HTMLElement>("[data-right-panel]"))panel.hidden=panel.dataset.rightPanel!==workspaceState.rightTab;
-    const lh=node("si-left-title");if(lh)lh.textContent={resumo:"Resumo",montagem:"Preparo",objetos:"Objetos",ajustes:"Módulo",missao:"Missão"}[workspaceState.leftTab];
+    const lh=node("si-left-title");if(lh)lh.textContent={resumo:"Montagem",preparo:"Preparo",objetos:"Recipientes",modulo:"Módulo",missao:"Missão"}[workspaceState.leftTab];
     const detail=viewerLevel==="detail"&&workspaceState.rightTab==="ver";
     const rh=node("si-right-title");if(rh)rh.textContent=workspaceState.rightTab==="dados"?"Dados":detail?"Investigar":"Ver";
     const back=node("si-dock-viewer-back");if(back)back.hidden=!detail;
@@ -135,11 +152,14 @@ namespace BaseDemoSI {
     workspaceStarted=true;
     document.querySelectorAll<HTMLElement>("[data-scene-view]").forEach(b=>b.addEventListener("click",()=>changeWorkspace({type:"view",view:b.dataset.sceneView as WorkspaceView})));
     document.querySelectorAll<HTMLElement>("[data-open-dock]").forEach(b=>b.addEventListener("click",()=>{
-      const which=b.dataset.openDock;openWorkspace(which==="montagem"?"left":"right",which==="montagem"?"montagem":which as WorkspaceRightTab,b);
+      const which=b.dataset.openDock;openWorkspace(which==="montagem"?"left":"right",which==="montagem"?"preparo":which as WorkspaceRightTab,b);
     }));
     document.querySelectorAll<HTMLElement>("[data-close-dock]").forEach(b=>b.addEventListener("click",()=>closeWorkspace(b.dataset.closeDock as WorkspaceSide)));
     document.querySelectorAll<HTMLElement>("[data-left-tab],[data-open-left-category]").forEach(b=>b.addEventListener("click",()=>{
-      changeWorkspace({type:"left-tab",tab:(b.dataset.leftTab??b.dataset.openLeftCategory) as WorkspaceLeftTab});
+      if(b.hidden || b.closest("[hidden],[inert]"))return;
+      const tab=normalizeLeftCategory(b.dataset.leftTab??b.dataset.openLeftCategory);
+      if(!tab)return;
+      changeWorkspace({type:"left-tab",tab});
       const container=node("si-left-scroll");if(container)container.scrollTop=0;
     }));
     document.querySelectorAll<HTMLElement>("[data-right-tab]").forEach(b=>b.addEventListener("click",()=>{
@@ -159,6 +179,7 @@ namespace BaseDemoSI {
     });
     node("si-expand")?.addEventListener("click",()=>changeWorkspace({type:"expand"}));
     node("si-sheet-backdrop")?.addEventListener("click",()=>{const side=activeSide();if(side)closeWorkspace(side);});
+    window.addEventListener("si-module-change",()=>{renderWorkspace();persistWorkspace();});
     document.addEventListener("keydown",keyboardHandler);
     window.addEventListener("resize",updateViewport);
     window.visualViewport?.addEventListener("resize",updateViewport);

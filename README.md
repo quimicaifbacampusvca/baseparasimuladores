@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.5
+# Base Demo Oficial - SI · 0.9.6
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.5 — Bloco 04: docas, categorias de montagem e investigação contextual.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.6 — Correção de organização e estilo da doca Montagem.**
 
 ## Executar
 
@@ -22,7 +22,7 @@ Todas as bibliotecas necessárias à execução e dados de demonstração estão
 
 **Permissões dos links são controles de interface, não segurança ou autenticação.** O conteúdo do endereço pode ser modificado por terceiros; não utilize links como mecanismo para proteger informações confidenciais. Links `file://` não são portáveis entre dispositivos sem distribuir o próprio aplicativo.
 
-A 0.9.5 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-BLOCO-04-0.9.5.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
+A 0.9.6 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-BLOCO-04-0.9.6.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
 
 ## Licença
 
@@ -44,6 +44,6 @@ A Home foi reestruturada segundo o contrato comum de navegação: ambiente de de
 
 Controles diretos por mouse/toque, movimento relativo à cena com limites, uma alteração no histórico por arraste e permissões por módulo. Ver `docs/ACEITE-BLOCO-03-0.9.4.md`.
 
-## Bloco 04 — Docas e investigação contextual (0.9.5)
+## Bloco 04 — Docas e investigação contextual (0.9.6)
 
-A doca de Montagem apresenta Resumo, Preparo, Objetos, Módulo e Missão. A doca Ver apresenta catálogo → detalhe → retorno, preservando instrumentos e visualizadores conectáveis. Dados reúne o inventário e os registros, com acesso ao Caderno e Relatórios. No celular as mesmas funções aparecem em folhas inferiores e a cena permanece independente da altura do conteúdo. Consulte `docs/ACEITE-BLOCO-04-0.9.5.md`.
+A doca de Montagem apresenta Resumo, Preparo, Objetos e Módulo; Missão é exibida somente durante uma atividade orientada. A doca Ver apresenta catálogo → detalhe → retorno, preservando instrumentos e visualizadores conectáveis. Dados reúne o inventário e os registros, com acesso ao Caderno e Relatórios. No celular as mesmas funções aparecem em folhas inferiores e a cena permanece independente da altura do conteúdo. Consulte `docs/ACEITE-BLOCO-04-0.9.6.md`.
