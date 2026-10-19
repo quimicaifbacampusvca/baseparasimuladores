@@ -14,6 +14,9 @@ namespace BaseDemoSI {
     window.addEventListener("hashchange", updateRoute);
     setupNavigationDrawer();
     setupDistribution();
+    setupModules();
+    setupManual();
+    setupSharedActivities();
   }
 }
 

@@ -10,13 +10,14 @@ const solo = read('standalone.html');
 const manifest = JSON.parse(read('manifest.webmanifest'));
 const precache = JSON.parse('['+sw.match(/const FILES = \[([\s\S]*?)\];/)[1].replace(/,\s*$/, '')+']');
 assert.equal(manifest.name, 'Base Demo Oficial - SI');
-assert.equal(JSON.parse(read('package.json')).version, '0.9.0');
+assert.equal(JSON.parse(read('package.json')).version, '0.9.1');
 assert(new Set(precache).size === precache.length, 'Recursos duplicados no precache');
 for(const entry of precache) if(entry!=='./') assert(fs.existsSync(path.join(root,entry)),'Faltando: '+entry);
 for(const ref of [...html.matchAll(/(?:src|href)="(\.\/[^"#?]+)"/g)])
   assert(precache.includes(ref[1]), 'Não está no precache: '+ref[1]);
 assert(precache.includes('./distribution.css'));
 assert(precache.includes('./inspection.css'));
+assert(precache.includes('./completion.css'));
 for(const icon of ['assets/icon-192.png','assets/icon-512.png','assets/apple-touch-icon.png']) {
   const data = fs.readFileSync(path.join(root,icon));
   assert.equal(data.subarray(1,4).toString(),'PNG');
@@ -37,6 +38,6 @@ assert(/connect-src 'none'/.test(solo));
 const resources=/https?:\/\/|@import|new\s+WebSocket|\bfetch\(/i;
 assert(!resources.test(script));
 assert(!/\b(fetch|XMLHttpRequest)\s*\(/.test(read('app.js')));
-const tests = ['docs/ACEITE-0.9.0.md','README.md','docs/PLANO-DE-CONSTRUCAO.md'];
+const tests = ['docs/ACEITE-0.9.1.md','README.md','docs/PLANO-DE-CONSTRUCAO.md'];
 for(const t of tests) assert(!/SIAB/i.test(read(t)),'Documento possui referência a outro simulador: '+t);
-console.log(`OK: distribuição 0.9.0, ${precache.length} recursos pré-cache, ícones PNG, standalone único com CSP hashes, sem links remotos.`);
+console.log(`OK: distribuição 0.9.1, ${precache.length} recursos pré-cache, ícones PNG, standalone único com CSP hashes, sem links remotos.`);

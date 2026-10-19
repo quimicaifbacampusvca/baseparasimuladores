@@ -113,6 +113,7 @@ namespace BaseDemoSI {
         activeId=id;engineState=next;persist();tell();return true;
       },
       runTool(id):ExtensionResult {
+        if (!moduleAllows("tools")) return failure("Ferramentas indisponíveis neste módulo.");
         const extension=current();if (!extension) return failure("Ative uma extensão antes de utilizar ferramentas.");
         const tool=extension.tools.find(t=>t.id===id);if(!tool)return failure("Ferramenta não registrada.");
         const ctx=context();if(tool.requiresSelection&&!ctx.selected)return failure("Selecione um objeto para utilizar esta ferramenta.");
@@ -130,6 +131,7 @@ namespace BaseDemoSI {
         } catch {return failure("A ferramenta falhou; a operação foi interrompida.");}
       },
       measure(id):ExtensionResult {
+        if (!moduleAllows("measure")) return failure("Instrumentos indisponíveis neste módulo.");
         const extension=current();if(!extension)return failure("Ative uma extensão antes de realizar leituras.");
         const instrument=extension.instruments.find(t=>t.id===id);if(!instrument)return failure("Instrumento não registrado.");
         const ctx=context();if(instrument.requiresSelection&&!ctx.selected)return failure("Selecione um objeto para medir.");

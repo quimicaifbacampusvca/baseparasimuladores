@@ -26,7 +26,7 @@ namespace BaseDemoSI {
       for(const item of definitions){
         const button=document.createElement("button");button.type="button";button.className="button outline si-extension-action";
         button.textContent=item.name;button.title=item.description;
-        button.disabled=item.requiresSelection&&!snapshot.selectedId;
+        button.disabled=(item.requiresSelection&&!snapshot.selectedId) || !moduleAllows(mode==="tool"?"tools":"measure");
         button.setAttribute("aria-label",`${item.name}. ${item.description}`);
         button.addEventListener("click",()=>showFeedback(mode==="tool"?runtime.runTool(item.id):runtime.measure(item.id)));
         target.append(button);
@@ -65,6 +65,7 @@ namespace BaseDemoSI {
       });
     }
     runtime.subscribe(()=>{renderExtensions(scene.getSnapshot());window.dispatchEvent(new Event("si-education-observation"));});
+    window.addEventListener("si-module-change",()=>renderExtensions(scene.getSnapshot()));
     renderExtensions(scene.getSnapshot());
   }
 }

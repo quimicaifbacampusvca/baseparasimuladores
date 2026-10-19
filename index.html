@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="./records.css">
   <link rel="stylesheet" href="./distribution.css">
   <link rel="stylesheet" href="./inspection.css">
+  <link rel="stylesheet" href="./completion.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
@@ -37,10 +38,11 @@
         <a data-route="professor" href="#/professor"><span aria-hidden="true">▦</span> Área do Professor</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span> Caderno</a>
         <a data-route="relatorios" href="#/relatorios"><span aria-hidden="true">▤</span> Relatórios</a>
+        <a data-route="manual" href="#/manual"><span aria-hidden="true">?</span> Manual</a>
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.1</span></small></div>
     </aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -49,7 +51,7 @@
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
         <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.9.0</span></span>
+        <span class="version-pill">v<span data-app-version>0.9.1</span></span>
       </header>
       <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
@@ -57,8 +59,8 @@
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 09 · VISTORIA E COMPATIBILIDADE</p>
-            <h1 id="home-title">Uma base universal em vistoria funcional, preparada para uso local.</h1>
+            <p class="eyebrow">ETAPA 09 · COMPLEMENTAÇÃO FUNCIONAL</p>
+            <h1 id="home-title">Uma base universal com recursos configuráveis e documentação integrada.</h1>
             <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
           </div>
@@ -81,12 +83,14 @@
                 <button type="button" class="si-tab" data-scene-view="focus" aria-pressed="true">Foco</button>
                 <button type="button" class="si-tab" data-scene-view="overview" aria-pressed="false">Visão geral</button>
               </div>
+              <div class="si-module-control"><label for="si-module-choice">Módulo</label><select id="si-module-choice" aria-describedby="si-module-description"></select></div>
               <div class="si-launchers" role="group" aria-label="Painéis da bancada">
                 <button type="button" data-open-dock="montagem" aria-controls="si-dock-left" aria-expanded="false"><span aria-hidden="true">▤</span> Montagem</button>
                 <button type="button" data-open-dock="ver" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">◉</span> Ver</button>
                 <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">▥</span> Dados</button>
               </div>
             </div>
+            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p>
             <div class="si-scene-region" id="si-stage" aria-label="Cena de demonstração">
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
@@ -158,7 +162,12 @@
                 <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
               </nav>
               <div class="si-dock-scroll">
-                <div data-right-panel="ver"><h3>Observação</h3><div id="si-observation" class="si-observation"></div><h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div></div>
+                <div data-right-panel="ver">
+                  <div class="si-viewer-controls" role="group" aria-label="Tipo de visualização"><div id="si-viewer-buttons"></div></div>
+                  <div id="si-viewer-output" class="si-viewer-output" aria-live="polite"></div>
+                  <div id="si-observation" class="si-observation" hidden></div>
+                  <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                </div>
                 <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div></div>
               </div>
             </aside>
@@ -175,11 +184,11 @@
         </section>
         <section class="view edu-view" data-view="missoes" aria-labelledby="missions-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">ATIVIDADES</p><h1 id="missions-title">Missões</h1><p>Objetivos verificados a partir de ações realizadas na bancada. Sem ranking ou pontuação.</p></div>
-          <div id="edu-mission-list" class="edu-grid"></div>
+          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid"></div>
         </section>
         <section class="view edu-view" data-view="roteiros" aria-labelledby="scripts-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">INVESTIGAÇÃO ORIENTADA</p><h1 id="scripts-title">Roteiros</h1><p>Sequências com etapas próprias e retorno direto ao ambiente para montar e examinar.</p></div>
-          <div id="edu-script-list" class="edu-grid"></div>
+          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid"></div>
         </section>
         <section class="view edu-view" data-view="professor" aria-labelledby="teacher-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">AUTORIA LOCAL</p><h1 id="teacher-title">Área do Professor</h1><p>Configure atividades sem conta e sem serviços externos. Os arquivos JSON podem ser compartilhados e importados em outra instalação da base.</p></div>
@@ -204,6 +213,12 @@
             <section class="edu-card" aria-labelledby="edu-library-title">
               <h2 id="edu-library-title">Biblioteca do professor</h2><p id="edu-teacher-summary" class="edu-counter" aria-live="polite"></p>
               <div id="edu-teacher-list" class="edu-teacher-list"></div>
+              <div class="si-sharing-config"><label for="si-sharing-mode">Permissão do link</label>
+                <select id="si-sharing-mode"><option value="view">Consultar (somente leitura)</option><option value="run">Consultar e executar localmente</option></select>
+                <p>O link contém uma cópia da atividade. Não envia dados a nenhum servidor. Um endereço gerado em arquivo local (`file://`) só funciona no mesmo caminho/dispositivo; para outras pessoas, use um endereço web compartilhado.</p>
+                <label for="si-sharing-link">Link gerado</label><input type="text" id="si-sharing-link" readonly aria-label="Link para compartilhar atividade">
+                <button type="button" class="button outline" id="si-sharing-copy">Copiar link</button>
+                <p id="si-sharing-status" role="status" aria-live="polite"></p></div>
               <div class="edu-data-tools"><button class="button outline" id="edu-export" type="button">Baixar JSON</button><label class="button outline edu-upload" for="edu-import">Importar JSON <input id="edu-import" type="file" accept=".json,application/json" aria-label="Selecionar arquivo JSON de atividades"></label></div>
               <p class="edu-small-note">A importação substitui somente as atividades personalizadas após confirmação. Dados incompatíveis são rejeitados antes da gravação.</p>
             </section>
@@ -269,6 +284,11 @@
           </section>
         </section>
 
+        <section class="view narrow" data-view="manual" aria-labelledby="manual-title" hidden>
+          <div class="section-heading"><p class="eyebrow">AJUDA LOCAL</p><h1 id="manual-title">Manual do usuário</h1><p>Orientações por funcionalidade, disponíveis sem internet. Use F1 para ajuda relativa à seção em uso.</p></div>
+          <div class="card si-manual-search"><label for="manual-search">Buscar no manual</label><input id="manual-search" type="search" maxlength="100" placeholder="Ex.: instrumentos, relatórios, docas" autocomplete="off"><p id="manual-results-count" role="status" aria-live="polite"></p></div>
+          <div id="manual-topics" class="si-manual-topics"></div>
+        </section>
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
           <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
@@ -279,15 +299,16 @@
             <div class="si-distribution-actions"><button class="button primary" id="distribution-install" type="button" hidden>Instalar aplicativo</button><button class="button outline" id="distribution-check" type="button">Conferir recursos offline</button></div>
             <p class="si-distribution-note">Caso não apareça a opção de instalação, utilize o menu do navegador quando disponível. O armazenamento local depende das permissões e do espaço do dispositivo; exporte backups regularmente.</p>
           </section>
+          <div class="card"><h2>Ajuda contextual</h2><p>O Manual apresenta orientações para cada área e pode ser aberto com F1.</p><a class="button outline" href="#/manual">Abrir Manual</a></div>
           <p class="notice">O contraste e a redução de movimento respeitam as preferências do navegador. Controles de acessibilidade adicionais permanecem sujeitos à homologação.</p>
         </section>
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.1</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.1</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>

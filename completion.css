@@ -1,0 +1,23 @@
+/* Complementos 0.9.1. Evitar modificar a geometria do workspace consolidado. */
+.si-module-control {display:flex;align-items:center;gap:.45rem;margin-inline:auto .25rem;min-width:0}
+.si-module-control label{font-size:.77rem;font-weight:700;white-space:nowrap}
+.si-module-control select{width:auto;max-width:145px;min-width:95px;min-height:36px;padding:.4rem .6rem}
+.si-viewer-controls>div{display:flex;flex-wrap:wrap;gap:.4rem;margin-block:.4rem .7rem}
+.si-viewer-controls .button{flex:1 1 auto;font-size:.78rem;min-height:36px;padding:.45rem .55rem}
+.si-viewer-controls [aria-pressed="true"]{outline:2px solid currentColor;outline-offset:-2px}
+.si-viewer-output{margin-block:.75rem;padding:.75rem;border:1px solid var(--border,#8796a4);border-radius:10px;min-height:5rem;overflow-wrap:anywhere}
+.si-viewer-output dl>div{display:flex;justify-content:space-between;gap:1rem;margin-block:.35rem}
+.si-viewer-output li{padding-block:.3rem}
+.si-manual-search{margin-block:1rem}
+.si-manual-search input{width:100%;max-width:100%;box-sizing:border-box}
+.si-manual-topics{display:grid;gap:.8rem}
+.si-manual-topic{padding:1rem}
+.si-manual-topic summary{cursor:pointer;font-size:1.05rem;font-weight:700}
+.si-manual-topic p{line-height:1.55}
+.si-sharing-config{display:grid;gap:.45rem;margin-block:1rem;padding:.9rem;border:1px solid var(--border,#8796a4);border-radius:12px}
+.si-sharing-config input{box-sizing:border-box;width:100%;min-width:0}
+.si-sharing-config p{font-size:.85rem;line-height:1.5}
+.si-shared-card{margin-bottom:1rem;border:2px solid currentColor;padding:1rem;overflow-wrap:anywhere}
+@media(max-width:900px){.si-module-control{margin-inline:.15rem 0}.si-module-control label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.si-module-control select{max-width:110px;min-width:78px;font-size:.75rem}}
+@media(max-width:390px){.si-module-control select{max-width:91px;min-width:75px}.si-workspace-toolbar{flex-wrap:wrap}}
+[hidden]{display:none!important}

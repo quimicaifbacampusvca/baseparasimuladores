@@ -1,5 +1,5 @@
 namespace BaseDemoSI {
-  const validRoutes = new Set<RouteId>(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "configuracoes", "sobre"]);
+  const validRoutes = new Set<RouteId>(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "manual", "configuracoes", "sobre"]);
 
   export function currentRoute(hash: string): RouteId {
     const slug = hash.replace(/^#\/?/, "").split(/[?&]/, 1)[0];

@@ -66,7 +66,7 @@ namespace BaseDemoSI {
     for(const a of activities){
       const card=document.createElement("article");card.className="edu-teacher-item";
       const info=document.createElement("div");info.append(text("strong",a.title),text("small",`${a.kind==="mission"?"Missão":"Roteiro"} · ${a.steps.length} etapa(s)`));
-      card.append(info,button("Excluir",async()=>{
+      card.append(info,button("Criar link",()=>offerShareLink(a)),button("Excluir",async()=>{
         const accepted=await confirmDialog({title:"Excluir atividade?",description:`A atividade ${a.title} e seu progresso serão excluídos deste navegador.`,confirmText:"Excluir",destructive:true});
         if(accepted&&education.removeActivity(a.id))notify("Atividade removida.","info");
       }));target.append(card);
@@ -121,6 +121,7 @@ namespace BaseDemoSI {
   }
   export function setupEducation(scene:SceneStore):void {
     educationScene=scene;education=createEducationStore(storage);
+    bindEducationForSharing(education);
     education.subscribe(renderAll);
     scene.subscribe(()=>{if(currentRoute(window.location.hash)!=="ambiente")renderAll();});
     window.addEventListener("si-education-observation",()=>renderAll());

@@ -60,6 +60,7 @@ namespace BaseDemoSI {
     const entity = selected();
     renderWorkspaceContent(snap);
     renderExtensions(snap);
+    renderViewers(snap);
     if (entity) {
       const field = get("object-label") as HTMLInputElement | null;
       const tone = get("object-tone") as HTMLSelectElement | null;
@@ -87,6 +88,7 @@ namespace BaseDemoSI {
     store.subscribe(event => { render(); if (event !== "selection") save(); });
     setupWorkspace(() => store.getSnapshot(), id => store.select(id));
     setupExtensions(store);
+    setupViewers(()=>store.getSnapshot());
     setupEducation(store);
     setupJournal(store);
     for (const button of document.querySelectorAll<HTMLButtonElement>("[data-add-kind]")) {
@@ -111,6 +113,7 @@ namespace BaseDemoSI {
         void confirmDialog({title:"Atalhos disponíveis",description:"Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.",confirmText:"Entendi",cancelText:"Fechar"});
         return;
       }
+      if (!moduleAllows("tools")) {notify("A criação de objetos não está disponível neste módulo.","warning");return;}
       const kind=action==="add-block"?"block":action==="add-circle"?"circle":action==="add-label"?"label":null;
       if(!kind)return;
       const snap=store.getSnapshot();

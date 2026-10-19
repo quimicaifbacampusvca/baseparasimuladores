@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-sMBYl0AsQasfcX20rQYvItTBJuO+y4nAZg1q1f87ag8='; script-src 'sha256-Bvd2R4QvhwKNVN5RL3Ba8HCmDvHS3YEY3Hq2DBOG2t8='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-4FrwUemXmFQ40MwKZSnKqRmmI+i9Hljov4w1OanPTto='; script-src 'sha256-6uLhlFf0hk00KRSClk2xJopMcba1hKA8KgYiIRs/00k='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
+  
   
   
   
@@ -283,6 +284,30 @@ body.si-modal-active{overflow:hidden}
   .si-sheet-active .si-notifications{width:min(260px,calc(100vw - 20px));}
   .si-sheet-active .si-notice{font-size:12px;padding:8px 10px;}
 }
+
+/* Complementos 0.9.1. Evitar modificar a geometria do workspace consolidado. */
+.si-module-control {display:flex;align-items:center;gap:.45rem;margin-inline:auto .25rem;min-width:0}
+.si-module-control label{font-size:.77rem;font-weight:700;white-space:nowrap}
+.si-module-control select{width:auto;max-width:145px;min-width:95px;min-height:36px;padding:.4rem .6rem}
+.si-viewer-controls>div{display:flex;flex-wrap:wrap;gap:.4rem;margin-block:.4rem .7rem}
+.si-viewer-controls .button{flex:1 1 auto;font-size:.78rem;min-height:36px;padding:.45rem .55rem}
+.si-viewer-controls [aria-pressed="true"]{outline:2px solid currentColor;outline-offset:-2px}
+.si-viewer-output{margin-block:.75rem;padding:.75rem;border:1px solid var(--border,#8796a4);border-radius:10px;min-height:5rem;overflow-wrap:anywhere}
+.si-viewer-output dl>div{display:flex;justify-content:space-between;gap:1rem;margin-block:.35rem}
+.si-viewer-output li{padding-block:.3rem}
+.si-manual-search{margin-block:1rem}
+.si-manual-search input{width:100%;max-width:100%;box-sizing:border-box}
+.si-manual-topics{display:grid;gap:.8rem}
+.si-manual-topic{padding:1rem}
+.si-manual-topic summary{cursor:pointer;font-size:1.05rem;font-weight:700}
+.si-manual-topic p{line-height:1.55}
+.si-sharing-config{display:grid;gap:.45rem;margin-block:1rem;padding:.9rem;border:1px solid var(--border,#8796a4);border-radius:12px}
+.si-sharing-config input{box-sizing:border-box;width:100%;min-width:0}
+.si-sharing-config p{font-size:.85rem;line-height:1.5}
+.si-shared-card{margin-bottom:1rem;border:2px solid currentColor;padding:1rem;overflow-wrap:anywhere}
+@media(max-width:900px){.si-module-control{margin-inline:.15rem 0}.si-module-control label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.si-module-control select{max-width:110px;min-width:78px;font-size:.75rem}}
+@media(max-width:390px){.si-module-control select{max-width:91px;min-width:75px}.si-workspace-toolbar{flex-wrap:wrap}}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -302,10 +327,11 @@ body.si-modal-active{overflow:hidden}
         <a data-route="professor" href="#/professor"><span aria-hidden="true">▦</span> Área do Professor</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span> Caderno</a>
         <a data-route="relatorios" href="#/relatorios"><span aria-hidden="true">▤</span> Relatórios</a>
+        <a data-route="manual" href="#/manual"><span aria-hidden="true">?</span> Manual</a>
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.1</span></small></div>
     </aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -314,7 +340,7 @@ body.si-modal-active{overflow:hidden}
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
         <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.9.0</span></span>
+        <span class="version-pill">v<span data-app-version>0.9.1</span></span>
       </header>
       <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
@@ -322,8 +348,8 @@ body.si-modal-active{overflow:hidden}
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 09 · VISTORIA E COMPATIBILIDADE</p>
-            <h1 id="home-title">Uma base universal em vistoria funcional, preparada para uso local.</h1>
+            <p class="eyebrow">ETAPA 09 · COMPLEMENTAÇÃO FUNCIONAL</p>
+            <h1 id="home-title">Uma base universal com recursos configuráveis e documentação integrada.</h1>
             <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
           </div>
@@ -346,12 +372,14 @@ body.si-modal-active{overflow:hidden}
                 <button type="button" class="si-tab" data-scene-view="focus" aria-pressed="true">Foco</button>
                 <button type="button" class="si-tab" data-scene-view="overview" aria-pressed="false">Visão geral</button>
               </div>
+              <div class="si-module-control"><label for="si-module-choice">Módulo</label><select id="si-module-choice" aria-describedby="si-module-description"></select></div>
               <div class="si-launchers" role="group" aria-label="Painéis da bancada">
                 <button type="button" data-open-dock="montagem" aria-controls="si-dock-left" aria-expanded="false"><span aria-hidden="true">▤</span> Montagem</button>
                 <button type="button" data-open-dock="ver" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">◉</span> Ver</button>
                 <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">▥</span> Dados</button>
               </div>
             </div>
+            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p>
             <div class="si-scene-region" id="si-stage" aria-label="Cena de demonstração">
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
@@ -423,7 +451,12 @@ body.si-modal-active{overflow:hidden}
                 <button type="button" data-right-tab="ver" aria-pressed="true">Ver</button><button type="button" data-right-tab="dados" aria-pressed="false">Dados</button>
               </nav>
               <div class="si-dock-scroll">
-                <div data-right-panel="ver"><h3>Observação</h3><div id="si-observation" class="si-observation"></div><h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div></div>
+                <div data-right-panel="ver">
+                  <div class="si-viewer-controls" role="group" aria-label="Tipo de visualização"><div id="si-viewer-buttons"></div></div>
+                  <div id="si-viewer-output" class="si-viewer-output" aria-live="polite"></div>
+                  <div id="si-observation" class="si-observation" hidden></div>
+                  <h3>Instrumentos conectados</h3><div id="extension-instruments" class="si-extension-buttons"></div>
+                </div>
                 <div data-right-panel="dados" hidden><h3>Dados da cena</h3><div id="si-data-summary" class="si-data-summary"></div><h3>Registros de leitura</h3><div id="extension-records"></div></div>
               </div>
             </aside>
@@ -440,11 +473,11 @@ body.si-modal-active{overflow:hidden}
         </section>
         <section class="view edu-view" data-view="missoes" aria-labelledby="missions-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">ATIVIDADES</p><h1 id="missions-title">Missões</h1><p>Objetivos verificados a partir de ações realizadas na bancada. Sem ranking ou pontuação.</p></div>
-          <div id="edu-mission-list" class="edu-grid"></div>
+          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid"></div>
         </section>
         <section class="view edu-view" data-view="roteiros" aria-labelledby="scripts-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">INVESTIGAÇÃO ORIENTADA</p><h1 id="scripts-title">Roteiros</h1><p>Sequências com etapas próprias e retorno direto ao ambiente para montar e examinar.</p></div>
-          <div id="edu-script-list" class="edu-grid"></div>
+          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid"></div>
         </section>
         <section class="view edu-view" data-view="professor" aria-labelledby="teacher-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">AUTORIA LOCAL</p><h1 id="teacher-title">Área do Professor</h1><p>Configure atividades sem conta e sem serviços externos. Os arquivos JSON podem ser compartilhados e importados em outra instalação da base.</p></div>
@@ -469,6 +502,12 @@ body.si-modal-active{overflow:hidden}
             <section class="edu-card" aria-labelledby="edu-library-title">
               <h2 id="edu-library-title">Biblioteca do professor</h2><p id="edu-teacher-summary" class="edu-counter" aria-live="polite"></p>
               <div id="edu-teacher-list" class="edu-teacher-list"></div>
+              <div class="si-sharing-config"><label for="si-sharing-mode">Permissão do link</label>
+                <select id="si-sharing-mode"><option value="view">Consultar (somente leitura)</option><option value="run">Consultar e executar localmente</option></select>
+                <p>O link contém uma cópia da atividade. Não envia dados a nenhum servidor. Um endereço gerado em arquivo local (`file://`) só funciona no mesmo caminho/dispositivo; para outras pessoas, use um endereço web compartilhado.</p>
+                <label for="si-sharing-link">Link gerado</label><input type="text" id="si-sharing-link" readonly aria-label="Link para compartilhar atividade">
+                <button type="button" class="button outline" id="si-sharing-copy">Copiar link</button>
+                <p id="si-sharing-status" role="status" aria-live="polite"></p></div>
               <div class="edu-data-tools"><button class="button outline" id="edu-export" type="button">Baixar JSON</button><label class="button outline edu-upload" for="edu-import">Importar JSON <input id="edu-import" type="file" accept=".json,application/json" aria-label="Selecionar arquivo JSON de atividades"></label></div>
               <p class="edu-small-note">A importação substitui somente as atividades personalizadas após confirmação. Dados incompatíveis são rejeitados antes da gravação.</p>
             </section>
@@ -534,6 +573,11 @@ body.si-modal-active{overflow:hidden}
           </section>
         </section>
 
+        <section class="view narrow" data-view="manual" aria-labelledby="manual-title" hidden>
+          <div class="section-heading"><p class="eyebrow">AJUDA LOCAL</p><h1 id="manual-title">Manual do usuário</h1><p>Orientações por funcionalidade, disponíveis sem internet. Use F1 para ajuda relativa à seção em uso.</p></div>
+          <div class="card si-manual-search"><label for="manual-search">Buscar no manual</label><input id="manual-search" type="search" maxlength="100" placeholder="Ex.: instrumentos, relatórios, docas" autocomplete="off"><p id="manual-results-count" role="status" aria-live="polite"></p></div>
+          <div id="manual-topics" class="si-manual-topics"></div>
+        </section>
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
           <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
@@ -544,15 +588,16 @@ body.si-modal-active{overflow:hidden}
             <div class="si-distribution-actions"><button class="button primary" id="distribution-install" type="button" hidden>Instalar aplicativo</button><button class="button outline" id="distribution-check" type="button">Conferir recursos offline</button></div>
             <p class="si-distribution-note">Caso não apareça a opção de instalação, utilize o menu do navegador quando disponível. O armazenamento local depende das permissões e do espaço do dispositivo; exporte backups regularmente.</p>
           </section>
+          <div class="card"><h2>Ajuda contextual</h2><p>O Manual apresenta orientações para cada área e pode ser aberto com F1.</p><a class="button outline" href="#/manual">Abrir Manual</a></div>
           <p class="notice">O contraste e a redução de movimento respeitam as preferências do navegador. Controles de acessibilidade adicionais permanecem sujeitos à homologação.</p>
         </section>
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.1</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.1</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -573,7 +618,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.0",
+        version: "0.9.1",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -585,6 +630,7 @@ var BaseDemoSI;
             { id: "professor", title: "Professor", subtitle: "Editor de atividades" },
             { id: "caderno", title: "Caderno", subtitle: "Observações e interpretações" },
             { id: "relatorios", title: "Relatórios", subtitle: "Documentação e impressão" },
+            { id: "manual", title: "Manual", subtitle: "Busca e orientação contextual" },
             { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
             { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
         ])
@@ -711,7 +757,7 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
-    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "configuracoes", "sobre"]);
+    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "manual", "configuracoes", "sobre"]);
     function currentRoute(hash) {
         const slug = hash.replace(/^#\/?/, "").split(/[?&]/, 1)[0];
         return validRoutes.has(slug) ? slug : "inicio";
@@ -779,6 +825,73 @@ var BaseDemoSI;
         });
     }
     BaseDemoSI.setupPreferences = setupPreferences;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const moduleKey = "module-selection-v1";
+    BaseDemoSI.moduleDefinitions = Object.freeze([
+        { id: "livre", label: "Livre", summary: "Todas as ferramentas, leituras e visualizações disponíveis.", capabilities: ["tools", "measure", "observe", "analyze"] },
+        { id: "explorar", label: "Explorar", summary: "Manipulação e observação de objetos, sem leituras instrumentais.", capabilities: ["tools", "observe"] },
+        { id: "medir", label: "Medir", summary: "Observação e medições de instrumentos habilitados.", capabilities: ["measure", "observe"] },
+        { id: "calcular", label: "Calcular", summary: "Análise de dados e indicadores genéricos da cena.", capabilities: ["observe", "analyze"] }
+    ]);
+    let activeModule = "livre";
+    function validModule(value) {
+        return typeof value === "string" && BaseDemoSI.moduleDefinitions.some(item => item.id === value);
+    }
+    BaseDemoSI.validModule = validModule;
+    function moduleAllows(capability) {
+        return BaseDemoSI.moduleDefinitions.find(item => item.id === activeModule).capabilities.includes(capability);
+    }
+    BaseDemoSI.moduleAllows = moduleAllows;
+    function currentModule() { return activeModule; }
+    BaseDemoSI.currentModule = currentModule;
+    function selectModule(value) {
+        if (!validModule(value))
+            return false;
+        if (activeModule === value)
+            return true;
+        activeModule = value;
+        BaseDemoSI.storage.write(moduleKey, activeModule);
+        if (typeof window !== "undefined" && typeof window.dispatchEvent === "function")
+            window.dispatchEvent(new CustomEvent("si-module-change", { detail: activeModule }));
+        return true;
+    }
+    BaseDemoSI.selectModule = selectModule;
+    function setupModules() {
+        const stored = BaseDemoSI.storage.read(moduleKey);
+        if (validModule(stored))
+            activeModule = stored;
+        const select = document.getElementById("si-module-choice");
+        if (!select)
+            return;
+        select.replaceChildren();
+        for (const definition of BaseDemoSI.moduleDefinitions) {
+            const item = document.createElement("option");
+            item.value = definition.id;
+            item.textContent = definition.label;
+            select.append(item);
+        }
+        const refresh = () => {
+            select.value = activeModule;
+            const current = BaseDemoSI.moduleDefinitions.find(item => item.id === activeModule);
+            const message = document.getElementById("si-module-description");
+            if (message)
+                message.textContent = current.summary;
+            document.getElementById("si-workspace")?.setAttribute("data-module", activeModule);
+            document.querySelectorAll("[data-add-kind]").forEach(button => {
+                button.disabled = !moduleAllows("tools");
+            });
+            document.querySelectorAll("[data-menu-action^=add-]").forEach(button => { button.disabled = !moduleAllows("tools"); });
+            document.getElementById("si-module-choice")?.setAttribute("title", current.summary);
+        };
+        select.addEventListener("change", () => { if (selectModule(select.value))
+            BaseDemoSI.notify("Módulo atualizado.", "info"); refresh(); });
+        window.addEventListener("si-module-change", () => { refresh(); });
+        refresh();
+        window.dispatchEvent(new CustomEvent("si-module-change", { detail: activeModule }));
+    }
+    BaseDemoSI.setupModules = setupModules;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -936,6 +1049,8 @@ var BaseDemoSI;
                 return true;
             },
             runTool(id) {
+                if (!BaseDemoSI.moduleAllows("tools"))
+                    return failure("Ferramentas indisponíveis neste módulo.");
                 const extension = current();
                 if (!extension)
                     return failure("Ative uma extensão antes de utilizar ferramentas.");
@@ -968,6 +1083,8 @@ var BaseDemoSI;
                 }
             },
             measure(id) {
+                if (!BaseDemoSI.moduleAllows("measure"))
+                    return failure("Instrumentos indisponíveis neste módulo.");
                 const extension = current();
                 if (!extension)
                     return failure("Ative uma extensão antes de realizar leituras.");
@@ -2108,7 +2225,7 @@ var BaseDemoSI;
                 button.className = "button outline si-extension-action";
                 button.textContent = item.name;
                 button.title = item.description;
-                button.disabled = item.requiresSelection && !snapshot.selectedId;
+                button.disabled = (item.requiresSelection && !snapshot.selectedId) || !BaseDemoSI.moduleAllows(mode === "tool" ? "tools" : "measure");
                 button.setAttribute("aria-label", `${item.name}. ${item.description}`);
                 button.addEventListener("click", () => showFeedback(mode === "tool" ? runtime.runTool(item.id) : runtime.measure(item.id)));
                 target.append(button);
@@ -2176,9 +2293,120 @@ var BaseDemoSI;
             });
         }
         runtime.subscribe(() => { renderExtensions(scene.getSnapshot()); window.dispatchEvent(new Event("si-education-observation")); });
+        window.addEventListener("si-module-change", () => renderExtensions(scene.getSnapshot()));
         renderExtensions(scene.getSnapshot());
     }
     BaseDemoSI.setupExtensions = setupExtensions;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const viewerRegistry = new Map();
+    let selectedViewer = "observacao";
+    let viewerScene;
+    const viewerKey = "viewer-selection-v1";
+    const label = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
+    function registerViewer(viewer) {
+        if (!viewer || !/^[a-z][a-z0-9-]{1,40}$/.test(viewer.id) || viewerRegistry.has(viewer.id)
+            || typeof viewer.title !== "string" || viewer.title.length < 2 || viewer.title.length > 60
+            || !["tools", "measure", "observe", "analyze"].includes(viewer.capability)
+            || typeof viewer.render !== "function")
+            return false;
+        viewerRegistry.set(viewer.id, viewer);
+        return true;
+    }
+    BaseDemoSI.registerViewer = registerViewer;
+    function availableViewers() { return [...viewerRegistry.values()]; }
+    BaseDemoSI.availableViewers = availableViewers;
+    function chooseViewer(id) {
+        const viewer = viewerRegistry.get(id);
+        if (!viewer || !BaseDemoSI.moduleAllows(viewer.capability))
+            return false;
+        selectedViewer = id;
+        BaseDemoSI.storage.write(viewerKey, id);
+        renderViewers(viewerScene?.());
+        return true;
+    }
+    BaseDemoSI.chooseViewer = chooseViewer;
+    function renderViewers(snapshot) {
+        if (!snapshot)
+            return;
+        const buttons = document.getElementById("si-viewer-buttons"), output = document.getElementById("si-viewer-output");
+        if (!buttons || !output)
+            return;
+        const allowed = [...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability));
+        if (!allowed.some(v => v.id === selectedViewer))
+            selectedViewer = allowed[0]?.id ?? "";
+        buttons.replaceChildren();
+        for (const v of allowed) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "button outline";
+            btn.textContent = v.title;
+            btn.setAttribute("aria-pressed", String(selectedViewer === v.id));
+            btn.addEventListener("click", () => { chooseViewer(v.id); });
+            buttons.append(btn);
+        }
+        output.replaceChildren();
+        const chosen = viewerRegistry.get(selectedViewer);
+        if (!chosen) {
+            output.append(label("p", "Não há visualizadores habilitados neste módulo."));
+            return;
+        }
+        try {
+            chosen.render(snapshot, BaseDemoSI.extensionGetRecords(), output);
+        }
+        catch {
+            output.replaceChildren(label("p", "Visualização indisponível."));
+        }
+    }
+    BaseDemoSI.renderViewers = renderViewers;
+    function setupViewers(scene) {
+        viewerScene = scene;
+        registerViewer({ id: "observacao", title: "Observar", capability: "observe", render(s, _, out) {
+                const selected = s.entities.find(e => e.id === s.selectedId);
+                out.append(label("h3", "Observação"), label("p", selected ? `Objeto em foco: ${selected.label}` : "Selecione um objeto na cena."));
+                if (selected) {
+                    const dl = document.createElement("dl");
+                    for (const [k, v] of [["Tipo", selected.kind], ["Posição", `${selected.x}% × ${selected.y}%`], ["Dimensões", `${selected.width}% × ${selected.height}%`]]) {
+                        const row = document.createElement("div");
+                        row.append(label("dt", k), label("dd", v));
+                        dl.append(row);
+                    }
+                    out.append(dl);
+                }
+            } });
+        registerViewer({ id: "medicao", title: "Medir", capability: "measure", render(_, records, out) {
+                out.append(label("h3", "Medições"));
+                if (!records.length) {
+                    out.append(label("p", "Nenhuma leitura registrada."));
+                    return;
+                }
+                const list = document.createElement("ol");
+                for (const entry of records.slice(-10).reverse())
+                    list.append(label("li", `${entry.label}: ${entry.value} ${entry.unit}`.trim()));
+                out.append(list);
+            } });
+        registerViewer({ id: "analise", title: "Analisar", capability: "analyze", render(s, records, out) {
+                out.append(label("h3", "Análise da cena"));
+                const kinds = { block: 0, circle: 0, label: 0 };
+                for (const e of s.entities)
+                    kinds[e.kind]++;
+                const dl = document.createElement("dl");
+                for (const [k, v] of [["Objetos", s.entities.length], ["Blocos", kinds.block], ["Círculos", kinds.circle], ["Etiquetas", kinds.label], ["Leituras registradas", records.length]]) {
+                    const row = document.createElement("div");
+                    row.append(label("dt", String(k)), label("dd", String(v)));
+                    dl.append(row);
+                }
+                out.append(dl);
+            } });
+        const stored = BaseDemoSI.storage.read(viewerKey);
+        if (stored && viewerRegistry.has(stored))
+            selectedViewer = stored;
+        window.addEventListener("si-module-change", () => renderViewers(scene()));
+        window.addEventListener("si-education-observation", () => renderViewers(scene()));
+        renderViewers(scene());
+    }
+    BaseDemoSI.setupViewers = setupViewers;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -2301,7 +2529,7 @@ var BaseDemoSI;
             card.className = "edu-teacher-item";
             const info = document.createElement("div");
             info.append(text("strong", a.title), text("small", `${a.kind === "mission" ? "Missão" : "Roteiro"} · ${a.steps.length} etapa(s)`));
-            card.append(info, button("Excluir", async () => {
+            card.append(info, button("Criar link", () => BaseDemoSI.offerShareLink(a)), button("Excluir", async () => {
                 const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir atividade?", description: `A atividade ${a.title} e seu progresso serão excluídos deste navegador.`, confirmText: "Excluir", destructive: true });
                 if (accepted && education.removeActivity(a.id))
                     BaseDemoSI.notify("Atividade removida.", "info");
@@ -2391,6 +2619,7 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        BaseDemoSI.bindEducationForSharing(education);
         education.subscribe(renderAll);
         scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
             renderAll(); });
@@ -2682,10 +2911,221 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    BaseDemoSI.manualTopics = Object.freeze([
+        { id: "inicio", title: "Primeiros passos", routes: ["inicio"], paragraphs: ["A página inicial organiza os recursos locais. Abra Ambiente para interagir com uma cena neutra.", "A navegação usa seções independentes e mantém os dados desta instalação no navegador."] },
+        { id: "bancada", title: "Bancada, docas e foco", routes: ["ambiente"], paragraphs: ["Em Montagem, crie e selecione objetos. Foco destaca o selecionado; Visão geral exibe o conjunto.", "No celular, Montagem, Ver e Dados abrem como folhas inferiores. Escape fecha painéis e diálogos."] },
+        { id: "modulos", title: "Módulos configuráveis", routes: ["ambiente", "configuracoes"], paragraphs: ["Livre habilita todos os recursos; Explorar oferece manipulação e observação; Medir apresenta instrumentos; Calcular expõe análise genérica.", "Módulos limitam controles disponíveis na interface. Não substituem validação científica nem mecanismos de segurança de acesso."] },
+        { id: "instrumentos", title: "Ferramentas e instrumentos", routes: ["ambiente"], paragraphs: ["Ferramentas alteram a cena; instrumentos registram leituras. A extensão ativa é escolhida nos Ajustes da doca Montagem.", "O painel Ver possui visualizações conectáveis de observação, medição e análise. Dados oferece histórico das leituras."] },
+        { id: "aprendizagem", title: "Aprender, Missões e Roteiros", routes: ["aprender", "missoes", "roteiros"], paragraphs: ["Aprender apresenta temas com marcação de leitura concluída. Missões e Roteiros verificam condições da cena ou a confirmação manual.", "O botão Montar na bancada abre o ambiente; depois, retorne à atividade para conferir cada etapa."] },
+        { id: "professor", title: "Atividades do professor e links", routes: ["professor", "missoes", "roteiros"], paragraphs: ["A Área do Professor cria atividades locais, exporta ou importa JSON e gera links autocontidos para uma atividade.", "O link de consulta não autoriza executar; o link de execução permite criar uma cópia local da atividade. Não há autenticação, restrição criptográfica ou controle remoto de estudantes."] },
+        { id: "registros", title: "Caderno e relatórios", routes: ["caderno", "relatorios"], paragraphs: ["O Caderno reúne observações, hipóteses e conclusões. Relatórios capturam uma cópia da cena e dos registros no momento da criação.", "Os registros podem ser exportados em JSON, e os relatórios em HTML autocontido, prontos para impressão."] },
+        { id: "offline", title: "Trabalhar sem internet", routes: ["configuracoes"], paragraphs: ["O standalone é um arquivo HTML com recursos incorporados. A PWA necessita de instalação e cache inicial em origem segura.", "Prefira backups JSON para garantir portabilidade. O armazenamento depende das permissões e dos limites do navegador."] },
+        { id: "acessibilidade", title: "Teclado e acessibilidade", routes: ["configuracoes", "ambiente"], paragraphs: ["Use Tab para navegar, Escape para fechar painéis, as setas para deslocar o objeto selecionado e Ctrl/⌘+Z para desfazer.", "A interface adapta-se a diferentes larguras e respeita a redução de movimento configurada no dispositivo."] }
+    ]);
+    function searchManual(query, route) {
+        const clean = query.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim().slice(0, 100);
+        return BaseDemoSI.manualTopics.filter(topic => {
+            if (route && !topic.routes.includes(route))
+                return false;
+            if (!clean)
+                return true;
+            const full = [topic.title, ...topic.paragraphs].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+            return full.includes(clean);
+        });
+    }
+    BaseDemoSI.searchManual = searchManual;
+    function manualElement(tag, content) { const n = document.createElement(tag); n.textContent = content; return n; }
+    function renderManual() {
+        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count");
+        if (!list)
+            return;
+        const input = document.getElementById("manual-search");
+        const results = searchManual(input?.value ?? "");
+        list.replaceChildren();
+        for (const topic of results) {
+            const article = document.createElement("article");
+            article.className = "card si-manual-topic";
+            article.id = "manual-" + topic.id;
+            const details = document.createElement("details");
+            details.open = !!input?.value.trim() || window.location.hash.includes("topic=" + topic.id);
+            details.append(manualElement("summary", topic.title));
+            for (const paragraph of topic.paragraphs)
+                details.append(manualElement("p", paragraph));
+            article.append(details);
+            list.append(article);
+        }
+        if (count)
+            count.textContent = `${results.length} de ${BaseDemoSI.manualTopics.length} orientações`;
+        if (!results.length)
+            list.append(manualElement("p", "Nenhuma orientação encontrada. Tente outro termo."));
+    }
+    function setupManual() {
+        document.getElementById("manual-search")?.addEventListener("input", renderManual);
+        window.addEventListener("si-route-changed", () => { if (BaseDemoSI.currentRoute(window.location.hash) === "manual")
+            renderManual(); });
+        document.addEventListener("keydown", event => {
+            if (event.key !== "F1" || event.altKey || event.ctrlKey || event.metaKey || BaseDemoSI.isPlatformDialogOpen())
+                return;
+            event.preventDefault();
+            const current = BaseDemoSI.currentRoute(window.location.hash);
+            const topic = BaseDemoSI.manualTopics.find(t => t.routes.includes(current))?.id ?? "inicio";
+            window.location.hash = `#/manual?topic=${topic}`;
+        });
+        renderManual();
+    }
+    BaseDemoSI.setupManual = setupManual;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const MAX_SHARE_CHARS = 12000;
+    function encodeSharedActivity(activity, permission) {
+        if (!BaseDemoSI.validTeacherActivity(activity) || !(permission === "view" || permission === "run"))
+            return null;
+        const text = JSON.stringify({ format: "base-si-link-v1", permission, activity });
+        if (text.length > 6000)
+            return null;
+        const bytes = new TextEncoder().encode(text);
+        let binary = "";
+        for (const v of bytes)
+            binary += String.fromCharCode(v);
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+    BaseDemoSI.encodeSharedActivity = encodeSharedActivity;
+    function decodeSharedActivity(encoded) {
+        if (encoded.length < 10 || encoded.length > MAX_SHARE_CHARS || !/^[a-zA-Z0-9_-]+$/.test(encoded))
+            return null;
+        try {
+            const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
+            const binary = atob(normalized);
+            const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+            const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+            const object = JSON.parse(text);
+            if (object.format !== "base-si-link-v1" || !(object.permission === "view" || object.permission === "run") || !BaseDemoSI.validTeacherActivity(object.activity))
+                return null;
+            if (encodeSharedActivity(object.activity, object.permission) !== encoded)
+                return null;
+            return { format: "base-si-link-v1", permission: object.permission, activity: object.activity };
+        }
+        catch {
+            return null;
+        }
+    }
+    BaseDemoSI.decodeSharedActivity = decodeSharedActivity;
+    function buildShareLink(activity, permission, base) {
+        const token = encodeSharedActivity(activity, permission);
+        if (!token)
+            return null;
+        return base.split("#")[0] + `#/` + (activity.kind === "mission" ? "missoes" : "roteiros") + `?share=${token}`;
+    }
+    BaseDemoSI.buildShareLink = buildShareLink;
+    function parseShareHash(hash) {
+        const match = hash.match(/^#\/(?:missoes|roteiros)\?share=([a-zA-Z0-9_-]+)$/);
+        if (!match)
+            return null;
+        const decoded = decodeSharedActivity(match[1]);
+        if (!decoded)
+            return null;
+        const route = BaseDemoSI.currentRoute(hash);
+        return decoded.activity.kind === (route === "missoes" ? "mission" : "script") ? decoded : null;
+    }
+    function renderShare() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        for (const id of ["si-shared-activity", "si-shared-mission"]) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.hidden = true;
+                el.replaceChildren();
+            }
+        }
+        if (route !== "roteiros" && route !== "missoes")
+            return;
+        const element = document.getElementById(route === "roteiros" ? "si-shared-activity" : "si-shared-mission");
+        if (!element)
+            return;
+        const shared = parseShareHash(window.location.hash);
+        if (!window.location.hash.includes("share="))
+            return;
+        element.hidden = false;
+        const text = (tag, s) => { const n = document.createElement(tag); n.textContent = s; return n; };
+        if (!shared) {
+            element.append(text("h2", "Link de atividade inválido"), text("p", "O conteúdo não passou na validação ou é incompatível."));
+            return;
+        }
+        const activity = shared.activity;
+        element.append(text("p", "Atividade compartilhada · " + (shared.permission === "view" ? "Somente consulta" : "Execução local permitida")), text("h2", activity.title), text("p", activity.description));
+        const ol = document.createElement("ol");
+        for (const step of activity.steps)
+            ol.append(text("li", step.label));
+        element.append(ol);
+        element.append(text("p", "A atividade foi incorporada ao endereço. Nenhuma informação foi enviada a terceiros. Permissões sem autenticação são apenas controles de interface."));
+        if (shared.permission === "run") {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "button primary";
+            button.textContent = "Adicionar cópia local para executar";
+            button.addEventListener("click", () => {
+                const existing = educationSharePort?.snapshot().teacherActivities.some(a => a.id === activity.id);
+                if (existing) {
+                    BaseDemoSI.notify("Esta atividade já está na biblioteca local.", "info");
+                    button.disabled = true;
+                    button.textContent = "Atividade já disponível";
+                    return;
+                }
+                // Generate collision-resistant local ID without changing the imported content.
+                const clone = { ...activity, id: `teacher-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e8).toString(36)}` };
+                if (educationSharePort?.createActivity(clone)) {
+                    BaseDemoSI.notify("Cópia local adicionada. Continue pela lista de atividades.", "success");
+                    button.disabled = true;
+                    button.textContent = "Cópia adicionada";
+                }
+                else
+                    BaseDemoSI.notify("Não foi possível adicionar a atividade. Confira o limite da biblioteca.", "warning");
+            });
+            element.append(button);
+        }
+    }
+    let educationSharePort = null;
+    function bindEducationForSharing(port) { educationSharePort = port; }
+    BaseDemoSI.bindEducationForSharing = bindEducationForSharing;
+    function setupSharedActivities() {
+        const share = document.getElementById("si-sharing-link");
+        document.getElementById("si-sharing-copy")?.addEventListener("click", async () => {
+            if (!share?.value)
+                return;
+            try {
+                await navigator.clipboard.writeText(share.value);
+                BaseDemoSI.notify("Link copiado.", "success");
+            }
+            catch {
+                share.focus();
+                share.select();
+                BaseDemoSI.notify("Selecione e copie o link manualmente.", "info");
+            }
+        });
+        window.addEventListener("si-route-changed", renderShare);
+        window.addEventListener("hashchange", renderShare);
+        renderShare();
+    }
+    BaseDemoSI.setupSharedActivities = setupSharedActivities;
+    function offerShareLink(activity) {
+        const select = document.getElementById("si-sharing-mode");
+        const permission = select?.value === "run" ? "run" : "view";
+        const link = buildShareLink(activity, permission, window.location.href);
+        const input = document.getElementById("si-sharing-link");
+        if (input)
+            input.value = link ?? "";
+        const status = document.getElementById("si-sharing-status");
+        if (status)
+            status.textContent = link ? `Link de ${permission === "view" ? "consulta" : "execução local"} pronto para copiar.` : "Não foi possível criar este link.";
+    }
+    BaseDemoSI.offerShareLink = offerShareLink;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -2883,6 +3323,7 @@ var BaseDemoSI;
         const entity = selected();
         BaseDemoSI.renderWorkspaceContent(snap);
         BaseDemoSI.renderExtensions(snap);
+        BaseDemoSI.renderViewers(snap);
         if (entity) {
             const field = get("object-label");
             const tone = get("object-tone");
@@ -2923,6 +3364,7 @@ var BaseDemoSI;
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
         BaseDemoSI.setupExtensions(store);
+        BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
         BaseDemoSI.setupJournal(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
@@ -2953,6 +3395,10 @@ var BaseDemoSI;
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
             if (action === "help") {
                 void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
+                return;
+            }
+            if (!BaseDemoSI.moduleAllows("tools")) {
+                BaseDemoSI.notify("A criação de objetos não está disponível neste módulo.", "warning");
                 return;
             }
             const kind = action === "add-block" ? "block" : action === "add-circle" ? "circle" : action === "add-label" ? "label" : null;
@@ -3044,6 +3490,9 @@ var BaseDemoSI;
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
         BaseDemoSI.setupNavigationDrawer();
         BaseDemoSI.setupDistribution();
+        BaseDemoSI.setupModules();
+        BaseDemoSI.setupManual();
+        BaseDemoSI.setupSharedActivities();
     }
     BaseDemoSI.initialize = initialize;
 })(BaseDemoSI || (BaseDemoSI = {}));

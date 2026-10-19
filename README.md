@@ -1,28 +1,29 @@
-# Base Demo Oficial - SI · 0.9.0
+# Base Demo Oficial - SI · 0.9.1
 
-Plataforma universal para simuladores educacionais. **Versão 0.9.0 — Vistoria funcional e correções de regressão.** A organização do workspace, os componentes educacionais e os contratos de extensão são preservados.
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.1 — Manual, módulos, visualizadores e compartilhamento local de atividades.**
 
 ## Executar
 
-- **Standalone:** abra `standalone.html`, arquivo HTML autocontido sem links ou bibliotecas de execução externos. A disponibilidade de armazenamento depende das permissões do navegador.
-- **PWA:** sirva `index.html` por HTTPS ou localhost. Os recursos essenciais são armazenados pelo Service Worker; a primeira carga precisa completar antes do uso desconectado.
-- **Desenvolvimento:** `npm run check` compila o JavaScript, recria o standalone, verifica contratos e regressões das nove camadas. `python3 tests/browser_smoke.py` executa cenários no Chromium local quando Playwright e Chromium estiverem instalados.
+- **Standalone:** abra `standalone.html` para utilizar CSS, JavaScript e ícones incorporados em um HTML. O armazenamento depende das permissões do navegador.
+- **PWA:** abra `index.html` por HTTPS ou localhost, complete a primeira instalação/cache e utilize desconectado após verificar os recursos offline.
+- **Desenvolvimento:** `npm run check` recompila, cria o standalone e executa regressões e testes de contratos. `python3 tests/browser_smoke.py` verifica fluxos no Chromium quando Playwright e Chromium estiverem disponíveis.
 
-## O que mudou na vistoria
+## Recursos da 0.9.1
 
-- Menu de navegação mobile com fundo modal, contenção de foco, fechamento por toque/Escape e bloqueio do restante da interface.
-- Aviso persistente e visível sempre que o navegador bloquear leitura ou gravação do armazenamento local. O sistema não promete salvamento nesse caso.
-- Estados ocultos protegidos contra regras CSS conflitantes, inclusive instalação PWA quando indisponível.
-- Atualização do cache offline, dos testes e da documentação de critérios de aceite.
+- Manual local com pesquisa, ajuda contextual via tecla F1 e nove temas de orientação.
+- Módulos **Livre, Explorar, Medir, Calcular**, com capacidades explicitamente declaradas e bloqueio de ferramentas/instrumentos não permitidos na camada de extensões.
+- Sistema de visualizadores com contrato de registro e três modos genéricos: Observar, Medir e Analisar.
+- Link autocontido por atividade personalizada, com modos **Consultar** e **Consultar e executar localmente**; validação de conteúdo antes de qualquer cópia para a biblioteca.
+- Preservação do workspace, dos objetos, dos registros, dos roteiros e das distribuições anteriores.
 
-## Capacidades da plataforma
+## Privacidade, offline e limitações
 
-Navegação, preferências, cena e histórico universal, docas Montagem e Ver/Dados, extensões locais para instrumentos e ferramentas, temas, missões, roteiros, Área do Professor, Caderno, relatórios e backups. Não há motor científico específico ou serviços de execução remotos.
+Todas as bibliotecas necessárias à execução e dados de demonstração estão incluídos localmente. Não há login nem comunicação obrigatória com servidores externos. Os links são interpretados pelo aplicativo no navegador, com cópia da atividade codificada após `#`.
 
-## Limites de homologação
+**Permissões dos links são controles de interface, não segurança ou autenticação.** O conteúdo do endereço pode ser modificado por terceiros; não utilize links como mecanismo para proteger informações confidenciais. Links `file://` não são portáveis entre dispositivos sem distribuir o próprio aplicativo.
 
-Esta versão **não corresponde à 1.0.0 homologada**. Permanecem pendentes, entre outros, Manual contextual, módulo configurável, links de atividade com permissões, avaliações aprofundadas de acessibilidade, Firefox, WebKit/Safari, PWA realmente instalada offline e abertura real por `file://` nos navegadores. Consulte `docs/ACEITE-0.9.0.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
+A 0.9.1 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-0.9.1.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
 
 ## Licença
 
-GPL-3.0. Consulte `LICENSE`.
+GPL-3.0, conforme `LICENSE`.

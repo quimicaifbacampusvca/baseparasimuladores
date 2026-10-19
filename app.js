@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.0",
+        version: "0.9.1",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -18,6 +18,7 @@ var BaseDemoSI;
             { id: "professor", title: "Professor", subtitle: "Editor de atividades" },
             { id: "caderno", title: "Caderno", subtitle: "Observações e interpretações" },
             { id: "relatorios", title: "Relatórios", subtitle: "Documentação e impressão" },
+            { id: "manual", title: "Manual", subtitle: "Busca e orientação contextual" },
             { id: "configuracoes", title: "Preferências", subtitle: "Personalização local" },
             { id: "sobre", title: "Sobre a base", subtitle: "Identidade e arquitetura" }
         ])
@@ -144,7 +145,7 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
-    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "configuracoes", "sobre"]);
+    const validRoutes = new Set(["inicio", "ambiente", "aprender", "missoes", "roteiros", "professor", "caderno", "relatorios", "manual", "configuracoes", "sobre"]);
     function currentRoute(hash) {
         const slug = hash.replace(/^#\/?/, "").split(/[?&]/, 1)[0];
         return validRoutes.has(slug) ? slug : "inicio";
@@ -212,6 +213,73 @@ var BaseDemoSI;
         });
     }
     BaseDemoSI.setupPreferences = setupPreferences;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const moduleKey = "module-selection-v1";
+    BaseDemoSI.moduleDefinitions = Object.freeze([
+        { id: "livre", label: "Livre", summary: "Todas as ferramentas, leituras e visualizações disponíveis.", capabilities: ["tools", "measure", "observe", "analyze"] },
+        { id: "explorar", label: "Explorar", summary: "Manipulação e observação de objetos, sem leituras instrumentais.", capabilities: ["tools", "observe"] },
+        { id: "medir", label: "Medir", summary: "Observação e medições de instrumentos habilitados.", capabilities: ["measure", "observe"] },
+        { id: "calcular", label: "Calcular", summary: "Análise de dados e indicadores genéricos da cena.", capabilities: ["observe", "analyze"] }
+    ]);
+    let activeModule = "livre";
+    function validModule(value) {
+        return typeof value === "string" && BaseDemoSI.moduleDefinitions.some(item => item.id === value);
+    }
+    BaseDemoSI.validModule = validModule;
+    function moduleAllows(capability) {
+        return BaseDemoSI.moduleDefinitions.find(item => item.id === activeModule).capabilities.includes(capability);
+    }
+    BaseDemoSI.moduleAllows = moduleAllows;
+    function currentModule() { return activeModule; }
+    BaseDemoSI.currentModule = currentModule;
+    function selectModule(value) {
+        if (!validModule(value))
+            return false;
+        if (activeModule === value)
+            return true;
+        activeModule = value;
+        BaseDemoSI.storage.write(moduleKey, activeModule);
+        if (typeof window !== "undefined" && typeof window.dispatchEvent === "function")
+            window.dispatchEvent(new CustomEvent("si-module-change", { detail: activeModule }));
+        return true;
+    }
+    BaseDemoSI.selectModule = selectModule;
+    function setupModules() {
+        const stored = BaseDemoSI.storage.read(moduleKey);
+        if (validModule(stored))
+            activeModule = stored;
+        const select = document.getElementById("si-module-choice");
+        if (!select)
+            return;
+        select.replaceChildren();
+        for (const definition of BaseDemoSI.moduleDefinitions) {
+            const item = document.createElement("option");
+            item.value = definition.id;
+            item.textContent = definition.label;
+            select.append(item);
+        }
+        const refresh = () => {
+            select.value = activeModule;
+            const current = BaseDemoSI.moduleDefinitions.find(item => item.id === activeModule);
+            const message = document.getElementById("si-module-description");
+            if (message)
+                message.textContent = current.summary;
+            document.getElementById("si-workspace")?.setAttribute("data-module", activeModule);
+            document.querySelectorAll("[data-add-kind]").forEach(button => {
+                button.disabled = !moduleAllows("tools");
+            });
+            document.querySelectorAll("[data-menu-action^=add-]").forEach(button => { button.disabled = !moduleAllows("tools"); });
+            document.getElementById("si-module-choice")?.setAttribute("title", current.summary);
+        };
+        select.addEventListener("change", () => { if (selectModule(select.value))
+            BaseDemoSI.notify("Módulo atualizado.", "info"); refresh(); });
+        window.addEventListener("si-module-change", () => { refresh(); });
+        refresh();
+        window.dispatchEvent(new CustomEvent("si-module-change", { detail: activeModule }));
+    }
+    BaseDemoSI.setupModules = setupModules;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -369,6 +437,8 @@ var BaseDemoSI;
                 return true;
             },
             runTool(id) {
+                if (!BaseDemoSI.moduleAllows("tools"))
+                    return failure("Ferramentas indisponíveis neste módulo.");
                 const extension = current();
                 if (!extension)
                     return failure("Ative uma extensão antes de utilizar ferramentas.");
@@ -401,6 +471,8 @@ var BaseDemoSI;
                 }
             },
             measure(id) {
+                if (!BaseDemoSI.moduleAllows("measure"))
+                    return failure("Instrumentos indisponíveis neste módulo.");
                 const extension = current();
                 if (!extension)
                     return failure("Ative uma extensão antes de realizar leituras.");
@@ -1541,7 +1613,7 @@ var BaseDemoSI;
                 button.className = "button outline si-extension-action";
                 button.textContent = item.name;
                 button.title = item.description;
-                button.disabled = item.requiresSelection && !snapshot.selectedId;
+                button.disabled = (item.requiresSelection && !snapshot.selectedId) || !BaseDemoSI.moduleAllows(mode === "tool" ? "tools" : "measure");
                 button.setAttribute("aria-label", `${item.name}. ${item.description}`);
                 button.addEventListener("click", () => showFeedback(mode === "tool" ? runtime.runTool(item.id) : runtime.measure(item.id)));
                 target.append(button);
@@ -1609,9 +1681,120 @@ var BaseDemoSI;
             });
         }
         runtime.subscribe(() => { renderExtensions(scene.getSnapshot()); window.dispatchEvent(new Event("si-education-observation")); });
+        window.addEventListener("si-module-change", () => renderExtensions(scene.getSnapshot()));
         renderExtensions(scene.getSnapshot());
     }
     BaseDemoSI.setupExtensions = setupExtensions;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const viewerRegistry = new Map();
+    let selectedViewer = "observacao";
+    let viewerScene;
+    const viewerKey = "viewer-selection-v1";
+    const label = (tag, value) => { const node = document.createElement(tag); node.textContent = value; return node; };
+    function registerViewer(viewer) {
+        if (!viewer || !/^[a-z][a-z0-9-]{1,40}$/.test(viewer.id) || viewerRegistry.has(viewer.id)
+            || typeof viewer.title !== "string" || viewer.title.length < 2 || viewer.title.length > 60
+            || !["tools", "measure", "observe", "analyze"].includes(viewer.capability)
+            || typeof viewer.render !== "function")
+            return false;
+        viewerRegistry.set(viewer.id, viewer);
+        return true;
+    }
+    BaseDemoSI.registerViewer = registerViewer;
+    function availableViewers() { return [...viewerRegistry.values()]; }
+    BaseDemoSI.availableViewers = availableViewers;
+    function chooseViewer(id) {
+        const viewer = viewerRegistry.get(id);
+        if (!viewer || !BaseDemoSI.moduleAllows(viewer.capability))
+            return false;
+        selectedViewer = id;
+        BaseDemoSI.storage.write(viewerKey, id);
+        renderViewers(viewerScene?.());
+        return true;
+    }
+    BaseDemoSI.chooseViewer = chooseViewer;
+    function renderViewers(snapshot) {
+        if (!snapshot)
+            return;
+        const buttons = document.getElementById("si-viewer-buttons"), output = document.getElementById("si-viewer-output");
+        if (!buttons || !output)
+            return;
+        const allowed = [...viewerRegistry.values()].filter(v => BaseDemoSI.moduleAllows(v.capability));
+        if (!allowed.some(v => v.id === selectedViewer))
+            selectedViewer = allowed[0]?.id ?? "";
+        buttons.replaceChildren();
+        for (const v of allowed) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "button outline";
+            btn.textContent = v.title;
+            btn.setAttribute("aria-pressed", String(selectedViewer === v.id));
+            btn.addEventListener("click", () => { chooseViewer(v.id); });
+            buttons.append(btn);
+        }
+        output.replaceChildren();
+        const chosen = viewerRegistry.get(selectedViewer);
+        if (!chosen) {
+            output.append(label("p", "Não há visualizadores habilitados neste módulo."));
+            return;
+        }
+        try {
+            chosen.render(snapshot, BaseDemoSI.extensionGetRecords(), output);
+        }
+        catch {
+            output.replaceChildren(label("p", "Visualização indisponível."));
+        }
+    }
+    BaseDemoSI.renderViewers = renderViewers;
+    function setupViewers(scene) {
+        viewerScene = scene;
+        registerViewer({ id: "observacao", title: "Observar", capability: "observe", render(s, _, out) {
+                const selected = s.entities.find(e => e.id === s.selectedId);
+                out.append(label("h3", "Observação"), label("p", selected ? `Objeto em foco: ${selected.label}` : "Selecione um objeto na cena."));
+                if (selected) {
+                    const dl = document.createElement("dl");
+                    for (const [k, v] of [["Tipo", selected.kind], ["Posição", `${selected.x}% × ${selected.y}%`], ["Dimensões", `${selected.width}% × ${selected.height}%`]]) {
+                        const row = document.createElement("div");
+                        row.append(label("dt", k), label("dd", v));
+                        dl.append(row);
+                    }
+                    out.append(dl);
+                }
+            } });
+        registerViewer({ id: "medicao", title: "Medir", capability: "measure", render(_, records, out) {
+                out.append(label("h3", "Medições"));
+                if (!records.length) {
+                    out.append(label("p", "Nenhuma leitura registrada."));
+                    return;
+                }
+                const list = document.createElement("ol");
+                for (const entry of records.slice(-10).reverse())
+                    list.append(label("li", `${entry.label}: ${entry.value} ${entry.unit}`.trim()));
+                out.append(list);
+            } });
+        registerViewer({ id: "analise", title: "Analisar", capability: "analyze", render(s, records, out) {
+                out.append(label("h3", "Análise da cena"));
+                const kinds = { block: 0, circle: 0, label: 0 };
+                for (const e of s.entities)
+                    kinds[e.kind]++;
+                const dl = document.createElement("dl");
+                for (const [k, v] of [["Objetos", s.entities.length], ["Blocos", kinds.block], ["Círculos", kinds.circle], ["Etiquetas", kinds.label], ["Leituras registradas", records.length]]) {
+                    const row = document.createElement("div");
+                    row.append(label("dt", String(k)), label("dd", String(v)));
+                    dl.append(row);
+                }
+                out.append(dl);
+            } });
+        const stored = BaseDemoSI.storage.read(viewerKey);
+        if (stored && viewerRegistry.has(stored))
+            selectedViewer = stored;
+        window.addEventListener("si-module-change", () => renderViewers(scene()));
+        window.addEventListener("si-education-observation", () => renderViewers(scene()));
+        renderViewers(scene());
+    }
+    BaseDemoSI.setupViewers = setupViewers;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1734,7 +1917,7 @@ var BaseDemoSI;
             card.className = "edu-teacher-item";
             const info = document.createElement("div");
             info.append(text("strong", a.title), text("small", `${a.kind === "mission" ? "Missão" : "Roteiro"} · ${a.steps.length} etapa(s)`));
-            card.append(info, button("Excluir", async () => {
+            card.append(info, button("Criar link", () => BaseDemoSI.offerShareLink(a)), button("Excluir", async () => {
                 const accepted = await BaseDemoSI.confirmDialog({ title: "Excluir atividade?", description: `A atividade ${a.title} e seu progresso serão excluídos deste navegador.`, confirmText: "Excluir", destructive: true });
                 if (accepted && education.removeActivity(a.id))
                     BaseDemoSI.notify("Atividade removida.", "info");
@@ -1824,6 +2007,7 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        BaseDemoSI.bindEducationForSharing(education);
         education.subscribe(renderAll);
         scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
             renderAll(); });
@@ -2115,10 +2299,221 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    BaseDemoSI.manualTopics = Object.freeze([
+        { id: "inicio", title: "Primeiros passos", routes: ["inicio"], paragraphs: ["A página inicial organiza os recursos locais. Abra Ambiente para interagir com uma cena neutra.", "A navegação usa seções independentes e mantém os dados desta instalação no navegador."] },
+        { id: "bancada", title: "Bancada, docas e foco", routes: ["ambiente"], paragraphs: ["Em Montagem, crie e selecione objetos. Foco destaca o selecionado; Visão geral exibe o conjunto.", "No celular, Montagem, Ver e Dados abrem como folhas inferiores. Escape fecha painéis e diálogos."] },
+        { id: "modulos", title: "Módulos configuráveis", routes: ["ambiente", "configuracoes"], paragraphs: ["Livre habilita todos os recursos; Explorar oferece manipulação e observação; Medir apresenta instrumentos; Calcular expõe análise genérica.", "Módulos limitam controles disponíveis na interface. Não substituem validação científica nem mecanismos de segurança de acesso."] },
+        { id: "instrumentos", title: "Ferramentas e instrumentos", routes: ["ambiente"], paragraphs: ["Ferramentas alteram a cena; instrumentos registram leituras. A extensão ativa é escolhida nos Ajustes da doca Montagem.", "O painel Ver possui visualizações conectáveis de observação, medição e análise. Dados oferece histórico das leituras."] },
+        { id: "aprendizagem", title: "Aprender, Missões e Roteiros", routes: ["aprender", "missoes", "roteiros"], paragraphs: ["Aprender apresenta temas com marcação de leitura concluída. Missões e Roteiros verificam condições da cena ou a confirmação manual.", "O botão Montar na bancada abre o ambiente; depois, retorne à atividade para conferir cada etapa."] },
+        { id: "professor", title: "Atividades do professor e links", routes: ["professor", "missoes", "roteiros"], paragraphs: ["A Área do Professor cria atividades locais, exporta ou importa JSON e gera links autocontidos para uma atividade.", "O link de consulta não autoriza executar; o link de execução permite criar uma cópia local da atividade. Não há autenticação, restrição criptográfica ou controle remoto de estudantes."] },
+        { id: "registros", title: "Caderno e relatórios", routes: ["caderno", "relatorios"], paragraphs: ["O Caderno reúne observações, hipóteses e conclusões. Relatórios capturam uma cópia da cena e dos registros no momento da criação.", "Os registros podem ser exportados em JSON, e os relatórios em HTML autocontido, prontos para impressão."] },
+        { id: "offline", title: "Trabalhar sem internet", routes: ["configuracoes"], paragraphs: ["O standalone é um arquivo HTML com recursos incorporados. A PWA necessita de instalação e cache inicial em origem segura.", "Prefira backups JSON para garantir portabilidade. O armazenamento depende das permissões e dos limites do navegador."] },
+        { id: "acessibilidade", title: "Teclado e acessibilidade", routes: ["configuracoes", "ambiente"], paragraphs: ["Use Tab para navegar, Escape para fechar painéis, as setas para deslocar o objeto selecionado e Ctrl/⌘+Z para desfazer.", "A interface adapta-se a diferentes larguras e respeita a redução de movimento configurada no dispositivo."] }
+    ]);
+    function searchManual(query, route) {
+        const clean = query.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").trim().slice(0, 100);
+        return BaseDemoSI.manualTopics.filter(topic => {
+            if (route && !topic.routes.includes(route))
+                return false;
+            if (!clean)
+                return true;
+            const full = [topic.title, ...topic.paragraphs].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+            return full.includes(clean);
+        });
+    }
+    BaseDemoSI.searchManual = searchManual;
+    function manualElement(tag, content) { const n = document.createElement(tag); n.textContent = content; return n; }
+    function renderManual() {
+        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count");
+        if (!list)
+            return;
+        const input = document.getElementById("manual-search");
+        const results = searchManual(input?.value ?? "");
+        list.replaceChildren();
+        for (const topic of results) {
+            const article = document.createElement("article");
+            article.className = "card si-manual-topic";
+            article.id = "manual-" + topic.id;
+            const details = document.createElement("details");
+            details.open = !!input?.value.trim() || window.location.hash.includes("topic=" + topic.id);
+            details.append(manualElement("summary", topic.title));
+            for (const paragraph of topic.paragraphs)
+                details.append(manualElement("p", paragraph));
+            article.append(details);
+            list.append(article);
+        }
+        if (count)
+            count.textContent = `${results.length} de ${BaseDemoSI.manualTopics.length} orientações`;
+        if (!results.length)
+            list.append(manualElement("p", "Nenhuma orientação encontrada. Tente outro termo."));
+    }
+    function setupManual() {
+        document.getElementById("manual-search")?.addEventListener("input", renderManual);
+        window.addEventListener("si-route-changed", () => { if (BaseDemoSI.currentRoute(window.location.hash) === "manual")
+            renderManual(); });
+        document.addEventListener("keydown", event => {
+            if (event.key !== "F1" || event.altKey || event.ctrlKey || event.metaKey || BaseDemoSI.isPlatformDialogOpen())
+                return;
+            event.preventDefault();
+            const current = BaseDemoSI.currentRoute(window.location.hash);
+            const topic = BaseDemoSI.manualTopics.find(t => t.routes.includes(current))?.id ?? "inicio";
+            window.location.hash = `#/manual?topic=${topic}`;
+        });
+        renderManual();
+    }
+    BaseDemoSI.setupManual = setupManual;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    const MAX_SHARE_CHARS = 12000;
+    function encodeSharedActivity(activity, permission) {
+        if (!BaseDemoSI.validTeacherActivity(activity) || !(permission === "view" || permission === "run"))
+            return null;
+        const text = JSON.stringify({ format: "base-si-link-v1", permission, activity });
+        if (text.length > 6000)
+            return null;
+        const bytes = new TextEncoder().encode(text);
+        let binary = "";
+        for (const v of bytes)
+            binary += String.fromCharCode(v);
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+    BaseDemoSI.encodeSharedActivity = encodeSharedActivity;
+    function decodeSharedActivity(encoded) {
+        if (encoded.length < 10 || encoded.length > MAX_SHARE_CHARS || !/^[a-zA-Z0-9_-]+$/.test(encoded))
+            return null;
+        try {
+            const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/");
+            const binary = atob(normalized);
+            const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+            const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+            const object = JSON.parse(text);
+            if (object.format !== "base-si-link-v1" || !(object.permission === "view" || object.permission === "run") || !BaseDemoSI.validTeacherActivity(object.activity))
+                return null;
+            if (encodeSharedActivity(object.activity, object.permission) !== encoded)
+                return null;
+            return { format: "base-si-link-v1", permission: object.permission, activity: object.activity };
+        }
+        catch {
+            return null;
+        }
+    }
+    BaseDemoSI.decodeSharedActivity = decodeSharedActivity;
+    function buildShareLink(activity, permission, base) {
+        const token = encodeSharedActivity(activity, permission);
+        if (!token)
+            return null;
+        return base.split("#")[0] + `#/` + (activity.kind === "mission" ? "missoes" : "roteiros") + `?share=${token}`;
+    }
+    BaseDemoSI.buildShareLink = buildShareLink;
+    function parseShareHash(hash) {
+        const match = hash.match(/^#\/(?:missoes|roteiros)\?share=([a-zA-Z0-9_-]+)$/);
+        if (!match)
+            return null;
+        const decoded = decodeSharedActivity(match[1]);
+        if (!decoded)
+            return null;
+        const route = BaseDemoSI.currentRoute(hash);
+        return decoded.activity.kind === (route === "missoes" ? "mission" : "script") ? decoded : null;
+    }
+    function renderShare() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        for (const id of ["si-shared-activity", "si-shared-mission"]) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.hidden = true;
+                el.replaceChildren();
+            }
+        }
+        if (route !== "roteiros" && route !== "missoes")
+            return;
+        const element = document.getElementById(route === "roteiros" ? "si-shared-activity" : "si-shared-mission");
+        if (!element)
+            return;
+        const shared = parseShareHash(window.location.hash);
+        if (!window.location.hash.includes("share="))
+            return;
+        element.hidden = false;
+        const text = (tag, s) => { const n = document.createElement(tag); n.textContent = s; return n; };
+        if (!shared) {
+            element.append(text("h2", "Link de atividade inválido"), text("p", "O conteúdo não passou na validação ou é incompatível."));
+            return;
+        }
+        const activity = shared.activity;
+        element.append(text("p", "Atividade compartilhada · " + (shared.permission === "view" ? "Somente consulta" : "Execução local permitida")), text("h2", activity.title), text("p", activity.description));
+        const ol = document.createElement("ol");
+        for (const step of activity.steps)
+            ol.append(text("li", step.label));
+        element.append(ol);
+        element.append(text("p", "A atividade foi incorporada ao endereço. Nenhuma informação foi enviada a terceiros. Permissões sem autenticação são apenas controles de interface."));
+        if (shared.permission === "run") {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "button primary";
+            button.textContent = "Adicionar cópia local para executar";
+            button.addEventListener("click", () => {
+                const existing = educationSharePort?.snapshot().teacherActivities.some(a => a.id === activity.id);
+                if (existing) {
+                    BaseDemoSI.notify("Esta atividade já está na biblioteca local.", "info");
+                    button.disabled = true;
+                    button.textContent = "Atividade já disponível";
+                    return;
+                }
+                // Generate collision-resistant local ID without changing the imported content.
+                const clone = { ...activity, id: `teacher-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e8).toString(36)}` };
+                if (educationSharePort?.createActivity(clone)) {
+                    BaseDemoSI.notify("Cópia local adicionada. Continue pela lista de atividades.", "success");
+                    button.disabled = true;
+                    button.textContent = "Cópia adicionada";
+                }
+                else
+                    BaseDemoSI.notify("Não foi possível adicionar a atividade. Confira o limite da biblioteca.", "warning");
+            });
+            element.append(button);
+        }
+    }
+    let educationSharePort = null;
+    function bindEducationForSharing(port) { educationSharePort = port; }
+    BaseDemoSI.bindEducationForSharing = bindEducationForSharing;
+    function setupSharedActivities() {
+        const share = document.getElementById("si-sharing-link");
+        document.getElementById("si-sharing-copy")?.addEventListener("click", async () => {
+            if (!share?.value)
+                return;
+            try {
+                await navigator.clipboard.writeText(share.value);
+                BaseDemoSI.notify("Link copiado.", "success");
+            }
+            catch {
+                share.focus();
+                share.select();
+                BaseDemoSI.notify("Selecione e copie o link manualmente.", "info");
+            }
+        });
+        window.addEventListener("si-route-changed", renderShare);
+        window.addEventListener("hashchange", renderShare);
+        renderShare();
+    }
+    BaseDemoSI.setupSharedActivities = setupSharedActivities;
+    function offerShareLink(activity) {
+        const select = document.getElementById("si-sharing-mode");
+        const permission = select?.value === "run" ? "run" : "view";
+        const link = buildShareLink(activity, permission, window.location.href);
+        const input = document.getElementById("si-sharing-link");
+        if (input)
+            input.value = link ?? "";
+        const status = document.getElementById("si-sharing-status");
+        if (status)
+            status.textContent = link ? `Link de ${permission === "view" ? "consulta" : "execução local"} pronto para copiar.` : "Não foi possível criar este link.";
+    }
+    BaseDemoSI.offerShareLink = offerShareLink;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -2316,6 +2711,7 @@ var BaseDemoSI;
         const entity = selected();
         BaseDemoSI.renderWorkspaceContent(snap);
         BaseDemoSI.renderExtensions(snap);
+        BaseDemoSI.renderViewers(snap);
         if (entity) {
             const field = get("object-label");
             const tone = get("object-tone");
@@ -2356,6 +2752,7 @@ var BaseDemoSI;
             save(); });
         BaseDemoSI.setupWorkspace(() => store.getSnapshot(), id => store.select(id));
         BaseDemoSI.setupExtensions(store);
+        BaseDemoSI.setupViewers(() => store.getSnapshot());
         BaseDemoSI.setupEducation(store);
         BaseDemoSI.setupJournal(store);
         for (const button of document.querySelectorAll("[data-add-kind]")) {
@@ -2386,6 +2783,10 @@ var BaseDemoSI;
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
             if (action === "help") {
                 void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Setas: mover o objeto selecionado quando estiver em foco.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
+                return;
+            }
+            if (!BaseDemoSI.moduleAllows("tools")) {
+                BaseDemoSI.notify("A criação de objetos não está disponível neste módulo.", "warning");
                 return;
             }
             const kind = action === "add-block" ? "block" : action === "add-circle" ? "circle" : action === "add-label" ? "label" : null;
@@ -2477,6 +2878,9 @@ var BaseDemoSI;
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
         BaseDemoSI.setupNavigationDrawer();
         BaseDemoSI.setupDistribution();
+        BaseDemoSI.setupModules();
+        BaseDemoSI.setupManual();
+        BaseDemoSI.setupSharedActivities();
     }
     BaseDemoSI.initialize = initialize;
 })(BaseDemoSI || (BaseDemoSI = {}));
