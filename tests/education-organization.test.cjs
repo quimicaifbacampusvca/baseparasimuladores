@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const r=path.resolve(__dirname,'..'),read=f=>fs.readFileSync(path.join(r,f),'utf8');
+const h=read('index.html'),u=read('src/education-ui.ts'),m=read('src/manual.ts'),css=read('environment-organization.css');
+for(const id of ['edu-topic-detail','edu-script-detail','edu-mission-detail','edu-teacher-preview','manual-index','si-return-activity'])assert(h.includes(`id="${id}"`),id);
+for(let n=1;n<=3;n++)assert(h.includes(`data-teacher-panel="${n}"`));
+assert(u.includes('returnToActivity')&&u.includes('Montar na bancada')&&u.includes('Conferir e registrar'));
+assert(m.includes('si-manual-index-links')&&m.includes('aria-current'));
+assert(css.includes('@media(max-width:760px)')&&css.includes('min-height:44px'));
+assert(read('sw.js').includes('"./environment-organization.css"'));
+assert(read('src/distribution.ts').includes('"./environment-organization.css"'));
+assert(read('standalone.html').includes('.si-edu-detail'));
+for(const file of ['README.md','docs/ACEITE-0.9.3.md','src/education-ui.ts','src/manual.ts','environment-organization.css'])assert(!/SIAB/i.test(read(file)),file);
+console.log('OK: catálogos, detalhamento, retorno, editor em etapas, índice, mobile e pacote offline.');

@@ -12,51 +12,100 @@ namespace BaseDemoSI {
     node.textContent=label;node.addEventListener("click",action);return node;
   }
   function countReadings():number {return extensionRecordCount();}
+  /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
+  let returnToActivity = "";
+  const selectedParam = (key:string):string => {
+    const search=window.location.hash.split("?")[1]??"";
+    return new URLSearchParams(search).get(key)??"";
+  };
+  function openDetail(route:RouteId,key:string,id:string):void {
+    window.location.hash=`#/${route}?${key}=${encodeURIComponent(id)}`;
+    if(currentRoute(window.location.hash)===route)renderAll();
+  }
+  function returnToCatalog(route:RouteId,id:string):void {
+    window.location.hash=`#/${route}`;
+    window.setTimeout(()=>{
+      document.querySelector<HTMLElement>(`[data-catalog-id="${id}"]`)?.focus({preventScroll:true});
+    },0);
+  }
+  function mountReturnLink():void {
+    const control=el("si-return-activity") as HTMLAnchorElement|null;
+    if(!control)return;
+    control.hidden=!returnToActivity || currentRoute(window.location.hash)!=="ambiente";
+    if(returnToActivity)control.href=returnToActivity;
+  }
+  function showDetail(catalogId:string,detailId:string,open:boolean):HTMLElement|null {
+    const catalog=el(catalogId),detail=el(detailId);
+    if(catalog)catalog.hidden=open;
+    if(detail)detail.hidden=!open;
+    if(open)detail?.replaceChildren();
+    return detail;
+  }
   function renderTopics():void {
     const target=el("edu-topic-list");if(!target)return;target.replaceChildren();
     const saved=education.snapshot();
+    const active=learningTopics.find(t=>t.id===selectedParam("tema"));
+    const detail=showDetail("edu-topic-list","edu-topic-detail",!!active);
     for(const topic of learningTopics){
       const card=document.createElement("article");card.className="edu-card";card.dataset.topicId=topic.id;
-      card.append(text("p",saved.topicsDone.includes(topic.id)?"Concluído":"Tema", "edu-kicker"),text("h2",topic.title),text("p",topic.summary));
-      const details=document.createElement("details");const summary=text("summary","Ler conteúdo");details.append(summary);
-      const body=document.createElement("div");body.className="edu-body";for(const paragraph of topic.paragraphs)body.append(text("p",paragraph));
-      details.append(body);card.append(details);
-      card.append(button(saved.topicsDone.includes(topic.id)?"Desmarcar conclusão":"Marcar como concluído",()=>{if(education.toggleTopic(topic.id)){const next=target.querySelector<HTMLElement>(`[data-topic-id="${topic.id}"] button`);next?.focus({preventScroll:true});}}));
+      card.append(text("p",saved.topicsDone.includes(topic.id)?"Concluído":"Tema disponível","edu-kicker"),text("h2",topic.title),text("p",topic.summary));
+      const go=button("Abrir tema",()=>openDetail("aprender","tema",topic.id),"outline");go.dataset.catalogId=topic.id;card.append(go);
       target.append(card);
+    }
+    if(active&&detail){
+      const back=button("← Todos os temas",()=>returnToCatalog("aprender",active.id));back.classList.add("si-detail-back");
+      const heading=text("h2",active.title);heading.tabIndex=-1;
+      detail.append(back,text("p","LEITURA ORIENTADA","edu-kicker"),heading,text("p",active.summary,"si-detail-lead"));
+      const article=document.createElement("article");article.className="si-detail-reading";
+      for(const paragraph of active.paragraphs)article.append(text("p",paragraph));detail.append(article);
+      detail.append(button(saved.topicsDone.includes(active.id)?"Desmarcar conclusão":"Marcar como concluído",()=>{
+        education.toggleTopic(active.id);
+        notify("Progresso de leitura atualizado.","success");
+      },"primary"));
     }
     const stats=el("edu-topic-summary");if(stats)stats.textContent=`${saved.topicsDone.length} de ${learningTopics.length} temas concluídos`;
   }
   function renderActivity(kind:ActivityKind):void {
-    const target=el(kind==="mission"?"edu-mission-list":"edu-script-list");if(!target)return;
-    target.replaceChildren();const snapshot=education.snapshot();
-    for(const a of education.list(kind)){
-      const card=document.createElement("article");card.className="edu-card";card.dataset.activityId=a.id;
-      const position=snapshot.progress[a.id]??0,finished=position>=a.steps.length;
-      card.append(text("p",`${a.origin==="teacher"?"Professor · ":""}${kind==="mission"?"Missão":"Roteiro"} · ${finished?"Concluído":`${position}/${a.steps.length} etapas`}`,"edu-kicker"),text("h2",a.title),text("p",a.description));
-      const list=document.createElement("ol");list.className="edu-steps";
-      for(let i=0;i<a.steps.length;i++){
-        const step=a.steps[i],item=document.createElement("li");
-        item.className=i<position?"edu-step-done":i===position?"edu-step-current":"";
-        item.append(text("strong",step.label));
-        const criterion=step.requirement==="entities"?`${step.minimum} objeto(s) na cena`:step.requirement==="selection"?"Um objeto selecionado":step.requirement==="readings"?`${step.minimum} leitura(s) registrada(s)`:"Confirmação de realização";
-        item.append(text("small",criterion));list.append(item);
-      }
-      card.append(list);
-      const actions=document.createElement("div");actions.className="edu-actions";
-      const go=document.createElement("a");go.className="button outline";go.href="#/ambiente";go.textContent="Montar na bancada";actions.append(go);
-      if(!finished){
-        const step=a.steps[position];const allowed=meetsRequirement(step,educationScene.getSnapshot(),countReadings());
-        const confirm=button(step.requirement==="manual"?"Confirmar etapa":"Conferir e registrar",()=>{
-          const outcome=education.advance(a.id,educationScene.getSnapshot(),countReadings());
-          notify(outcome.message,outcome.ok?"success":"warning");
-          if(outcome.ok){const current=target.querySelector<HTMLElement>(`[data-activity-id="${a.id}"]`);
-            (current?.querySelector<HTMLButtonElement>("button")??current?.querySelector<HTMLAnchorElement>("a"))?.focus({preventScroll:true});}
-        },"primary");
-        confirm.disabled=!allowed;confirm.title=allowed?"Registrar etapa":"Conclua o critério no ambiente primeiro";actions.append(confirm);
-      } else actions.append(text("span","Atividade finalizada","edu-finished"));
-      card.append(actions);target.append(card);
+    const route:RouteId=kind==="mission"?"missoes":"roteiros";
+    const listId=kind==="mission"?"edu-mission-list":"edu-script-list";
+    const detailId=kind==="mission"?"edu-mission-detail":"edu-script-detail";
+    const target=el(listId);if(!target)return;target.replaceChildren();
+    const snapshot=education.snapshot();const activities=education.list(kind);
+    const active=activities.find(a=>a.id===selectedParam("item") && currentRoute(window.location.hash)===route);
+    const detail=showDetail(listId,detailId,!!active);
+    for(const activity of activities){
+      const position=snapshot.progress[activity.id]??0,finished=position>=activity.steps.length;
+      const card=document.createElement("article");card.className="edu-card";card.dataset.activityId=activity.id;
+      card.append(text("p",`${activity.origin==="teacher"?"Professor · ":""}${kind==="mission"?"Missão":"Roteiro"} · ${finished?"Concluído":`${position}/${activity.steps.length} etapas`}`,"edu-kicker"),text("h2",activity.title),text("p",activity.description));
+      const go=button("Ver detalhes",()=>openDetail(route,"item",activity.id));go.dataset.catalogId=activity.id;
+      card.append(go);target.append(card);
     }
     if(!target.children.length)target.append(text("p","Nenhuma atividade disponível."));
+    if(!active||!detail)return;
+    const position=snapshot.progress[active.id]??0,finished=position>=active.steps.length;
+    returnToActivity=`#/${route}?item=${encodeURIComponent(active.id)}`;
+    const back=button(`← Todas as ${kind==="mission"?"missões":"investigações"}`,()=>returnToCatalog(route,active.id));back.classList.add("si-detail-back");
+    const heading=text("h2",active.title);heading.tabIndex=-1;
+    detail.append(back,text("p",kind==="mission"?"MISSÃO · OBJETIVOS":"ROTEIRO · PROCEDIMENTO","edu-kicker"),heading,text("p",active.description,"si-detail-lead"));
+    const list=document.createElement("ol");list.className="edu-steps si-detail-steps";
+    for(let i=0;i<active.steps.length;i++){
+      const step=active.steps[i],item=document.createElement("li");item.className=i<position?"edu-step-done":i===position?"edu-step-current":"";
+      item.append(text("strong",step.label));
+      const criterion=step.requirement==="entities"?`${step.minimum} objeto(s) na cena`:step.requirement==="selection"?"Um objeto selecionado":step.requirement==="readings"?`${step.minimum} leitura(s) registrada(s)`:"Confirmação de realização";
+      item.append(text("small",criterion));list.append(item);
+    }
+    detail.append(list);
+    const actions=document.createElement("div");actions.className="edu-actions";
+    const bench=document.createElement("a");bench.className="button primary";bench.href="#/ambiente";bench.textContent="Montar na bancada";actions.append(bench);
+    if(!finished){
+      const step=active.steps[position];const allowed=meetsRequirement(step,educationScene.getSnapshot(),countReadings());
+      const check=button(step.requirement==="manual"?"Confirmar etapa":"Conferir e registrar",()=>{
+        const outcome=education.advance(active.id,educationScene.getSnapshot(),countReadings());
+        notify(outcome.message,outcome.ok?"success":"warning");
+      },"outline");
+      check.disabled=!allowed;check.title=allowed?"Registrar etapa":"Conclua o critério no ambiente primeiro";actions.append(check);
+    }else actions.append(text("span","Atividade concluída","edu-finished"));
+    detail.append(actions);mountReturnLink();
   }
   function renderTeacher():void {
     const target=el("edu-teacher-list");if(!target)return;target.replaceChildren();
@@ -72,13 +121,39 @@ namespace BaseDemoSI {
       }));target.append(card);
     }
   }
-  function renderAll():void {renderTopics();renderActivity("mission");renderActivity("script");renderTeacher();}
+  function renderAll():void {renderTopics();renderActivity("mission");renderActivity("script");renderTeacher();mountReturnLink();}
   const inputValue=(id:string):string=>(el(id) as HTMLInputElement|HTMLTextAreaElement|null)?.value.trim()??"";
   const rule=(id:string):RequirementKind=>(el(id) as HTMLSelectElement).value as RequirementKind;
   const step=(prefix:string):LearningStep=>({label:inputValue(`${prefix}-label`),requirement:rule(`${prefix}-rule`),minimum:Number(inputValue(`${prefix}-min`)||1)});
   function displayTeacherKind():void {
     const show=(el("edu-form-kind") as HTMLSelectElement).value==="script";
     const second=el("edu-second-step");if(second)second.hidden=!show;
+  }
+  let currentTeacherStep=1;
+  function teacherStep(step:number,validate=true):void {
+    const form=el("edu-teacher-form") as HTMLFormElement|null;
+    if(!form || step<1 || step>3)return;
+    if(validate && step>currentTeacherStep){
+      for(let index=currentTeacherStep;index<step;index++){
+        const panel=form.querySelector<HTMLElement>(`[data-teacher-panel="${index}"]`);
+        const inputs=Array.from(panel?.querySelectorAll<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>("input,textarea,select")??[]);
+        const invalid=inputs.find(input=>!input.disabled && !input.checkValidity());
+        if(invalid){notify("Preencha os campos obrigatórios antes de continuar.","warning");invalid.focus();return;}
+      }
+    }
+    currentTeacherStep=step;
+    for(const panel of form.querySelectorAll<HTMLElement>("[data-teacher-panel]"))panel.hidden=Number(panel.dataset.teacherPanel)!==step;
+    for(const control of document.querySelectorAll<HTMLButtonElement>("[data-teacher-step]")){
+      if(Number(control.dataset.teacherStep)===step)control.setAttribute("aria-current","step");
+      else control.removeAttribute("aria-current");
+    }
+    const preview=el("edu-teacher-preview");
+    if(preview && step===3){preview.replaceChildren();
+      preview.append(text("strong",inputValue("edu-form-title")||"Título não informado"),text("p",inputValue("edu-form-description")));
+      preview.append(text("p",`Tipo: ${(el("edu-form-kind") as HTMLSelectElement).value==="script"?"Roteiro":"Missão"}`));
+      preview.append(text("p",`1. ${inputValue("edu-step-one-label")}`));
+      if((el("edu-form-kind") as HTMLSelectElement).value==="script")preview.append(text("p",`2. ${inputValue("edu-step-two-label")}`));
+    }
   }
   function setupTeacherForm():void {
     const kind=el("edu-form-kind") as HTMLSelectElement|null;
@@ -92,13 +167,17 @@ namespace BaseDemoSI {
       });
     }
     displayTeacherKind();
+    document.querySelectorAll<HTMLButtonElement>("[data-teacher-next],[data-teacher-previous],[data-teacher-step]").forEach(control=>{
+      control.addEventListener("click",()=>teacherStep(Number(control.dataset.teacherNext??control.dataset.teacherPrevious??control.dataset.teacherStep)));
+    });
+    teacherStep(1,false);
     el("edu-teacher-form")?.addEventListener("submit",event=>{
       event.preventDefault();const type=kind?.value as ActivityKind;
       const created:LearningActivity={id:`teacher-${Date.now().toString(36)}-${(++teacherSerial).toString(36)}`,kind:type,origin:"teacher",
         title:inputValue("edu-form-title"),description:inputValue("edu-form-description"),
         steps:type==="script"?[step("edu-step-one"),step("edu-step-two")]:[step("edu-step-one")]};
       if(!education.createActivity(created)){notify("Revise os campos: título, descrição, critérios e etapas são obrigatórios.","warning");return;}
-      (el("edu-teacher-form") as HTMLFormElement).reset();displayTeacherKind();notify("Atividade personalizada criada.","success");
+      (el("edu-teacher-form") as HTMLFormElement).reset();displayTeacherKind();teacherStep(1,false);notify("Atividade personalizada criada.","success");
     });
     el("edu-export")?.addEventListener("click",()=>{
       const file=new Blob([education.exportTeachers()],{type:"application/json;charset=utf-8"});

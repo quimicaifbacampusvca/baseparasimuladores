@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-cCdljY3RvRRu+lLL/RSvoJoXC3ufK/i2Agi8z+iwW4g='; script-src 'sha256-SgV36uk0EaiRuSOBIbth4rkUi63aebqFfm9217M5rDk='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-Jfd9SclzIRcHAKtRYFTYaM5+mEjwXNlJ+6a4zzukKRk='; script-src 'sha256-vgNnTChLb+ENJWLN2KIysjlmH5QVdQwiA/AATa2HwjU='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -16,6 +16,10 @@
   
   
   
+  
+  
+  
+    
   
 
   <title>Base Demo Oficial - SI</title>
@@ -443,37 +447,268 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
 .si-home-path-primary .si-path-kicker{display:block;}
 .si-home-path-primary .si-path-description{max-width:560px;}
 .si-home-path-primary .si-path-action{display:block;margin-top:auto;align-self:flex-start;}
+
+/* Organização interna 0.9.3 — hierarquia catálogo, detalhe e ação. */
+.edu-grid[hidden],.si-edu-detail[hidden],.si-teacher-panel[hidden],#manual-index[hidden],#si-return-activity[hidden]{display:none!important}
+.si-edu-detail{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:18px;padding:clamp(20px,3vw,36px);max-width:900px;display:grid;gap:15px;min-width:0}
+.si-edu-detail h2{font-size:clamp(24px,3vw,34px);line-height:1.2;margin:0;letter-spacing:-.03em}
+.si-edu-detail .si-detail-lead{line-height:1.7;color:var(--muted);max-width:70ch;margin:0}
+.si-edu-detail .si-detail-reading{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:12px 0;max-width:72ch}
+.si-detail-reading p{line-height:1.8;margin:12px 0;font-size:15px}
+.si-detail-back{justify-self:start;min-height:44px}
+.si-detail-steps{max-width:700px;gap:10px}
+.si-return-activity{display:inline-flex;align-items:center;min-height:40px;border:1px solid var(--border);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--text);font-weight:700;margin:8px 14px;text-decoration:none;max-width:calc(100% - 28px)}
+.si-teacher-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;list-style:none;margin:0;padding:0}
+.si-teacher-steps button{border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:10px;min-height:48px;width:100%;padding:8px;text-align:center;font:inherit;font-weight:650;cursor:pointer;font-size:12px}
+.si-teacher-steps button[aria-current=step]{background:var(--tint);border-color:var(--accent);color:var(--text)}
+.si-teacher-panel{display:grid;gap:10px;min-width:0}.si-teacher-panel h3{margin:7px 0;font-size:16px}.si-teacher-controls{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;border-top:1px solid var(--border);padding-top:14px}
+.si-teacher-preview{border:1px solid var(--border);border-radius:12px;background:var(--bg);padding:15px;overflow-wrap:anywhere}
+.si-teacher-preview p{font-size:13px;line-height:1.6;margin:7px 0}
+.si-manual-layout{display:grid;grid-template-columns:minmax(190px,.4fr) minmax(0,1fr);align-items:start;gap:16px}
+.si-manual-index{position:sticky;top:16px;display:grid;gap:12px;max-height:80vh;overflow-y:auto}
+.si-manual-index h2{font-size:16px;margin:0}.si-manual-index-links{display:grid;gap:5px}
+.si-manual-index a{display:block;color:var(--text);text-decoration:none;font-size:13px;padding:10px 11px;border-radius:9px;border:1px solid transparent}
+.si-manual-index a[aria-current=true],.si-manual-index a:hover{background:var(--tint);border-color:var(--border)}
+.si-manual-topic details summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
+.si-manual-topic details p{line-height:1.75}
+@media(max-width:760px){.si-manual-layout{grid-template-columns:minmax(0,1fr)}.si-manual-index{position:static;max-height:none}.si-manual-index-links{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px;padding-bottom:5px}.si-manual-index a{white-space:nowrap;scroll-snap-align:start;background:var(--bg);border-color:var(--border)}.si-teacher-steps{grid-template-columns:1fr}.si-teacher-steps button{text-align:left;min-height:44px}.si-edu-detail{padding:18px}.si-edu-detail .edu-actions .button{flex:1 1 160px}}
+@media(prefers-reduced-motion:reduce){.si-edu-detail *{scroll-behavior:auto}}
+
+/* Menu estrutural universal · agrupamento de seções e controles de acesso. */
+body.nav-open{overflow:hidden;}
+.side.si-menu-drawer{
+  display:flex;position:fixed;inset:0 auto 0 0;
+  width:min(360px,88vw);max-width:360px;height:100dvh;
+  padding:0;gap:0;background:var(--surface);color:var(--text);border-right:1px solid var(--border);
+  border-radius:0 14px 14px 0;overflow:hidden;z-index:101;
+  transform:translateX(-110%);visibility:hidden;transition:transform .2s ease;
+  box-shadow:9px 0 32px #0005;
+}
+body.nav-open .side.si-menu-drawer{transform:translateX(0);visibility:visible;}
+body.route-ambiente.nav-open .side.si-menu-drawer{width:min(360px,88vw);transform:translateX(0);visibility:visible;display:flex!important;z-index:101;box-shadow:9px 0 32px #0005;}
+.si-drawer-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;}
+.si-drawer-head h2{margin:0;font-size:17px;font-weight:750;letter-spacing:0;}
+.si-drawer-close{width:44px;height:44px;min-width:44px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:27px;line-height:1;cursor:pointer;}
+.si-drawer-close:hover,.si-drawer-close:focus-visible{background:var(--tint);border-color:var(--accent);}
+.si-drawer-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 10px calc(22px + env(safe-area-inset-bottom,0px));}
+.si-drawer-section{padding:4px 0 8px;border-bottom:1px solid var(--border);}
+.si-drawer-section:last-of-type{border-bottom:0;}
+.si-drawer-section h3{font-size:11px;line-height:1.4;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0;padding:12px 10px 6px;}
+.si-drawer-now strong{font-size:14px;padding:0 10px;display:block;}
+.si-drawer-now p{font-size:12px;color:var(--muted);padding:0 10px;margin:3px 0 7px;line-height:1.5;}
+.si-drawer-continue{margin:0 10px 6px;min-height:38px;border:1px solid var(--border);border-radius:9px;background:var(--tint);color:var(--accent);font-weight:700;padding:7px 13px;cursor:pointer;}
+.si-drawer-nav-toggle{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;text-align:left;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--text);font-weight:700;cursor:pointer;}
+.si-drawer-nav-toggle:hover{background:var(--tint);}
+.si-drawer-chevron{margin-left:auto;transition:transform .2s ease;}
+.si-drawer-nav-toggle[aria-expanded=false] .si-drawer-chevron{transform:rotate(-90deg);}
+.si-drawer-links{display:flex;flex-direction:column;gap:1px;}
+.si-drawer-links[hidden]{display:none!important;}
+.si-drawer-links a{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:8px 10px;color:var(--text);font-size:14px;font-weight:600;line-height:1.3;border:1px solid transparent;border-radius:10px;text-decoration:none;box-shadow:none;}
+.si-drawer-links a:hover{background:var(--tint);color:var(--text);}
+.si-drawer-links a[aria-current=page]{color:var(--accent);background:var(--tint);border-color:var(--border);box-shadow:none;}
+.si-drawer-links .si-menu-icon,.si-drawer-nav-toggle .si-menu-icon{display:inline-flex;flex:0 0 22px;align-items:center;justify-content:center;font-size:19px;line-height:1.1;text-align:center;font-weight:500;color:var(--muted);}
+.si-drawer-links a[aria-current=page] .si-menu-icon{color:var(--accent);}
+.si-drawer-version{font-size:11px;color:var(--muted);margin:12px 10px 0;}
+.nav-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.62);backdrop-filter:blur(2px);}
+@media(max-width:760px){
+  .side.si-menu-drawer{width:min(360px,88vw);}
+  .si-drawer-head{padding-top:calc(12px + env(safe-area-inset-top,0px));}
+}
+@media(max-height:520px){.si-drawer-head{padding-top:8px;padding-bottom:8px;}.si-drawer-section h3{padding-top:6px;padding-bottom:4px;}}
+@media(prefers-reduced-motion:reduce){.side.si-menu-drawer,.si-drawer-chevron{transition:none!important;}}
+@media print{.side.si-menu-drawer,.nav-backdrop{display:none!important;}}
+
+/* Bloco 02 — contrato espacial e de manipulação da Home para toda a família. */
+.si-home-family{max-width:1180px;padding-top:24px;}
+.si-home-family .si-home-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:6px 6px 28px;border:0;border-radius:0;background:none;box-shadow:none;}
+.si-home-family .si-home-hero-copy{min-width:0;}
+.si-home-family .si-home-hero h1{margin:10px 0 12px;font-size:clamp(35px,4.5vw,55px);line-height:1.1;max-width:650px;letter-spacing:-.035em;}
+.si-home-family .si-home-hero h1 span{color:var(--accent);}
+.si-home-family .si-home-hero-icon{width:144px;height:144px;margin:0 20px 0 0;flex-shrink:0;}
+.si-home-family .si-home-motto{color:var(--muted);font-size:15px;line-height:1.5;}
+.si-home-family .si-home-heading{border-top:1px solid var(--border);padding:15px 0;margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+.si-home-family .si-home-heading h2{font-size:17px;font-weight:750;}
+.si-home-family .si-home-heading p{font-size:12px;}
+.si-home-family .si-home-paths{display:grid;grid-template-columns:1.08fr 1fr 1fr;grid-template-rows:repeat(2,minmax(205px,auto));gap:14px;}
+.si-home-family .si-home-path{position:relative;display:flex;flex-direction:column;gap:9px;min-height:205px;min-width:0;padding:22px;border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--text);text-decoration:none;overflow:hidden;box-shadow:none;transition:transform .18s ease,border-color .18s ease,background .18s ease;}
+.si-home-family .si-home-path:hover{transform:translateY(-2px);border-color:var(--accent);}
+.si-home-family .si-home-path:focus-visible{outline:3px solid var(--ring);outline-offset:3px;}
+.si-home-family .si-home-path strong{font-size:18px;line-height:1.2;}
+.si-home-family .si-path-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;}
+.si-home-family .si-path-arrow{font-size:19px;color:var(--muted);transition:transform .18s;}
+.si-home-family .si-home-path:hover .si-path-arrow{transform:translate(2px,-2px);}
+.si-home-family .si-path-icon{width:42px;height:42px;background:var(--tint);border:1px solid var(--border);border-radius:12px;font-size:23px;}
+.si-home-family .si-path-description{font-size:13px;line-height:1.55;color:var(--muted);max-width:34ch;}
+.si-home-family .si-home-path:not(.si-home-path-primary) .si-path-action{font-size:12px;font-weight:700;margin-top:auto;padding-top:10px;color:var(--muted);align-self:flex-start;}
+.si-home-family .si-home-path-primary{grid-column:1;grid-row:span 2;min-height:424px;padding:26px;display:flex;flex-direction:column;gap:11px;background:radial-gradient(ellipse at right top,color-mix(in srgb,var(--accent) 13%,transparent),transparent 70%),var(--surface);border-color:color-mix(in srgb,var(--accent) 50%,var(--border));}
+.si-home-family .si-home-path-primary::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--accent);}
+.si-home-family .si-home-path-primary .si-path-upper{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;}
+.si-home-family .si-path-tag{font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--accent);border:1px solid var(--border);border-radius:20px;padding:5px 10px;background:var(--surface);text-transform:none;}
+.si-home-family .si-home-path-primary .si-path-kicker{font-size:12px;font-weight:700;color:var(--accent);}
+.si-home-family .si-home-path-primary strong{font-size:30px;}
+.si-home-family .si-home-path-primary .si-path-description{max-width:30ch;}
+.si-home-family .si-path-accent{display:flex;gap:8px;align-items:center;margin:20px 0;}
+.si-home-family .si-path-accent i{display:block;width:22px;height:6px;border-radius:6px;background:var(--accent);opacity:.4;}
+.si-home-family .si-path-accent i:nth-child(2){opacity:.55}.si-home-family .si-path-accent i:nth-child(3){opacity:.7}.si-home-family .si-path-accent i:nth-child(4){opacity:.85}.si-home-family .si-path-accent i:nth-child(5){opacity:1}
+.si-home-family .si-home-path-primary .si-path-action{display:flex;align-items:center;justify-content:space-between;align-self:stretch;margin-top:auto;padding:12px 15px;background:var(--accent);color:var(--bg);font-weight:750;border-radius:10px;font-size:13px;gap:12px;}
+.si-home-family .si-home-path-primary .si-path-action span{font-size:20px;line-height:1;}
+.si-home-family .si-home-support{border:0;padding-top:8px;margin-top:14px;}
+.si-home-family .si-home-support nav{display:flex;gap:8px 22px;align-items:center;}
+.si-home-family .si-home-support a{min-height:44px;display:inline-flex;align-items:center;font-weight:600;}
+@media(max-width:960px){
+ .si-home-family .si-home-paths{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;}
+ .si-home-family .si-home-path-primary{grid-column:1/-1;grid-row:auto;min-height:215px;gap:7px;}
+ .si-home-family .si-home-path-primary .si-path-upper{margin-bottom:4px;}
+ .si-home-family .si-home-path-primary .si-path-accent{margin:7px 0;}
+ .si-home-family .si-home-hero-icon{width:110px;height:110px;margin-right:8px;}
+}
+@media(max-width:640px){
+ .si-home-family{padding-top:18px;}
+ .si-home-family .si-home-hero{gap:12px;padding:0 0 22px;}
+ .si-home-family .si-home-hero h1{font-size:clamp(29px,7vw,42px);margin:9px 0;letter-spacing:-.02em;}
+ .si-home-family .si-home-hero h1 span{display:block;}
+ .si-home-family .si-home-motto{font-size:13px;}
+ .si-home-family .si-home-hero-icon{width:76px;height:76px;margin:0;}
+ .si-home-family .si-home-heading{display:flex;flex-wrap:wrap;gap:3px 12px;}
+ .si-home-family .si-home-paths{gap:10px;}
+ .si-home-family .si-home-path{padding:16px;min-height:185px;gap:7px;}
+ .si-home-family .si-home-path-primary{padding:20px;min-height:280px;}
+ .si-home-family .si-home-path strong{font-size:16px;}
+ .si-home-family .si-home-path-primary strong{font-size:27px;}
+ .si-home-family .si-path-description{font-size:12px;}
+ .si-home-family .si-path-icon{width:38px;height:38px;}
+ .si-home-family .si-home-support nav{gap:5px 16px;}
+}
+@media(max-width:370px){
+ .si-home-family .si-home-paths{grid-template-columns:1fr;}
+ .si-home-family .si-home-path:not(.si-home-path-primary){display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-rows:repeat(3,auto);gap:3px 13px;min-height:0;align-items:start;}
+ .si-home-family .si-home-path:not(.si-home-path-primary) .si-path-top{grid-row:1/4;grid-column:1;align-self:start;}
+ .si-home-family .si-home-path:not(.si-home-path-primary) .si-path-arrow{display:none;}
+ .si-home-family .si-home-path:not(.si-home-path-primary)>strong,.si-home-family .si-home-path:not(.si-home-path-primary)>.si-path-description,.si-home-family .si-home-path:not(.si-home-path-primary)>.si-path-action{grid-column:2;min-width:0;}
+ .si-home-family .si-home-path:not(.si-home-path-primary) .si-path-action{margin-top:2px;padding-top:2px;}
+ .si-home-family .si-home-path-primary{min-height:280px;}
+}
+@media(prefers-reduced-motion:reduce){.si-home-family .si-home-path,.si-home-family .si-path-arrow{transition:none!important;}}
+@media print{.si-home-family .si-home-paths{grid-template-columns:repeat(2,minmax(0,1fr));}.si-home-family .si-home-path-primary{grid-column:1/-1;min-height:0;}}
+
+/* Contrato da gaveta / Família de simuladores · Revisão de fidelidade. */
+.si-drawer-item{display:flex;width:100%;min-height:44px;align-items:center;gap:12px;padding:8px 10px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--text);text-align:left;text-decoration:none;font-size:.9rem;font-weight:600;cursor:pointer;line-height:1.35}
+.si-drawer-item:hover:not(:disabled),.si-drawer-item:focus-visible{background:var(--tint);border-color:var(--border)}
+.si-drawer-item:disabled{opacity:.5;cursor:not-allowed}
+.si-drawer-item[aria-current=page]{color:var(--accent);background:var(--tint);border-color:var(--border)}
+.si-drawer-item .si-menu-svg,.si-drawer-nav-toggle .si-menu-svg,.si-header-action .si-menu-svg,.menu-toggle .si-menu-svg{width:20px;height:20px;flex:0 0 20px;color:var(--muted)}
+.si-drawer-item[aria-current=page] .si-menu-svg{color:var(--accent)}
+.si-drawer-item>span:not(:first-child){flex:1}
+.si-drawer-item small{font-weight:500;font-size:.66rem;color:var(--muted);white-space:nowrap}
+.si-drawer-links{gap:2px}
+.si-drawer-nav-toggle .si-menu-svg:last-child{margin-left:auto;width:16px;height:16px;transition:transform .16s}
+.si-drawer-nav-toggle[aria-expanded=true] .si-menu-svg:last-child{transform:rotate(90deg)}
+.si-drawer-close{display:flex;align-items:center;justify-content:center}
+.si-drawer-close .si-menu-svg{width:21px;height:21px;stroke:currentColor}
+.si-drawer-context{margin:0 10px 6px;font-size:.8rem;color:var(--muted)}
+#si-activity-menu .si-drawer-item:last-child{color:#d65f61}
+.si-a11y-panel{display:flex;flex-direction:column;padding:2px 0 10px 32px;gap:1px}
+.si-a11y-panel[hidden],.si-startup-panel[hidden]{display:none!important}
+.si-panel-title{margin:10px 0 2px;padding:0 10px;color:var(--muted);font-size:.68rem;letter-spacing:.1em;font-weight:700;text-transform:uppercase}
+.si-a11y-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:6px 8px;border-radius:7px;color:var(--text);font-size:.82rem}
+.si-a11y-row:has(input:not(:disabled)):hover{background:var(--tint)}
+.si-a11y-label{display:flex;flex-direction:column;gap:2px;min-width:0}
+.si-a11y-label small{font-size:.69rem;font-weight:400;color:var(--muted)}
+.si-switch{position:relative;flex:0 0 42px;width:42px;height:25px}
+.si-switch input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;z-index:1}
+.si-switch .si-track{position:absolute;inset:0;border-radius:99px;background:var(--border);transition:background .15s}
+.si-switch .si-track::after{content:"";position:absolute;left:3px;top:3px;width:19px;height:19px;background:var(--surface);border-radius:99px;box-shadow:0 1px 3px #0004;transition:transform .15s}
+.si-switch input:checked+.si-track{background:var(--accent)}
+.si-switch input:checked+.si-track::after{transform:translateX(17px)}
+.si-switch input:focus-visible+.si-track{outline:2px solid var(--accent);outline-offset:3px}
+.si-switch input:disabled+.si-track{opacity:.42}
+.si-fontstep{display:flex;align-items:center;gap:4px}
+.si-fontstep button{min-width:34px;min-height:36px;border:1px solid var(--border);border-radius:6px;background:var(--tint);color:var(--text);font-weight:700}
+.si-fontstep output{font-size:.75rem;min-width:42px;text-align:center;color:var(--muted)}
+.si-a11y-row select,.si-startup-panel select{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:7px;min-height:36px;max-width:135px;width:100%;font-size:.76rem;padding:4px}
+.si-panel-note{padding:0 8px;color:var(--muted);font-size:.7rem;line-height:1.45;margin:5px 0}
+.si-disabled-marker{font-size:.67rem;color:var(--muted)}
+.si-startup-panel{padding:8px 10px 12px 40px}
+.si-startup-panel label{display:flex;align-items:center;justify-content:space-between;gap:7px;color:var(--muted);font-size:.75rem}
+.si-projector-row{cursor:pointer}.si-projector-row input{margin-left:auto;width:17px;height:17px;accent-color:var(--accent)}
+.si-header-action{cursor:pointer}.si-header-action .si-menu-svg{margin-right:5px;vertical-align:middle}
+:root.si-highcontrast{--surface:#050505;--text:#fff;--border:#fff;--tint:#171717;--muted:#ddd;--accent:#ffeb3b}
+:root.si-large-spacing .si-menu-drawer{letter-spacing:.045em}
+:root.si-simple-reading .si-menu-drawer .si-drawer-item{font-size:1rem;font-weight:700}
+:root.si-font-mod .app-shell{font-size:calc(100% * var(--si-font-factor,1))}
+:root.si-no-motion .si-menu-drawer,:root.si-no-motion .si-drawer-nav-toggle .si-menu-svg{transition:none!important}
+body.si-projector-mode .si-global-nav{display:none}
+body.si-projector-mode #conteudo{max-width:1800px;margin-inline:auto}
+body.si-projector-mode .si-global-brand{font-size:1.12em}
+@media(max-width:640px){.si-a11y-panel{padding-left:18px}.si-a11y-row{gap:6px}.si-a11y-row select{max-width:120px}.si-a11y-row .si-a11y-label{font-size:.78rem}}
+@media(max-height:440px){.si-drawer-head{padding-block:7px}.si-drawer-body{padding-top:0}}
+
+:root.si-achromatopsia #main-column{filter:grayscale(1)}
+.si-tour-overlay{position:fixed;inset:0;z-index:1005;display:flex;justify-content:center;align-items:flex-end;background:#0009;padding:20px}
+.si-tour-card{width:min(450px,100%);border-radius:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);padding:20px;box-shadow:0 16px 55px #0007}
+.si-tour-card h2{margin:0 0 8px;font-size:1.15rem}.si-tour-card p{font-size:.9rem;line-height:1.6}
+.si-tour-card div{display:flex;gap:9px;flex-wrap:wrap}.si-tour-card button{border:1px solid var(--border);background:var(--tint);color:var(--text);border-radius:8px;min-height:40px;padding:6px 13px;cursor:pointer}
+.si-tour-card button:disabled{opacity:.5;cursor:default}
+
+.si-a11y-label.si-with-icon{display:flex;flex-direction:row;align-items:center;gap:10px}
+.si-a11y-label .si-a11y-svg{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
+.si-a11y-label.si-with-icon small{font-size:.67rem}
 </style>
 </head>
 <body>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <div class="app-shell">
-    <aside class="side" id="sidebar" aria-label="Menu de navegação">
-      <a href="#/inicio" class="identity" aria-label="Base Demo Oficial - SI, início">
-        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" width="48" height="48" alt="">
-        <span><strong>Base Demo Oficial</strong><small>SI · Plataforma de simuladores</small></span>
-      </a>
-      <nav class="nav" aria-label="Seções">
-        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span> Início</a>
-        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span> Ambiente</a>
-        <a data-route="aprender" href="#/aprender"><span aria-hidden="true">▤</span> Aprender</a>
-        <a data-route="missoes" href="#/missoes"><span aria-hidden="true">◈</span> Missões</a>
-        <a data-route="roteiros" href="#/roteiros"><span aria-hidden="true">☷</span> Roteiros</a>
-        <a data-route="professor" href="#/professor"><span aria-hidden="true">▦</span> Área do Professor</a>
-        <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span> Caderno</a>
-        <a data-route="relatorios" href="#/relatorios"><span aria-hidden="true">▤</span> Relatórios</a>
-        <a data-route="manual" href="#/manual"><span aria-hidden="true">?</span> Manual</a>
-        <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
-        <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
-      </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.2</span></small></div>
-    </aside>
+    <aside class="side si-menu-drawer" id="sidebar" role="dialog" aria-modal="true" aria-labelledby="si-menu-title" aria-hidden="true">
+<div class="si-drawer-head"><h2 id="si-menu-title">Menu</h2><button type="button" id="si-nav-close" class="si-drawer-close" aria-label="Fechar menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<div class="si-drawer-body">
+ <section class="si-drawer-section" id="si-activity-menu" hidden aria-labelledby="si-activity-title">
+   <h3 id="si-activity-title">Atividade em andamento</h3><p id="si-activity-context" class="si-drawer-context"></p>
+   <button type="button" class="si-drawer-item" id="si-activity-about" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre esta atividade</span></button><a class="si-drawer-item" href="#/manual" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0M9 8a3 3 0 1 1 4 3c-1 1-1 1-1 3M12 17h.01"/></svg><span>Ajuda</span></a><a class="si-drawer-item" href="#/relatorios" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h10l4 4v14H5ZM15 3v5h4M8 12h8M8 16h8"/></svg><span>Relatório</span></a><button type="button" class="si-drawer-item" id="si-activity-finish" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 12h11M11.5 5.5 18 12l-6.5 6.5"/></svg><span>Finalizar atividade</span></button><button type="button" class="si-drawer-item" id="si-activity-exit" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Encerrar atividade</span></button>
+ </section>
+ <section class="si-drawer-section si-drawer-now" aria-labelledby="si-now-label"><h3 id="si-now-label">Agora</h3><strong id="si-now-title">Início</strong><p id="si-now-description">Seu contexto atual</p><button type="button" id="si-nav-continue" class="si-drawer-continue">Continuar nesta tela</button></section>
+ <section class="si-drawer-section" aria-label="Seções principais">
+   <button type="button" class="si-drawer-nav-toggle" id="si-nav-group-toggle" aria-expanded="true" aria-controls="si-nav-main"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Navegar</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
+   <nav id="si-nav-main" class="si-drawer-links" aria-label="Destinos da plataforma"><a class="si-drawer-item" href="#/inicio" data-route="inicio"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Início</span></a><a class="si-drawer-item" href="#/aprender" data-route="aprender"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8ZM8 19h8M10 22h4M9 8l3 3 3-3M12 11v5"/></svg><span>Aprender</span></a><a class="si-drawer-item" href="#/missoes" data-route="missoes"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-8-8M16 12a4 4 0 1 1-4-4M12 12l9-9M17 3h4v4"/></svg><span>Missões</span></a><a class="si-drawer-item" href="#/roteiros" data-route="roteiros"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Roteiros Experimentais</span></a><a class="si-drawer-item" href="#/ambiente" data-route="ambiente"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4h8M5 4v14a3 3 0 0 0 6 0V4M5 13h6M18 5c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6Z"/></svg><span>Ambiente</span></a><a class="si-drawer-item" href="#/caderno" data-route="caderno"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3h14v18H6ZM3 7h5M3 12h5M3 17h5M11 7h5M11 11h5M11 15h3"/></svg><span>Caderno</span></a><a class="si-drawer-item" href="#/manual" data-route="manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Manual</span></a></nav>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-resources-title"><h3 id="si-resources-title">Recursos</h3><div class="si-drawer-links"><button class="si-drawer-item si-menu-pending" type="button" disabled title="Aguardando integração funcional" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"/></svg><span>Montagens prontas</span><small>Em integração</small></button><button type="button" class="si-drawer-item" id="si-drawer-tour" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Tour da bancada</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-teacher-title"><h3 id="si-teacher-title">Professor</h3><div class="si-drawer-links"><a class="si-drawer-item" href="#/professor" data-route="professor"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M2 20v-5a3 3 0 0 1 6 0v5M13 6h8v15h-9V6h1M14 3h5v5h-5ZM15 12h3M15 16h3"/></svg><span>Área do Professor</span></a><a class="si-drawer-item" href="#/manual" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Apoio pedagógico</span></a><button type="button" class="si-drawer-item" id="si-guide-open" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Ideias para uma aula acessível</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-preferences-title"><h3 id="si-preferences-title">Preferências</h3>
+  <button class="si-drawer-nav-toggle" id="si-a11y-toggle" type="button" aria-expanded="false" aria-controls="si-a11y-panel"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Acessibilidade</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
+<div aria-labelledby="si-a11y-toggle" class="si-a11y-panel" hidden="" id="si-a11y-panel" role="group">
+<p class="si-panel-title">Aparência</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"></path></svg>Modo escuro</span><span class="si-switch"><input id="si-dark" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 3v18M12 7h7M12 11h9M12 15h8"></path></svg>Alto contraste</span><span class="si-switch"><input id="si-contrast" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M5 20 11 4h2l6 16M8 14h8"></path></svg>Tamanho do texto</span><div class="si-fontstep"><button aria-label="Diminuir texto" id="si-font-minus" type="button">A−</button><output aria-live="polite" id="si-font-output">100%</output><button aria-label="Aumentar texto" id="si-font-plus" type="button">A+</button></div></div>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M3 12h18M6 9l-3 3 3 3M18 9l3 3-3 3"></path></svg>Espaçamento de letras</span><span class="si-switch"><input id="si-letter-spacing" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 9v6M14 9v6"></path></svg>Reduzir animações</span><span class="si-switch"><input id="si-motion" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M10 4v8a4 4 0 0 0 8 0V4M8 4h12M10 9h8M4 17l2 2M4 11h2M5 6l1.5 1.5"></path></svg>Animação de abertura<small>Ao abrir ou recarregar</small></span><span class="si-switch"><input id="si-intro" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 6h16M4 10h16M4 14h10M4 18h7"></path></svg>Leitura simples<small>Texto maior e cores mais firmes</small></span><span class="si-switch"><input id="si-simple" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Visão de cores</p><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path></svg>Simular daltonismo</span><select id="si-vision-select"><option value="none">Nenhum</option><option value="protanopia">Protanopia</option><option value="deuteranopia">Deuteranopia</option><option value="tritanopia">Tritanopia</option><option value="acromatopsia">Acromatopsia</option></select></label>
+<p class="si-panel-note">Os filtros simulam diferenças de percepção; não substituem descrições textuais.</p>
+<p class="si-panel-title">Som e toque</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 9v6h4l5 4V5L8 9H4ZM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path></svg>Feedback sonoro<small>Disponível quando uma extensão fornecer eventos</small></span><span class="si-switch"><input disabled="" id="si-sound" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M8 4h8a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1ZM3 9v6M21 9v6"></path></svg>Feedback por vibração<small>Em dispositivos compatíveis e com suporte da extensão</small></span><span class="si-switch"><input disabled="" id="si-vibrate" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Outros recursos</p>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-2.7L3.3 15a1.5 1.5 0 0 1 2.5-1.7L8 16"></path></svg>Tradutor de Libras<small>Requer uma integração local homologada</small></span><span class="si-disabled-marker">Não disponível</span></div>
+<button class="si-drawer-item" id="si-a11y-reset" type="button"><svg aria-hidden="true" class="si-menu-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 8a9 9 0 1 1-1 7M3 3v6h6M12 7v6l4 2"></path></svg><span>Restaurar padrões</span></button>
+</div>
+  <div class="si-drawer-links si-present-settings">
+    <button type="button" id="si-startup-toggle" class="si-drawer-item"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Tela inicial</span></button>
+    <div id="si-startup-panel" class="si-startup-panel" hidden><label>Ao abrir a plataforma<select id="si-startup-select"><option value="inicio">Início</option><option value="ambiente">Ambiente</option><option value="aprender">Aprender</option></select></label></div>
+    <label class="si-drawer-item si-projector-row"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v13H3ZM8 22l4-5 4 5M12 17v5"/></svg><span>Apresentação · Modo projetor</span><input id="si-projector" type="checkbox" role="switch" aria-label="Modo projetor"></label>
+    <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
+  </div>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.3</span></p></section>
+</div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
 
     <div class="main-column" id="main-column">
       <header class="topbar si-global-header">
-        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu de navegação" title="Menu">☰</button>
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu" aria-haspopup="dialog" title="Menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
         <a class="si-global-brand" href="#/inicio" aria-label="Base Demo Oficial - SI, início">
           <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" width="34" height="34" alt="">
           <span><strong>SI</strong><small>Base Demo Oficial</small></span>
@@ -482,14 +717,14 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
           <a data-route="inicio" href="#/inicio">Início</a>
           <a data-route="aprender" href="#/aprender">Aprender</a>
           <a data-route="missoes" href="#/missoes">Missões</a>
-          <a data-route="roteiros" href="#/roteiros">Roteiros</a>
+          <a data-route="roteiros" href="#/roteiros">Roteiros Experimentais</a>
           <a data-route="ambiente" href="#/ambiente">Ambiente</a>
           <a data-route="caderno" href="#/caderno">Caderno</a>
           <a data-route="manual" href="#/manual">Manual</a>
         </nav>
         <div class="si-global-actions">
-          <a class="si-header-action" href="#/configuracoes" aria-label="Preferências e acessibilidade" title="Preferências e acessibilidade">⚙ <span>Preferências</span></a>
-          <span class="version-pill">v<span data-app-version>0.9.2</span></span>
+          <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
+          <span class="version-pill">v<span data-app-version>0.9.3</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -497,29 +732,51 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
         </div>
       <main id="conteudo" tabindex="-1">
-        <section class="view si-organized-home" data-view="inicio" aria-labelledby="home-title">
-          <header class="si-home-hero">
+        <section class="view si-organized-home si-home-family" data-view="inicio" aria-labelledby="home-title">
+          <header class="si-home-hero" aria-label="Apresentação da plataforma">
             <div class="si-home-hero-copy">
               <p class="eyebrow">BASE DEMO OFICIAL · SI</p>
-              <h1 id="home-title">Um ambiente. Muitas possibilidades.</h1>
-              <p class="si-home-motto">Explore. Construa. Observe. Investigue.</p>
+              <h1 id="home-title">Um ambiente. <span>Muitas possibilidades.</span></h1>
+              <p class="si-home-motto">Observe. Manipule. Registre. Investigue.</p>
             </div>
-            <img class="si-home-hero-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="110" height="110">
+            <img class="si-home-hero-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="144" height="144">
           </header>
           <div class="si-home-heading"><h2>Escolha seu próximo passo</h2><p>Da exploração livre à atividade orientada.</p></div>
           <nav class="si-home-paths" aria-label="Caminhos principais da plataforma">
-            <a class="si-home-path si-home-path-primary" href="#/ambiente">
-              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Cena livre</span></span>
-              <span class="si-path-kicker">Experimente na prática</span><strong>Ambiente</strong>
-              <span class="si-path-description">Organize objetos, experimente ferramentas e acompanhe suas observações.</span>
+            <a class="si-home-path si-home-path-primary" href="#/ambiente" aria-label="Entrar no ambiente de exploração livre">
+              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Ambiente livre</span></span>
+              <span class="si-path-kicker">Explore na prática</span>
+              <strong>Ambiente</strong>
+              <span class="si-path-description">Prepare uma cena, manipule objetos, utilize ferramentas e acompanhe o resultado.</span>
+              <span class="si-path-accent" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
               <span class="si-path-action">Entrar no ambiente <span aria-hidden="true">→</span></span>
             </a>
-            <a class="si-home-path" href="#/aprender"><span class="si-path-icon" aria-hidden="true">▤</span><strong>Aprender</strong><span class="si-path-description">Conheça os temas disponíveis.</span><span class="si-path-action">Explorar temas →</span></a>
-            <a class="si-home-path" href="#/missoes"><span class="si-path-icon" aria-hidden="true">◈</span><strong>Missões</strong><span class="si-path-description">Investigue objetivos e desafios.</span><span class="si-path-action">Ver missões →</span></a>
-            <a class="si-home-path" href="#/roteiros"><span class="si-path-icon" aria-hidden="true">☷</span><strong>Roteiros</strong><span class="si-path-description">Realize percursos por etapas.</span><span class="si-path-action">Abrir roteiros →</span></a>
-            <a class="si-home-path" href="#/caderno"><span class="si-path-icon" aria-hidden="true">▧</span><strong>Caderno</strong><span class="si-path-description">Registre e recupere investigações.</span><span class="si-path-action">Abrir caderno →</span></a>
+            <a class="si-home-path" href="#/aprender">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">▤</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Aprender</strong>
+              <span class="si-path-description">Conheça os temas e entenda como utilizar os recursos disponíveis.</span>
+              <span class="si-path-action" id="si-home-learning-meta">Temas para explorar</span>
+            </a>
+            <a class="si-home-path" href="#/missoes">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">◇</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Missões</strong>
+              <span class="si-path-description">Teste hipóteses e resolva desafios usando a cena.</span>
+              <span class="si-path-action" id="si-home-missions-meta">Desafios para investigar</span>
+            </a>
+            <a class="si-home-path" href="#/roteiros">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">☷</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Roteiros Experimentais</strong>
+              <span class="si-path-description">Realize investigações organizadas em etapas e retorne ao procedimento.</span>
+              <span class="si-path-action" id="si-home-scripts-meta">Percursos orientados</span>
+            </a>
+            <a class="si-home-path" href="#/caderno">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">▧</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Caderno</strong>
+              <span class="si-path-description">Registre observações, reúna interpretações e recupere suas descobertas.</span>
+              <span class="si-path-action" id="si-home-notebook-meta">Seu espaço de registros</span>
+            </a>
           </nav>
-          <footer class="si-home-support"><nav aria-label="Apoio e configuração"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
+          <footer class="si-home-support"><nav aria-label="Apoio e configurações"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
         </section>
 
         <section class="view si-environment" data-view="ambiente" aria-labelledby="environment-title" hidden>
@@ -537,7 +794,7 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
                 <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">▥</span> Dados</button>
               </div>
             </div>
-            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p>
+            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p><a href="#/roteiros" id="si-return-activity" class="si-return-activity" hidden>← Retornar à atividade orientada</a>
             <div class="si-scene-region" id="si-stage" aria-label="Cena de demonstração">
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
@@ -627,25 +884,36 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
 
         <section class="view edu-view" data-view="aprender" aria-labelledby="learn-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">TEMAS</p><h1 id="learn-title">Aprender</h1><p>Conteúdos organizados em temas, com leitura independente e marcação de conclusão.</p><p id="edu-topic-summary" class="edu-counter" aria-live="polite"></p></div>
-          <div id="edu-topic-list" class="edu-grid"></div>
+          <div id="edu-topic-list" class="edu-grid" aria-label="Catálogo de temas"></div><section id="edu-topic-detail" class="si-edu-detail" aria-label="Leitura do tema" hidden></section>
         </section>
         <section class="view edu-view" data-view="missoes" aria-labelledby="missions-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">ATIVIDADES</p><h1 id="missions-title">Missões</h1><p>Objetivos verificados a partir de ações realizadas na bancada. Sem ranking ou pontuação.</p></div>
-          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid"></div>
+          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid" aria-label="Catálogo de missões"></div><section id="edu-mission-detail" class="si-edu-detail" aria-label="Detalhes da missão" hidden></section>
         </section>
         <section class="view edu-view" data-view="roteiros" aria-labelledby="scripts-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">INVESTIGAÇÃO ORIENTADA</p><h1 id="scripts-title">Roteiros</h1><p>Sequências com etapas próprias e retorno direto ao ambiente para montar e examinar.</p></div>
-          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid"></div>
+          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid" aria-label="Catálogo de roteiros"></div><section id="edu-script-detail" class="si-edu-detail" aria-label="Detalhes do roteiro" hidden></section>
         </section>
         <section class="view edu-view" data-view="professor" aria-labelledby="teacher-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">AUTORIA LOCAL</p><h1 id="teacher-title">Área do Professor</h1><p>Configure atividades sem conta e sem serviços externos. Os arquivos JSON podem ser compartilhados e importados em outra instalação da base.</p></div>
           <div class="edu-teacher-layout">
             <section class="edu-card" aria-labelledby="edu-editor-title">
-              <h2 id="edu-editor-title">Nova atividade</h2>
+              <h2 id="edu-editor-title">Preparar atividade</h2>
+              <ol class="si-teacher-steps" aria-label="Etapas da preparação">
+                <li><button type="button" data-teacher-step="1" aria-current="step">1 · Identificação</button></li>
+                <li><button type="button" data-teacher-step="2">2 · Procedimentos</button></li>
+                <li><button type="button" data-teacher-step="3">3 · Conferir e gerar</button></li>
+              </ol>
               <form id="edu-teacher-form" class="edu-form">
+                <div class="si-teacher-panel" data-teacher-panel="1">
+                <h3>Identificação</h3>
                 <label for="edu-form-kind">Tipo de atividade</label><select id="edu-form-kind"><option value="mission">Missão</option><option value="script">Roteiro</option></select>
                 <label for="edu-form-title">Título</label><input id="edu-form-title" maxlength="90" required placeholder="Ex.: Organizando uma cena">
                 <label for="edu-form-description">Orientação</label><textarea id="edu-form-description" maxlength="300" rows="3" required placeholder="Descreva o propósito da atividade."></textarea>
+                <div class="si-teacher-controls"><button type="button" class="button primary" data-teacher-next="2">Próximo: procedimentos</button></div>
+                </div>
+                <div class="si-teacher-panel" data-teacher-panel="2" hidden>
+                <h3>Procedimentos e critérios</h3>
                 <fieldset><legend>Etapa 1</legend>
                   <label for="edu-step-one-label">Procedimento</label><input id="edu-step-one-label" maxlength="140" required placeholder="O que o estudante deve fazer?">
                   <div class="edu-form-row"><div><label for="edu-step-one-rule">Critério</label><select id="edu-step-one-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-one-min">Quantidade</label><input id="edu-step-one-min" type="number" min="1" max="60" value="1" disabled required></div></div>
@@ -654,7 +922,14 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
                   <label for="edu-step-two-label">Procedimento</label><input id="edu-step-two-label" maxlength="140" placeholder="Próxima etapa">
                   <div class="edu-form-row"><div><label for="edu-step-two-rule">Critério</label><select id="edu-step-two-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-two-min">Quantidade</label><input id="edu-step-two-min" type="number" min="1" max="60" value="1" disabled></div></div>
                 </fieldset>
-                <button class="button primary" type="submit">Criar atividade</button>
+                <div class="si-teacher-controls"><button type="button" class="button outline" data-teacher-previous="1">Voltar</button><button type="button" class="button primary" data-teacher-next="3">Próximo: conferir</button></div>
+                </div>
+                <div class="si-teacher-panel" data-teacher-panel="3" hidden>
+                  <h3>Conferência antes da publicação</h3>
+                  <div id="edu-teacher-preview" class="si-teacher-preview" role="status" aria-live="polite"></div>
+                  <p class="edu-small-note">A criação é local. Após salvar, abra a biblioteca para gerar o link ou exportar o JSON.</p>
+                  <div class="si-teacher-controls"><button type="button" class="button outline" data-teacher-previous="2">Voltar</button><button class="button primary" type="submit">Validar e gerar atividade</button></div>
+                </div>
               </form>
             </section>
             <section class="edu-card" aria-labelledby="edu-library-title">
@@ -734,7 +1009,10 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
         <section class="view narrow" data-view="manual" aria-labelledby="manual-title" hidden>
           <div class="section-heading"><p class="eyebrow">AJUDA LOCAL</p><h1 id="manual-title">Manual do usuário</h1><p>Orientações por funcionalidade, disponíveis sem internet. Use F1 para ajuda relativa à seção em uso.</p></div>
           <div class="card si-manual-search"><label for="manual-search">Buscar no manual</label><input id="manual-search" type="search" maxlength="100" placeholder="Ex.: instrumentos, relatórios, docas" autocomplete="off"><p id="manual-results-count" role="status" aria-live="polite"></p></div>
-          <div id="manual-topics" class="si-manual-topics"></div>
+          <div class="si-manual-layout">
+            <nav id="manual-index" class="card si-manual-index" aria-label="Índice do Manual"></nav>
+            <div id="manual-topics" class="si-manual-topics"></div>
+          </div>
         </section>
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
@@ -752,7 +1030,7 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.2</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.3</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -761,7 +1039,7 @@ body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.2</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.3</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -782,7 +1060,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.2",
+        version: "0.9.3",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -850,6 +1128,7 @@ var BaseDemoSI;
         const wasOpen = drawerOpen();
         document.body.classList.remove("nav-open");
         menuButton()?.setAttribute("aria-expanded", "false");
+        drawer()?.setAttribute("aria-hidden", "true");
         const shade = backdrop();
         if (shade)
             shade.hidden = true;
@@ -865,16 +1144,34 @@ var BaseDemoSI;
             return;
         document.body.classList.add("nav-open");
         menuButton()?.setAttribute("aria-expanded", "true");
+        drawer()?.setAttribute("aria-hidden", "false");
+        updateMenuContext();
         const shade = backdrop();
         if (shade)
             shade.hidden = false;
         const page = mainColumn();
         if (page)
             page.inert = true;
-        drawer()?.querySelector('.nav a[aria-current="page"],.nav a[href]')?.focus({ preventScroll: true });
+        // A transição visual não pode impedir a entrada do foco na gaveta modal.
+        window.requestAnimationFrame(() => {
+            if (!drawerOpen())
+                return;
+            const initial = drawer()?.querySelector("#si-nav-close");
+            initial?.focus({ preventScroll: true });
+        });
+    }
+    function updateMenuContext() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        const found = BaseDemoSI.manifest.routes.find(item => item.id === route);
+        const title = document.getElementById("si-now-title");
+        const description = document.getElementById("si-now-description");
+        if (title)
+            title.textContent = found?.title ?? "Início";
+        if (description)
+            description.textContent = found?.subtitle ?? "Continue sua atividade.";
     }
     function focusableItems() {
-        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled])') ?? [])
+        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled]),input:not([disabled]),select:not([disabled])') ?? [])
             .filter(item => item.getClientRects().length > 0);
     }
     function setupNavigationDrawer() {
@@ -882,6 +1179,16 @@ var BaseDemoSI;
             return;
         drawerStarted = true;
         menuButton()?.addEventListener("click", () => drawerOpen() ? closeNavigationDrawer(true) : openNavigationDrawer());
+        document.getElementById("si-nav-close")?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.getElementById("si-nav-continue")?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.getElementById("si-nav-group-toggle")?.addEventListener("click", () => {
+            const group = document.getElementById("si-nav-main");
+            const toggle = document.getElementById("si-nav-group-toggle");
+            if (!group || !toggle)
+                return;
+            group.hidden = !group.hidden;
+            toggle.setAttribute("aria-expanded", String(!group.hidden));
+        });
         backdrop()?.addEventListener("click", () => closeNavigationDrawer(true));
         document.addEventListener("keydown", event => {
             if (!drawerOpen())
@@ -915,6 +1222,230 @@ var BaseDemoSI;
         }));
     }
     BaseDemoSI.setupNavigationDrawer = setupNavigationDrawer;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    // Contrato de menu: preferência local e acesso contextual; nenhum motor científico.
+    const menuGet = (id) => document.getElementById(id);
+    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio" };
+    const prefKey = "family-menu-v1";
+    const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
+    let pref = { ...prefDefault };
+    let activityLink = "";
+    const checkbox = (id, checked) => { const node = menuGet(id); if (node)
+        node.checked = checked; };
+    function menuPreferences(value) {
+        pref = value;
+        const root = document.documentElement;
+        const theme = pref.dark ? "escuro" : "claro";
+        BaseDemoSI.applyTheme(theme);
+        menuGet("theme-choice")?.setAttribute("data-from-menu", theme);
+        const selector = menuGet("theme-choice");
+        if (selector)
+            selector.value = theme;
+        BaseDemoSI.storage.write("theme", theme);
+        root.classList.toggle("si-highcontrast", pref.contrast);
+        root.classList.toggle("si-large-spacing", pref.spacing);
+        root.classList.toggle("si-no-motion", pref.motion);
+        root.classList.toggle("si-simple-reading", pref.simple);
+        root.classList.toggle("si-font-mod", pref.font !== 1);
+        root.style.setProperty("--si-font-factor", String(pref.font));
+        document.body.classList.toggle("si-projector-mode", pref.projector);
+        for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
+            checkbox(id, v);
+        const output = menuGet("si-font-output");
+        if (output)
+            output.textContent = `${Math.round(pref.font * 100)}%`;
+        const minus = menuGet("si-font-minus");
+        const plus = menuGet("si-font-plus");
+        if (minus)
+            minus.disabled = pref.font <= .8;
+        if (plus)
+            plus.disabled = pref.font >= 2;
+        const vision = menuGet("si-vision-select");
+        if (vision)
+            vision.value = pref.vision;
+        const startup = menuGet("si-startup-select");
+        if (startup)
+            startup.value = pref.startup;
+        // Acromatopsia é representável por escala cinza. Os demais perfis
+        // demandam transformações de cor validadas e permanecem informativos.
+        root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+    }
+    function updatePref(key, value) {
+        menuPreferences({ ...pref, [key]: value });
+        if (!BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)))
+            BaseDemoSI.notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.", "warning");
+    }
+    function getActivityContext() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        const item = new URLSearchParams((window.location.hash.split("?")[1] ?? "")).get("item");
+        if (item && (route === "missoes" || route === "roteiros")) {
+            const candidates = [...BaseDemoSI.officialActivities];
+            const match = candidates.find(a => a.id === item);
+            if (match)
+                return { title: match.title, url: `#/${route}?item=${encodeURIComponent(item)}` };
+        }
+        const returnControl = menuGet("si-return-activity");
+        if (route === "ambiente" && returnControl && !returnControl.hidden && returnControl.href) {
+            const path = returnControl.getAttribute("href") ?? "";
+            if (path.startsWith("#/"))
+                return { title: "Atividade orientada", url: path };
+        }
+        return null;
+    }
+    function syncMenuReview() {
+        const ctx = getActivityContext();
+        activityLink = ctx?.url ?? "";
+        const activity = menuGet("si-activity-menu");
+        if (activity)
+            activity.hidden = !ctx;
+        const context = menuGet("si-activity-context");
+        if (context)
+            context.textContent = ctx ? `${ctx.title} · execução local` : "";
+        const title = menuGet("si-menu-title");
+        if (title)
+            title.textContent = ctx ? "Menu da atividade" : "Menu";
+        const now = menuGet("si-now-title"), desc = menuGet("si-now-description");
+        const route = BaseDemoSI.currentRoute(window.location.hash), info = BaseDemoSI.manifest.routes.find(x => x.id === route);
+        if (now)
+            now.textContent = info?.title ?? "Início";
+        if (desc)
+            desc.textContent = route === "ambiente" ? "Ambiente livre · Cena e ferramentas" : info?.subtitle ?? "Seu contexto atual";
+        const button = menuGet("si-nav-continue");
+        if (button)
+            button.textContent = route === "ambiente" ? "Continuar no ambiente" : "Continuar nesta tela";
+    }
+    function openAccessibility() {
+        const menu = menuGet("nav-toggle");
+        if (menu?.getAttribute("aria-expanded") !== "true")
+            menu?.click();
+        const area = menuGet("si-a11y-panel"), expand = menuGet("si-a11y-toggle");
+        if (area)
+            area.hidden = false;
+        if (expand)
+            expand.setAttribute("aria-expanded", "true");
+        expand?.focus({ preventScroll: true });
+        expand?.scrollIntoView({ block: "nearest" });
+    }
+    function togglePanel(triggerId, panelId) {
+        const trigger = menuGet(triggerId);
+        const panel = menuGet(panelId);
+        if (!panel || !trigger)
+            return;
+        panel.hidden = !panel.hidden;
+        trigger.setAttribute("aria-expanded", String(!panel.hidden));
+    }
+    function tour() {
+        window.location.hash = "#/ambiente";
+        BaseDemoSI.closeNavigationDrawer(false);
+        const targets = ["#si-stage", "#si-dock-left", "#si-dock-right", ".si-actionbar"];
+        const captions = ["Esta é a cena principal, que recebe os objetos.", "Montagem reúne objetos e ferramentas.", "Ver e Dados apresentam visualizações e registros.", "A barra de ações reúne operações de edição e histórico."];
+        let index = 0;
+        const root = document.createElement("div");
+        root.className = "si-tour-overlay";
+        root.setAttribute("role", "dialog");
+        root.setAttribute("aria-modal", "true");
+        root.setAttribute("aria-label", "Tour do ambiente");
+        const card = document.createElement("section");
+        card.className = "si-tour-card";
+        const title = document.createElement("h2");
+        const detail = document.createElement("p");
+        const buttons = document.createElement("div");
+        const back = document.createElement("button"), next = document.createElement("button"), exit = document.createElement("button");
+        back.type = next.type = exit.type = "button";
+        back.textContent = "Anterior";
+        exit.textContent = "Encerrar";
+        function done() { document.removeEventListener("keydown", key); root.remove(); }
+        function key(ev) { if (ev.key === "Escape") {
+            ev.preventDefault();
+            done();
+        } }
+        function render() {
+            title.textContent = `Tour do ambiente · ${index + 1}/${captions.length}`;
+            detail.textContent = captions[index];
+            back.disabled = index === 0;
+            next.textContent = index === captions.length - 1 ? "Concluir" : "Próximo";
+            const item = document.querySelector(targets[index]);
+            if (item) {
+                item.scrollIntoView({ block: "center", behavior: "instant" });
+            }
+        }
+        back.addEventListener("click", () => { index = Math.max(index - 1, 0); render(); });
+        next.addEventListener("click", () => { if (index === captions.length - 1)
+            done();
+        else {
+            index++;
+            render();
+        } });
+        exit.addEventListener("click", done);
+        buttons.append(back, next, exit);
+        card.append(title, detail, buttons);
+        root.append(card);
+        document.body.append(root);
+        render();
+        next.focus();
+        document.addEventListener("keydown", key);
+    }
+    function setupMenuReview() {
+        try {
+            const value = BaseDemoSI.storage.read(prefKey);
+            if (value) {
+                const obj = JSON.parse(value);
+                if (obj && typeof obj === "object")
+                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio" };
+            }
+        }
+        catch {
+            pref = { ...prefDefault };
+        }
+        const theme = BaseDemoSI.normalizeTheme(BaseDemoSI.storage.read("theme"));
+        if (theme !== "sistema")
+            pref.dark = theme === "escuro";
+        menuPreferences(pref);
+        // Apenas na abertura sem destino indicado é aplicada a tela inicial.
+        if (!window.location.hash || window.location.hash === "#/")
+            window.location.hash = `#/${pref.startup}`;
+        // A lista de destinos deve iniciar expandida em qualquer tamanho de tela.
+        // O usuário pode recolhê-la manualmente sem perder o acesso ao menu.
+        menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded", "true");
+        const routes = menuGet("si-nav-main");
+        if (routes)
+            routes.hidden = false;
+        menuGet("si-a11y-toggle")?.addEventListener("click", () => togglePanel("si-a11y-toggle", "si-a11y-panel"));
+        menuGet("si-startup-toggle")?.addEventListener("click", () => togglePanel("si-startup-toggle", "si-startup-panel"));
+        menuGet("si-header-access")?.addEventListener("click", openAccessibility);
+        menuGet("nav-toggle")?.addEventListener("click", () => requestAnimationFrame(syncMenuReview));
+        window.addEventListener("si-route-changed", syncMenuReview);
+        menuGet("si-startup-select")?.addEventListener("change", event => updatePref("startup", event.target.value));
+        for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
+            menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
+        }
+        for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
+            menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
+        }
+        menuGet("si-vision-select")?.addEventListener("change", event => { const v = event.target.value; updatePref("vision", v); if (v !== "none" && v !== "acromatopsia")
+            BaseDemoSI.notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.", "info"); });
+        menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
+        menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
+        menuGet("si-drawer-tour")?.addEventListener("click", tour);
+        menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
+        menuGet("si-activity-about")?.addEventListener("click", () => { if (activityLink) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = activityLink;
+        } });
+        menuGet("si-activity-finish")?.addEventListener("click", () => { if (activityLink) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = activityLink;
+            BaseDemoSI.notify("Confira os critérios e registre a etapa na própria atividade.", "info");
+        } });
+        menuGet("si-activity-exit")?.addEventListener("click", async () => { const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" }); if (decision) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = "#/roteiros";
+        } });
+        syncMenuReview();
+    }
+    BaseDemoSI.setupMenuReview = setupMenuReview;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -2591,88 +3122,146 @@ var BaseDemoSI;
         return node;
     }
     function countReadings() { return BaseDemoSI.extensionRecordCount(); }
+    /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
+    let returnToActivity = "";
+    const selectedParam = (key) => {
+        const search = window.location.hash.split("?")[1] ?? "";
+        return new URLSearchParams(search).get(key) ?? "";
+    };
+    function openDetail(route, key, id) {
+        window.location.hash = `#/${route}?${key}=${encodeURIComponent(id)}`;
+        if (BaseDemoSI.currentRoute(window.location.hash) === route)
+            renderAll();
+    }
+    function returnToCatalog(route, id) {
+        window.location.hash = `#/${route}`;
+        window.setTimeout(() => {
+            document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
+        }, 0);
+    }
+    function mountReturnLink() {
+        const control = el("si-return-activity");
+        if (!control)
+            return;
+        control.hidden = !returnToActivity || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
+        if (returnToActivity)
+            control.href = returnToActivity;
+    }
+    function showDetail(catalogId, detailId, open) {
+        const catalog = el(catalogId), detail = el(detailId);
+        if (catalog)
+            catalog.hidden = open;
+        if (detail)
+            detail.hidden = !open;
+        if (open)
+            detail?.replaceChildren();
+        return detail;
+    }
     function renderTopics() {
         const target = el("edu-topic-list");
         if (!target)
             return;
         target.replaceChildren();
         const saved = education.snapshot();
+        const active = BaseDemoSI.learningTopics.find(t => t.id === selectedParam("tema"));
+        const detail = showDetail("edu-topic-list", "edu-topic-detail", !!active);
         for (const topic of BaseDemoSI.learningTopics) {
             const card = document.createElement("article");
             card.className = "edu-card";
             card.dataset.topicId = topic.id;
-            card.append(text("p", saved.topicsDone.includes(topic.id) ? "Concluído" : "Tema", "edu-kicker"), text("h2", topic.title), text("p", topic.summary));
-            const details = document.createElement("details");
-            const summary = text("summary", "Ler conteúdo");
-            details.append(summary);
-            const body = document.createElement("div");
-            body.className = "edu-body";
-            for (const paragraph of topic.paragraphs)
-                body.append(text("p", paragraph));
-            details.append(body);
-            card.append(details);
-            card.append(button(saved.topicsDone.includes(topic.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => { if (education.toggleTopic(topic.id)) {
-                const next = target.querySelector(`[data-topic-id="${topic.id}"] button`);
-                next?.focus({ preventScroll: true });
-            } }));
+            card.append(text("p", saved.topicsDone.includes(topic.id) ? "Concluído" : "Tema disponível", "edu-kicker"), text("h2", topic.title), text("p", topic.summary));
+            const go = button("Abrir tema", () => openDetail("aprender", "tema", topic.id), "outline");
+            go.dataset.catalogId = topic.id;
+            card.append(go);
             target.append(card);
+        }
+        if (active && detail) {
+            const back = button("← Todos os temas", () => returnToCatalog("aprender", active.id));
+            back.classList.add("si-detail-back");
+            const heading = text("h2", active.title);
+            heading.tabIndex = -1;
+            detail.append(back, text("p", "LEITURA ORIENTADA", "edu-kicker"), heading, text("p", active.summary, "si-detail-lead"));
+            const article = document.createElement("article");
+            article.className = "si-detail-reading";
+            for (const paragraph of active.paragraphs)
+                article.append(text("p", paragraph));
+            detail.append(article);
+            detail.append(button(saved.topicsDone.includes(active.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => {
+                education.toggleTopic(active.id);
+                BaseDemoSI.notify("Progresso de leitura atualizado.", "success");
+            }, "primary"));
         }
         const stats = el("edu-topic-summary");
         if (stats)
             stats.textContent = `${saved.topicsDone.length} de ${BaseDemoSI.learningTopics.length} temas concluídos`;
     }
     function renderActivity(kind) {
-        const target = el(kind === "mission" ? "edu-mission-list" : "edu-script-list");
+        const route = kind === "mission" ? "missoes" : "roteiros";
+        const listId = kind === "mission" ? "edu-mission-list" : "edu-script-list";
+        const detailId = kind === "mission" ? "edu-mission-detail" : "edu-script-detail";
+        const target = el(listId);
         if (!target)
             return;
         target.replaceChildren();
         const snapshot = education.snapshot();
-        for (const a of education.list(kind)) {
+        const activities = education.list(kind);
+        const active = activities.find(a => a.id === selectedParam("item") && BaseDemoSI.currentRoute(window.location.hash) === route);
+        const detail = showDetail(listId, detailId, !!active);
+        for (const activity of activities) {
+            const position = snapshot.progress[activity.id] ?? 0, finished = position >= activity.steps.length;
             const card = document.createElement("article");
             card.className = "edu-card";
-            card.dataset.activityId = a.id;
-            const position = snapshot.progress[a.id] ?? 0, finished = position >= a.steps.length;
-            card.append(text("p", `${a.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${a.steps.length} etapas`}`, "edu-kicker"), text("h2", a.title), text("p", a.description));
-            const list = document.createElement("ol");
-            list.className = "edu-steps";
-            for (let i = 0; i < a.steps.length; i++) {
-                const step = a.steps[i], item = document.createElement("li");
-                item.className = i < position ? "edu-step-done" : i === position ? "edu-step-current" : "";
-                item.append(text("strong", step.label));
-                const criterion = step.requirement === "entities" ? `${step.minimum} objeto(s) na cena` : step.requirement === "selection" ? "Um objeto selecionado" : step.requirement === "readings" ? `${step.minimum} leitura(s) registrada(s)` : "Confirmação de realização";
-                item.append(text("small", criterion));
-                list.append(item);
-            }
-            card.append(list);
-            const actions = document.createElement("div");
-            actions.className = "edu-actions";
-            const go = document.createElement("a");
-            go.className = "button outline";
-            go.href = "#/ambiente";
-            go.textContent = "Montar na bancada";
-            actions.append(go);
-            if (!finished) {
-                const step = a.steps[position];
-                const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
-                const confirm = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
-                    const outcome = education.advance(a.id, educationScene.getSnapshot(), countReadings());
-                    BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
-                    if (outcome.ok) {
-                        const current = target.querySelector(`[data-activity-id="${a.id}"]`);
-                        (current?.querySelector("button") ?? current?.querySelector("a"))?.focus({ preventScroll: true });
-                    }
-                }, "primary");
-                confirm.disabled = !allowed;
-                confirm.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
-                actions.append(confirm);
-            }
-            else
-                actions.append(text("span", "Atividade finalizada", "edu-finished"));
-            card.append(actions);
+            card.dataset.activityId = activity.id;
+            card.append(text("p", `${activity.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${activity.steps.length} etapas`}`, "edu-kicker"), text("h2", activity.title), text("p", activity.description));
+            const go = button("Ver detalhes", () => openDetail(route, "item", activity.id));
+            go.dataset.catalogId = activity.id;
+            card.append(go);
             target.append(card);
         }
         if (!target.children.length)
             target.append(text("p", "Nenhuma atividade disponível."));
+        if (!active || !detail)
+            return;
+        const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
+        returnToActivity = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
+        back.classList.add("si-detail-back");
+        const heading = text("h2", active.title);
+        heading.tabIndex = -1;
+        detail.append(back, text("p", kind === "mission" ? "MISSÃO · OBJETIVOS" : "ROTEIRO · PROCEDIMENTO", "edu-kicker"), heading, text("p", active.description, "si-detail-lead"));
+        const list = document.createElement("ol");
+        list.className = "edu-steps si-detail-steps";
+        for (let i = 0; i < active.steps.length; i++) {
+            const step = active.steps[i], item = document.createElement("li");
+            item.className = i < position ? "edu-step-done" : i === position ? "edu-step-current" : "";
+            item.append(text("strong", step.label));
+            const criterion = step.requirement === "entities" ? `${step.minimum} objeto(s) na cena` : step.requirement === "selection" ? "Um objeto selecionado" : step.requirement === "readings" ? `${step.minimum} leitura(s) registrada(s)` : "Confirmação de realização";
+            item.append(text("small", criterion));
+            list.append(item);
+        }
+        detail.append(list);
+        const actions = document.createElement("div");
+        actions.className = "edu-actions";
+        const bench = document.createElement("a");
+        bench.className = "button primary";
+        bench.href = "#/ambiente";
+        bench.textContent = "Montar na bancada";
+        actions.append(bench);
+        if (!finished) {
+            const step = active.steps[position];
+            const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
+            const check = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
+                const outcome = education.advance(active.id, educationScene.getSnapshot(), countReadings());
+                BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
+            }, "outline");
+            check.disabled = !allowed;
+            check.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
+            actions.append(check);
+        }
+        else
+            actions.append(text("span", "Atividade concluída", "edu-finished"));
+        detail.append(actions);
+        mountReturnLink();
     }
     function renderTeacher() {
         const target = el("edu-teacher-list");
@@ -2698,7 +3287,7 @@ var BaseDemoSI;
             target.append(card);
         }
     }
-    function renderAll() { renderTopics(); renderActivity("mission"); renderActivity("script"); renderTeacher(); }
+    function renderAll() { renderTopics(); renderActivity("mission"); renderActivity("script"); renderTeacher(); mountReturnLink(); }
     const inputValue = (id) => el(id)?.value.trim() ?? "";
     const rule = (id) => el(id).value;
     const step = (prefix) => ({ label: inputValue(`${prefix}-label`), requirement: rule(`${prefix}-rule`), minimum: Number(inputValue(`${prefix}-min`) || 1) });
@@ -2707,6 +3296,42 @@ var BaseDemoSI;
         const second = el("edu-second-step");
         if (second)
             second.hidden = !show;
+    }
+    let currentTeacherStep = 1;
+    function teacherStep(step, validate = true) {
+        const form = el("edu-teacher-form");
+        if (!form || step < 1 || step > 3)
+            return;
+        if (validate && step > currentTeacherStep) {
+            for (let index = currentTeacherStep; index < step; index++) {
+                const panel = form.querySelector(`[data-teacher-panel="${index}"]`);
+                const inputs = Array.from(panel?.querySelectorAll("input,textarea,select") ?? []);
+                const invalid = inputs.find(input => !input.disabled && !input.checkValidity());
+                if (invalid) {
+                    BaseDemoSI.notify("Preencha os campos obrigatórios antes de continuar.", "warning");
+                    invalid.focus();
+                    return;
+                }
+            }
+        }
+        currentTeacherStep = step;
+        for (const panel of form.querySelectorAll("[data-teacher-panel]"))
+            panel.hidden = Number(panel.dataset.teacherPanel) !== step;
+        for (const control of document.querySelectorAll("[data-teacher-step]")) {
+            if (Number(control.dataset.teacherStep) === step)
+                control.setAttribute("aria-current", "step");
+            else
+                control.removeAttribute("aria-current");
+        }
+        const preview = el("edu-teacher-preview");
+        if (preview && step === 3) {
+            preview.replaceChildren();
+            preview.append(text("strong", inputValue("edu-form-title") || "Título não informado"), text("p", inputValue("edu-form-description")));
+            preview.append(text("p", `Tipo: ${el("edu-form-kind").value === "script" ? "Roteiro" : "Missão"}`));
+            preview.append(text("p", `1. ${inputValue("edu-step-one-label")}`));
+            if (el("edu-form-kind").value === "script")
+                preview.append(text("p", `2. ${inputValue("edu-step-two-label")}`));
+        }
     }
     function setupTeacherForm() {
         const kind = el("edu-form-kind");
@@ -2721,6 +3346,10 @@ var BaseDemoSI;
             });
         }
         displayTeacherKind();
+        document.querySelectorAll("[data-teacher-next],[data-teacher-previous],[data-teacher-step]").forEach(control => {
+            control.addEventListener("click", () => teacherStep(Number(control.dataset.teacherNext ?? control.dataset.teacherPrevious ?? control.dataset.teacherStep)));
+        });
+        teacherStep(1, false);
         el("edu-teacher-form")?.addEventListener("submit", event => {
             event.preventDefault();
             const type = kind?.value;
@@ -2733,6 +3362,7 @@ var BaseDemoSI;
             }
             el("edu-teacher-form").reset();
             displayTeacherKind();
+            teacherStep(1, false);
             BaseDemoSI.notify("Atividade personalizada criada.", "success");
         });
         el("edu-export")?.addEventListener("click", () => {
@@ -3096,19 +3726,39 @@ var BaseDemoSI;
     }
     BaseDemoSI.searchManual = searchManual;
     function manualElement(tag, content) { const n = document.createElement(tag); n.textContent = content; return n; }
+    function manualSelectedTopic() {
+        return new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("topic") ?? "";
+    }
     function renderManual() {
-        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count");
+        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count"), index = document.getElementById("manual-index");
         if (!list)
             return;
         const input = document.getElementById("manual-search");
+        const searching = !!input?.value.trim();
         const results = searchManual(input?.value ?? "");
+        const selected = manualSelectedTopic();
         list.replaceChildren();
+        index?.replaceChildren();
+        if (index) {
+            index.append(manualElement("h2", "Índice do Manual"));
+            const group = document.createElement("div");
+            group.className = "si-manual-index-links";
+            for (const topic of results) {
+                const link = document.createElement("a");
+                link.href = `#/manual?topic=${encodeURIComponent(topic.id)}`;
+                link.textContent = topic.title;
+                if (selected === topic.id)
+                    link.setAttribute("aria-current", "true");
+                group.append(link);
+            }
+            index.append(group);
+        }
         for (const topic of results) {
             const article = document.createElement("article");
             article.className = "card si-manual-topic";
             article.id = "manual-" + topic.id;
             const details = document.createElement("details");
-            details.open = !!input?.value.trim() || window.location.hash.includes("topic=" + topic.id);
+            details.open = searching || selected === topic.id;
             details.append(manualElement("summary", topic.title));
             for (const paragraph of topic.paragraphs)
                 details.append(manualElement("p", paragraph));
@@ -3131,6 +3781,13 @@ var BaseDemoSI;
             const current = BaseDemoSI.currentRoute(window.location.hash);
             const topic = BaseDemoSI.manualTopics.find(t => t.routes.includes(current))?.id ?? "inicio";
             window.location.hash = `#/manual?topic=${topic}`;
+        });
+        document.getElementById("manual-index")?.addEventListener("click", event => {
+            const link = event.target.closest("a");
+            if (!link)
+                return;
+            // A mudança de hash conserva a seção e seleciona o item no índice.
+            window.setTimeout(() => document.getElementById("manual-" + manualSelectedTopic())?.querySelector("summary")?.focus({ preventScroll: true }), 0);
         });
         renderManual();
     }
@@ -3286,7 +3943,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -3300,6 +3957,9 @@ var BaseDemoSI;
         const control = document.getElementById("distribution-install");
         if (control)
             control.hidden = !visible;
+        const menuControl = document.getElementById("si-drawer-install");
+        if (menuControl)
+            menuControl.hidden = !visible;
     }
     function setupDistribution() {
         window.addEventListener("beforeinstallprompt", event => {
@@ -3636,6 +4296,47 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    /** Indicadores reais do catálogo, sem conteúdo disciplinar na Home. */
+    function updateHomeIndicators() {
+        const setText = (id, text) => { const node = document.getElementById(id); if (node)
+            node.textContent = text; };
+        const officialMissions = BaseDemoSI.officialActivities.filter(a => a.kind === "mission").length;
+        const officialScripts = BaseDemoSI.officialActivities.filter(a => a.kind === "script").length;
+        let saved = null;
+        let journal = null;
+        try {
+            const value = BaseDemoSI.storage.read("education-document-v1");
+            if (value)
+                saved = BaseDemoSI.parseEducation(JSON.parse(value));
+        }
+        catch { /* Sem dados acessíveis: catálogo ainda funciona. */ }
+        try {
+            const value = BaseDemoSI.storage.read("journal-document-v1");
+            if (value)
+                journal = BaseDemoSI.parseJournal(JSON.parse(value));
+        }
+        catch { /* Falha de armazenamento não bloqueia a Home. */ }
+        const topicsDone = saved?.topicsDone.length ?? 0;
+        const extraMissions = saved?.teacherActivities.filter(a => a.kind === "mission").length ?? 0;
+        const extraScripts = saved?.teacherActivities.filter(a => a.kind === "script").length ?? 0;
+        const notes = journal?.notes.length ?? 0;
+        setText("si-home-learning-meta", `${BaseDemoSI.learningTopics.length} temas · ${topicsDone} concluído${topicsDone === 1 ? "" : "s"}`);
+        setText("si-home-missions-meta", `${officialMissions + extraMissions} desafios para investigar`);
+        setText("si-home-scripts-meta", `${officialScripts + extraScripts} investigações orientadas`);
+        setText("si-home-notebook-meta", notes ? `${notes} registro${notes === 1 ? "" : "s"} salvo${notes === 1 ? "" : "s"}` : "Pronto para seus registros");
+    }
+    BaseDemoSI.updateHomeIndicators = updateHomeIndicators;
+    function setupHome() {
+        window.addEventListener("si-route-changed", () => {
+            if (BaseDemoSI.currentRoute(window.location.hash) === "inicio")
+                updateHomeIndicators();
+        });
+        updateHomeIndicators();
+    }
+    BaseDemoSI.setupHome = setupHome;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     function initialize() {
         document.documentElement.lang = BaseDemoSI.manifest.language;
         for (const version of document.querySelectorAll("[data-app-version]")) {
@@ -3650,10 +4351,12 @@ var BaseDemoSI;
         BaseDemoSI.updateRoute();
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
         BaseDemoSI.setupNavigationDrawer();
+        BaseDemoSI.setupMenuReview();
         BaseDemoSI.setupDistribution();
         BaseDemoSI.setupModules();
         BaseDemoSI.setupManual();
         BaseDemoSI.setupSharedActivities();
+        BaseDemoSI.setupHome();
     }
     BaseDemoSI.initialize = initialize;
 })(BaseDemoSI || (BaseDemoSI = {}));

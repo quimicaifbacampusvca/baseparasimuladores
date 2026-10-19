@@ -21,14 +21,26 @@ namespace BaseDemoSI {
     });
   }
   function manualElement(tag:string,content:string):HTMLElement {const n=document.createElement(tag);n.textContent=content;return n;}
+  function manualSelectedTopic():string {
+    return new URLSearchParams(window.location.hash.split("?")[1]??"").get("topic")??"";
+  }
   function renderManual():void {
-    const list=document.getElementById("manual-topics"),count=document.getElementById("manual-results-count");if(!list)return;
+    const list=document.getElementById("manual-topics"),count=document.getElementById("manual-results-count"),index=document.getElementById("manual-index");if(!list)return;
     const input=document.getElementById("manual-search") as HTMLInputElement|null;
-    const results=searchManual(input?.value??"");list.replaceChildren();
-    for(const topic of results){const article=document.createElement("article");article.className="card si-manual-topic";article.id="manual-"+topic.id;
-      const details=document.createElement("details");details.open=!!input?.value.trim() || window.location.hash.includes("topic="+topic.id);
+    const searching=!!input?.value.trim();const results=searchManual(input?.value??"");
+    const selected=manualSelectedTopic();list.replaceChildren();index?.replaceChildren();
+    if(index){index.append(manualElement("h2","Índice do Manual"));
+      const group=document.createElement("div");group.className="si-manual-index-links";
+      for(const topic of results){const link=document.createElement("a");link.href=`#/manual?topic=${encodeURIComponent(topic.id)}`;link.textContent=topic.title;
+        if(selected===topic.id)link.setAttribute("aria-current","true");group.append(link);}
+      index.append(group);
+    }
+    for(const topic of results){
+      const article=document.createElement("article");article.className="card si-manual-topic";article.id="manual-"+topic.id;
+      const details=document.createElement("details");details.open=searching || selected===topic.id;
       details.append(manualElement("summary",topic.title));for(const paragraph of topic.paragraphs)details.append(manualElement("p",paragraph));
-      article.append(details);list.append(article);}
+      article.append(details);list.append(article);
+    }
     if(count)count.textContent=`${results.length} de ${manualTopics.length} orientações`;
     if(!results.length)list.append(manualElement("p","Nenhuma orientação encontrada. Tente outro termo."));
   }
@@ -41,6 +53,12 @@ namespace BaseDemoSI {
       const current=currentRoute(window.location.hash);
       const topic=manualTopics.find(t=>t.routes.includes(current))?.id??"inicio";
       window.location.hash=`#/manual?topic=${topic}`;
+    });
+    document.getElementById("manual-index")?.addEventListener("click",event=>{
+      const link=(event.target as HTMLElement).closest("a");
+      if(!link)return;
+      // A mudança de hash conserva a seção e seleciona o item no índice.
+      window.setTimeout(()=>document.getElementById("manual-"+manualSelectedTopic())?.querySelector("summary")?.focus({preventScroll:true}),0);
     });
     renderManual();
   }

@@ -19,38 +19,67 @@
   <link rel="stylesheet" href="./inspection.css">
   <link rel="stylesheet" href="./completion.css">
   <link rel="stylesheet" href="./organization.css">
+  <link rel="stylesheet" href="./environment-organization.css">
+  <link rel="stylesheet" href="./menu-fidelity.css">
+    <link rel="stylesheet" href="./home-fidelity.css">
+  <link rel="stylesheet" href="./menu-review.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
 <body>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <div class="app-shell">
-    <aside class="side" id="sidebar" aria-label="Menu de navegação">
-      <a href="#/inicio" class="identity" aria-label="Base Demo Oficial - SI, início">
-        <img src="./assets/icon.svg" width="48" height="48" alt="">
-        <span><strong>Base Demo Oficial</strong><small>SI · Plataforma de simuladores</small></span>
-      </a>
-      <nav class="nav" aria-label="Seções">
-        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span> Início</a>
-        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span> Ambiente</a>
-        <a data-route="aprender" href="#/aprender"><span aria-hidden="true">▤</span> Aprender</a>
-        <a data-route="missoes" href="#/missoes"><span aria-hidden="true">◈</span> Missões</a>
-        <a data-route="roteiros" href="#/roteiros"><span aria-hidden="true">☷</span> Roteiros</a>
-        <a data-route="professor" href="#/professor"><span aria-hidden="true">▦</span> Área do Professor</a>
-        <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span> Caderno</a>
-        <a data-route="relatorios" href="#/relatorios"><span aria-hidden="true">▤</span> Relatórios</a>
-        <a data-route="manual" href="#/manual"><span aria-hidden="true">?</span> Manual</a>
-        <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
-        <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
-      </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.2</span></small></div>
-    </aside>
+    <aside class="side si-menu-drawer" id="sidebar" role="dialog" aria-modal="true" aria-labelledby="si-menu-title" aria-hidden="true">
+<div class="si-drawer-head"><h2 id="si-menu-title">Menu</h2><button type="button" id="si-nav-close" class="si-drawer-close" aria-label="Fechar menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<div class="si-drawer-body">
+ <section class="si-drawer-section" id="si-activity-menu" hidden aria-labelledby="si-activity-title">
+   <h3 id="si-activity-title">Atividade em andamento</h3><p id="si-activity-context" class="si-drawer-context"></p>
+   <button type="button" class="si-drawer-item" id="si-activity-about" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre esta atividade</span></button><a class="si-drawer-item" href="#/manual" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0M9 8a3 3 0 1 1 4 3c-1 1-1 1-1 3M12 17h.01"/></svg><span>Ajuda</span></a><a class="si-drawer-item" href="#/relatorios" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 3h10l4 4v14H5ZM15 3v5h4M8 12h8M8 16h8"/></svg><span>Relatório</span></a><button type="button" class="si-drawer-item" id="si-activity-finish" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 12h11M11.5 5.5 18 12l-6.5 6.5"/></svg><span>Finalizar atividade</span></button><button type="button" class="si-drawer-item" id="si-activity-exit" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Encerrar atividade</span></button>
+ </section>
+ <section class="si-drawer-section si-drawer-now" aria-labelledby="si-now-label"><h3 id="si-now-label">Agora</h3><strong id="si-now-title">Início</strong><p id="si-now-description">Seu contexto atual</p><button type="button" id="si-nav-continue" class="si-drawer-continue">Continuar nesta tela</button></section>
+ <section class="si-drawer-section" aria-label="Seções principais">
+   <button type="button" class="si-drawer-nav-toggle" id="si-nav-group-toggle" aria-expanded="true" aria-controls="si-nav-main"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Navegar</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
+   <nav id="si-nav-main" class="si-drawer-links" aria-label="Destinos da plataforma"><a class="si-drawer-item" href="#/inicio" data-route="inicio"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Início</span></a><a class="si-drawer-item" href="#/aprender" data-route="aprender"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 16c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8ZM8 19h8M10 22h4M9 8l3 3 3-3M12 11v5"/></svg><span>Aprender</span></a><a class="si-drawer-item" href="#/missoes" data-route="missoes"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-8-8M16 12a4 4 0 1 1-4-4M12 12l9-9M17 3h4v4"/></svg><span>Missões</span></a><a class="si-drawer-item" href="#/roteiros" data-route="roteiros"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Roteiros Experimentais</span></a><a class="si-drawer-item" href="#/ambiente" data-route="ambiente"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 4h8M5 4v14a3 3 0 0 0 6 0V4M5 13h6M18 5c1 2 3 4 3 6a3 3 0 0 1-6 0c0-2 2-4 3-6Z"/></svg><span>Ambiente</span></a><a class="si-drawer-item" href="#/caderno" data-route="caderno"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3h14v18H6ZM3 7h5M3 12h5M3 17h5M11 7h5M11 11h5M11 15h3"/></svg><span>Caderno</span></a><a class="si-drawer-item" href="#/manual" data-route="manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Manual</span></a></nav>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-resources-title"><h3 id="si-resources-title">Recursos</h3><div class="si-drawer-links"><button class="si-drawer-item si-menu-pending" type="button" disabled title="Aguardando integração funcional" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 18h20M4 18v3M20 18v3M5 3h6M6 3v10a2 2 0 0 0 4 0V3M6 10h4M16 6v4l-3 5h8l-3-5V6M15 6h4"/></svg><span>Montagens prontas</span><small>Em integração</small></button><button type="button" class="si-drawer-item" id="si-drawer-tour" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M16 8l-3 5-5 3 3-5Z"/></svg><span>Tour da bancada</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-teacher-title"><h3 id="si-teacher-title">Professor</h3><div class="si-drawer-links"><a class="si-drawer-item" href="#/professor" data-route="professor"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M2 20v-5a3 3 0 0 1 6 0v5M13 6h8v15h-9V6h1M14 3h5v5h-5ZM15 12h3M15 16h3"/></svg><span>Área do Professor</span></a><a class="si-drawer-item" href="#/manual" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5H5v16h14V5h-3M8 3h8v4H8ZM8 11l1 1 2-2M13 11h3M8 16h8"/></svg><span>Apoio pedagógico</span></a><button type="button" class="si-drawer-item" id="si-guide-open" ><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Ideias para uma aula acessível</span></button></div></section>
+ <section class="si-drawer-section" aria-labelledby="si-preferences-title"><h3 id="si-preferences-title">Preferências</h3>
+  <button class="si-drawer-nav-toggle" id="si-a11y-toggle" type="button" aria-expanded="false" aria-controls="si-a11y-panel"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg><span>Acessibilidade</span><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg></button>
+<div aria-labelledby="si-a11y-toggle" class="si-a11y-panel" hidden="" id="si-a11y-panel" role="group">
+<p class="si-panel-title">Aparência</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"></path></svg>Modo escuro</span><span class="si-switch"><input id="si-dark" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 3v18M12 7h7M12 11h9M12 15h8"></path></svg>Alto contraste</span><span class="si-switch"><input id="si-contrast" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M5 20 11 4h2l6 16M8 14h8"></path></svg>Tamanho do texto</span><div class="si-fontstep"><button aria-label="Diminuir texto" id="si-font-minus" type="button">A−</button><output aria-live="polite" id="si-font-output">100%</output><button aria-label="Aumentar texto" id="si-font-plus" type="button">A+</button></div></div>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M3 12h18M6 9l-3 3 3 3M18 9l3 3-3 3"></path></svg>Espaçamento de letras</span><span class="si-switch"><input id="si-letter-spacing" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM10 9v6M14 9v6"></path></svg>Reduzir animações</span><span class="si-switch"><input id="si-motion" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M10 4v8a4 4 0 0 0 8 0V4M8 4h12M10 9h8M4 17l2 2M4 11h2M5 6l1.5 1.5"></path></svg>Animação de abertura<small>Ao abrir ou recarregar</small></span><span class="si-switch"><input id="si-intro" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 6h16M4 10h16M4 14h10M4 18h7"></path></svg>Leitura simples<small>Texto maior e cores mais firmes</small></span><span class="si-switch"><input id="si-simple" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Visão de cores</p><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path></svg>Simular daltonismo</span><select id="si-vision-select"><option value="none">Nenhum</option><option value="protanopia">Protanopia</option><option value="deuteranopia">Deuteranopia</option><option value="tritanopia">Tritanopia</option><option value="acromatopsia">Acromatopsia</option></select></label>
+<p class="si-panel-note">Os filtros simulam diferenças de percepção; não substituem descrições textuais.</p>
+<p class="si-panel-title">Som e toque</p>
+<label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M4 9v6h4l5 4V5L8 9H4ZM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path></svg>Feedback sonoro<small>Disponível quando uma extensão fornecer eventos</small></span><span class="si-switch"><input disabled="" id="si-sound" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label><label class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M8 4h8a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1ZM3 9v6M21 9v6"></path></svg>Feedback por vibração<small>Em dispositivos compatíveis e com suporte da extensão</small></span><span class="si-switch"><input disabled="" id="si-vibrate" role="switch" type="checkbox"/><span aria-hidden="true" class="si-track"></span></span></label>
+<p class="si-panel-title">Outros recursos</p>
+<div class="si-a11y-row"><span class="si-a11y-label si-with-icon"><svg aria-hidden="true" class="si-a11y-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-1a6 6 0 0 1-5-2.7L3.3 15a1.5 1.5 0 0 1 2.5-1.7L8 16"></path></svg>Tradutor de Libras<small>Requer uma integração local homologada</small></span><span class="si-disabled-marker">Não disponível</span></div>
+<button class="si-drawer-item" id="si-a11y-reset" type="button"><svg aria-hidden="true" class="si-menu-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 8a9 9 0 1 1-1 7M3 3v6h6M12 7v6l4 2"></path></svg><span>Restaurar padrões</span></button>
+</div>
+  <div class="si-drawer-links si-present-settings">
+    <button type="button" id="si-startup-toggle" class="si-drawer-item"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Tela inicial</span></button>
+    <div id="si-startup-panel" class="si-startup-panel" hidden><label>Ao abrir a plataforma<select id="si-startup-select"><option value="inicio">Início</option><option value="ambiente">Ambiente</option><option value="aprender">Aprender</option></select></label></div>
+    <label class="si-drawer-item si-projector-row"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v13H3ZM8 22l4-5 4 5M12 17v5"/></svg><span>Apresentação · Modo projetor</span><input id="si-projector" type="checkbox" role="switch" aria-label="Modo projetor"></label>
+    <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
+  </div>
+ </section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.3</span></p></section>
+</div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
 
     <div class="main-column" id="main-column">
       <header class="topbar si-global-header">
-        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu de navegação" title="Menu">☰</button>
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu" aria-haspopup="dialog" title="Menu"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
         <a class="si-global-brand" href="#/inicio" aria-label="Base Demo Oficial - SI, início">
           <img src="./assets/icon.svg" width="34" height="34" alt="">
           <span><strong>SI</strong><small>Base Demo Oficial</small></span>
@@ -59,14 +88,14 @@
           <a data-route="inicio" href="#/inicio">Início</a>
           <a data-route="aprender" href="#/aprender">Aprender</a>
           <a data-route="missoes" href="#/missoes">Missões</a>
-          <a data-route="roteiros" href="#/roteiros">Roteiros</a>
+          <a data-route="roteiros" href="#/roteiros">Roteiros Experimentais</a>
           <a data-route="ambiente" href="#/ambiente">Ambiente</a>
           <a data-route="caderno" href="#/caderno">Caderno</a>
           <a data-route="manual" href="#/manual">Manual</a>
         </nav>
         <div class="si-global-actions">
-          <a class="si-header-action" href="#/configuracoes" aria-label="Preferências e acessibilidade" title="Preferências e acessibilidade">⚙ <span>Preferências</span></a>
-          <span class="version-pill">v<span data-app-version>0.9.2</span></span>
+          <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
+          <span class="version-pill">v<span data-app-version>0.9.3</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -74,29 +103,51 @@
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
         </div>
       <main id="conteudo" tabindex="-1">
-        <section class="view si-organized-home" data-view="inicio" aria-labelledby="home-title">
-          <header class="si-home-hero">
+        <section class="view si-organized-home si-home-family" data-view="inicio" aria-labelledby="home-title">
+          <header class="si-home-hero" aria-label="Apresentação da plataforma">
             <div class="si-home-hero-copy">
               <p class="eyebrow">BASE DEMO OFICIAL · SI</p>
-              <h1 id="home-title">Um ambiente. Muitas possibilidades.</h1>
-              <p class="si-home-motto">Explore. Construa. Observe. Investigue.</p>
+              <h1 id="home-title">Um ambiente. <span>Muitas possibilidades.</span></h1>
+              <p class="si-home-motto">Observe. Manipule. Registre. Investigue.</p>
             </div>
-            <img class="si-home-hero-icon" src="./assets/icon.svg" alt="" width="110" height="110">
+            <img class="si-home-hero-icon" src="./assets/icon.svg" alt="" width="144" height="144">
           </header>
           <div class="si-home-heading"><h2>Escolha seu próximo passo</h2><p>Da exploração livre à atividade orientada.</p></div>
           <nav class="si-home-paths" aria-label="Caminhos principais da plataforma">
-            <a class="si-home-path si-home-path-primary" href="#/ambiente">
-              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Cena livre</span></span>
-              <span class="si-path-kicker">Experimente na prática</span><strong>Ambiente</strong>
-              <span class="si-path-description">Organize objetos, experimente ferramentas e acompanhe suas observações.</span>
+            <a class="si-home-path si-home-path-primary" href="#/ambiente" aria-label="Entrar no ambiente de exploração livre">
+              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Ambiente livre</span></span>
+              <span class="si-path-kicker">Explore na prática</span>
+              <strong>Ambiente</strong>
+              <span class="si-path-description">Prepare uma cena, manipule objetos, utilize ferramentas e acompanhe o resultado.</span>
+              <span class="si-path-accent" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
               <span class="si-path-action">Entrar no ambiente <span aria-hidden="true">→</span></span>
             </a>
-            <a class="si-home-path" href="#/aprender"><span class="si-path-icon" aria-hidden="true">▤</span><strong>Aprender</strong><span class="si-path-description">Conheça os temas disponíveis.</span><span class="si-path-action">Explorar temas →</span></a>
-            <a class="si-home-path" href="#/missoes"><span class="si-path-icon" aria-hidden="true">◈</span><strong>Missões</strong><span class="si-path-description">Investigue objetivos e desafios.</span><span class="si-path-action">Ver missões →</span></a>
-            <a class="si-home-path" href="#/roteiros"><span class="si-path-icon" aria-hidden="true">☷</span><strong>Roteiros</strong><span class="si-path-description">Realize percursos por etapas.</span><span class="si-path-action">Abrir roteiros →</span></a>
-            <a class="si-home-path" href="#/caderno"><span class="si-path-icon" aria-hidden="true">▧</span><strong>Caderno</strong><span class="si-path-description">Registre e recupere investigações.</span><span class="si-path-action">Abrir caderno →</span></a>
+            <a class="si-home-path" href="#/aprender">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">▤</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Aprender</strong>
+              <span class="si-path-description">Conheça os temas e entenda como utilizar os recursos disponíveis.</span>
+              <span class="si-path-action" id="si-home-learning-meta">Temas para explorar</span>
+            </a>
+            <a class="si-home-path" href="#/missoes">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">◇</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Missões</strong>
+              <span class="si-path-description">Teste hipóteses e resolva desafios usando a cena.</span>
+              <span class="si-path-action" id="si-home-missions-meta">Desafios para investigar</span>
+            </a>
+            <a class="si-home-path" href="#/roteiros">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">☷</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Roteiros Experimentais</strong>
+              <span class="si-path-description">Realize investigações organizadas em etapas e retorne ao procedimento.</span>
+              <span class="si-path-action" id="si-home-scripts-meta">Percursos orientados</span>
+            </a>
+            <a class="si-home-path" href="#/caderno">
+              <span class="si-path-top"><span class="si-path-icon" aria-hidden="true">▧</span><span class="si-path-arrow" aria-hidden="true">↗</span></span>
+              <strong>Caderno</strong>
+              <span class="si-path-description">Registre observações, reúna interpretações e recupere suas descobertas.</span>
+              <span class="si-path-action" id="si-home-notebook-meta">Seu espaço de registros</span>
+            </a>
           </nav>
-          <footer class="si-home-support"><nav aria-label="Apoio e configuração"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
+          <footer class="si-home-support"><nav aria-label="Apoio e configurações"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
         </section>
 
         <section class="view si-environment" data-view="ambiente" aria-labelledby="environment-title" hidden>
@@ -114,7 +165,7 @@
                 <button type="button" data-open-dock="dados" aria-controls="si-dock-right" aria-expanded="false"><span aria-hidden="true">▥</span> Dados</button>
               </div>
             </div>
-            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p>
+            <p id="si-module-description" class="sr-only" aria-live="polite">Modo de trabalho livre.</p><a href="#/roteiros" id="si-return-activity" class="si-return-activity" hidden>← Retornar à atividade orientada</a>
             <div class="si-scene-region" id="si-stage" aria-label="Cena de demonstração">
               <section id="workspace-focus" class="si-focus-view" aria-label="Foco da cena">
                 <div class="si-stage-name"><strong id="focused-object-label">Cena de demonstração</strong><small id="focused-object-subtitle">Selecione ou adicione um objeto</small></div>
@@ -204,25 +255,36 @@
 
         <section class="view edu-view" data-view="aprender" aria-labelledby="learn-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">TEMAS</p><h1 id="learn-title">Aprender</h1><p>Conteúdos organizados em temas, com leitura independente e marcação de conclusão.</p><p id="edu-topic-summary" class="edu-counter" aria-live="polite"></p></div>
-          <div id="edu-topic-list" class="edu-grid"></div>
+          <div id="edu-topic-list" class="edu-grid" aria-label="Catálogo de temas"></div><section id="edu-topic-detail" class="si-edu-detail" aria-label="Leitura do tema" hidden></section>
         </section>
         <section class="view edu-view" data-view="missoes" aria-labelledby="missions-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">ATIVIDADES</p><h1 id="missions-title">Missões</h1><p>Objetivos verificados a partir de ações realizadas na bancada. Sem ranking ou pontuação.</p></div>
-          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid"></div>
+          <div id="si-shared-mission" class="edu-card si-shared-card" hidden></div><div id="edu-mission-list" class="edu-grid" aria-label="Catálogo de missões"></div><section id="edu-mission-detail" class="si-edu-detail" aria-label="Detalhes da missão" hidden></section>
         </section>
         <section class="view edu-view" data-view="roteiros" aria-labelledby="scripts-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">INVESTIGAÇÃO ORIENTADA</p><h1 id="scripts-title">Roteiros</h1><p>Sequências com etapas próprias e retorno direto ao ambiente para montar e examinar.</p></div>
-          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid"></div>
+          <div id="si-shared-activity" class="edu-card si-shared-card" hidden></div><div id="edu-script-list" class="edu-grid" aria-label="Catálogo de roteiros"></div><section id="edu-script-detail" class="si-edu-detail" aria-label="Detalhes do roteiro" hidden></section>
         </section>
         <section class="view edu-view" data-view="professor" aria-labelledby="teacher-title" hidden>
           <div class="section-heading edu-page-heading"><p class="eyebrow">AUTORIA LOCAL</p><h1 id="teacher-title">Área do Professor</h1><p>Configure atividades sem conta e sem serviços externos. Os arquivos JSON podem ser compartilhados e importados em outra instalação da base.</p></div>
           <div class="edu-teacher-layout">
             <section class="edu-card" aria-labelledby="edu-editor-title">
-              <h2 id="edu-editor-title">Nova atividade</h2>
+              <h2 id="edu-editor-title">Preparar atividade</h2>
+              <ol class="si-teacher-steps" aria-label="Etapas da preparação">
+                <li><button type="button" data-teacher-step="1" aria-current="step">1 · Identificação</button></li>
+                <li><button type="button" data-teacher-step="2">2 · Procedimentos</button></li>
+                <li><button type="button" data-teacher-step="3">3 · Conferir e gerar</button></li>
+              </ol>
               <form id="edu-teacher-form" class="edu-form">
+                <div class="si-teacher-panel" data-teacher-panel="1">
+                <h3>Identificação</h3>
                 <label for="edu-form-kind">Tipo de atividade</label><select id="edu-form-kind"><option value="mission">Missão</option><option value="script">Roteiro</option></select>
                 <label for="edu-form-title">Título</label><input id="edu-form-title" maxlength="90" required placeholder="Ex.: Organizando uma cena">
                 <label for="edu-form-description">Orientação</label><textarea id="edu-form-description" maxlength="300" rows="3" required placeholder="Descreva o propósito da atividade."></textarea>
+                <div class="si-teacher-controls"><button type="button" class="button primary" data-teacher-next="2">Próximo: procedimentos</button></div>
+                </div>
+                <div class="si-teacher-panel" data-teacher-panel="2" hidden>
+                <h3>Procedimentos e critérios</h3>
                 <fieldset><legend>Etapa 1</legend>
                   <label for="edu-step-one-label">Procedimento</label><input id="edu-step-one-label" maxlength="140" required placeholder="O que o estudante deve fazer?">
                   <div class="edu-form-row"><div><label for="edu-step-one-rule">Critério</label><select id="edu-step-one-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-one-min">Quantidade</label><input id="edu-step-one-min" type="number" min="1" max="60" value="1" disabled required></div></div>
@@ -231,7 +293,14 @@
                   <label for="edu-step-two-label">Procedimento</label><input id="edu-step-two-label" maxlength="140" placeholder="Próxima etapa">
                   <div class="edu-form-row"><div><label for="edu-step-two-rule">Critério</label><select id="edu-step-two-rule"><option value="manual">Confirmação manual</option><option value="entities">Quantidade de objetos</option><option value="selection">Objeto selecionado</option><option value="readings">Quantidade de leituras</option></select></div><div><label for="edu-step-two-min">Quantidade</label><input id="edu-step-two-min" type="number" min="1" max="60" value="1" disabled></div></div>
                 </fieldset>
-                <button class="button primary" type="submit">Criar atividade</button>
+                <div class="si-teacher-controls"><button type="button" class="button outline" data-teacher-previous="1">Voltar</button><button type="button" class="button primary" data-teacher-next="3">Próximo: conferir</button></div>
+                </div>
+                <div class="si-teacher-panel" data-teacher-panel="3" hidden>
+                  <h3>Conferência antes da publicação</h3>
+                  <div id="edu-teacher-preview" class="si-teacher-preview" role="status" aria-live="polite"></div>
+                  <p class="edu-small-note">A criação é local. Após salvar, abra a biblioteca para gerar o link ou exportar o JSON.</p>
+                  <div class="si-teacher-controls"><button type="button" class="button outline" data-teacher-previous="2">Voltar</button><button class="button primary" type="submit">Validar e gerar atividade</button></div>
+                </div>
               </form>
             </section>
             <section class="edu-card" aria-labelledby="edu-library-title">
@@ -311,7 +380,10 @@
         <section class="view narrow" data-view="manual" aria-labelledby="manual-title" hidden>
           <div class="section-heading"><p class="eyebrow">AJUDA LOCAL</p><h1 id="manual-title">Manual do usuário</h1><p>Orientações por funcionalidade, disponíveis sem internet. Use F1 para ajuda relativa à seção em uso.</p></div>
           <div class="card si-manual-search"><label for="manual-search">Buscar no manual</label><input id="manual-search" type="search" maxlength="100" placeholder="Ex.: instrumentos, relatórios, docas" autocomplete="off"><p id="manual-results-count" role="status" aria-live="polite"></p></div>
-          <div id="manual-topics" class="si-manual-topics"></div>
+          <div class="si-manual-layout">
+            <nav id="manual-index" class="card si-manual-index" aria-label="Índice do Manual"></nav>
+            <div id="manual-topics" class="si-manual-topics"></div>
+          </div>
         </section>
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
@@ -329,7 +401,7 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.2</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.3</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -338,7 +410,7 @@
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.2</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.3</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>

@@ -19,5 +19,5 @@ assert(!nav.includes('mobileMenu()'));
 assert(read('sw.js').includes('"./organization.css"'));
 assert(read('src/distribution.ts').includes('"./organization.css"'));
 assert(read('standalone.html').includes('.si-global-nav'));
-for(const p of ['README.md','docs/ACEITE-0.9.2.md','organization.css','src/navigation.ts'])assert(!/SIAB/i.test(read(p)));
+for(const p of ['README.md','docs/ACEITE-0.9.3.md','organization.css','src/navigation.ts'])assert(!/SIAB/i.test(read(p)));
 console.log('OK: hierarquia de telas, navegação universal, Home por caminhos, acessos mobile, isolamento da bancada e distribuição offline.');

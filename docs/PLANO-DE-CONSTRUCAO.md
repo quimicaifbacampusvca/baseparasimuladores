@@ -14,3 +14,5 @@
 | 1.0.0 | Homologação | Contratos estáveis e base universal validada | Planejada |
 
 Regra permanente: nenhuma etapa introduz conteúdo científico específico no núcleo. Toda dependência de execução deve ser distribuída localmente. A documentação registra apenas a identidade da própria plataforma.
+
+- 0.9.3: organização interna de Aprender, Missões, Roteiros, Professor e Manual (catálogos, detalhamento, retornos e mobile).

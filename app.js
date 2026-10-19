@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.2",
+        version: "0.9.3",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -74,6 +74,7 @@ var BaseDemoSI;
         const wasOpen = drawerOpen();
         document.body.classList.remove("nav-open");
         menuButton()?.setAttribute("aria-expanded", "false");
+        drawer()?.setAttribute("aria-hidden", "true");
         const shade = backdrop();
         if (shade)
             shade.hidden = true;
@@ -89,16 +90,34 @@ var BaseDemoSI;
             return;
         document.body.classList.add("nav-open");
         menuButton()?.setAttribute("aria-expanded", "true");
+        drawer()?.setAttribute("aria-hidden", "false");
+        updateMenuContext();
         const shade = backdrop();
         if (shade)
             shade.hidden = false;
         const page = mainColumn();
         if (page)
             page.inert = true;
-        drawer()?.querySelector('.nav a[aria-current="page"],.nav a[href]')?.focus({ preventScroll: true });
+        // A transição visual não pode impedir a entrada do foco na gaveta modal.
+        window.requestAnimationFrame(() => {
+            if (!drawerOpen())
+                return;
+            const initial = drawer()?.querySelector("#si-nav-close");
+            initial?.focus({ preventScroll: true });
+        });
+    }
+    function updateMenuContext() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        const found = BaseDemoSI.manifest.routes.find(item => item.id === route);
+        const title = document.getElementById("si-now-title");
+        const description = document.getElementById("si-now-description");
+        if (title)
+            title.textContent = found?.title ?? "Início";
+        if (description)
+            description.textContent = found?.subtitle ?? "Continue sua atividade.";
     }
     function focusableItems() {
-        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled])') ?? [])
+        return Array.from(drawer()?.querySelectorAll('a[href]:not([hidden]),button:not([disabled]),input:not([disabled]),select:not([disabled])') ?? [])
             .filter(item => item.getClientRects().length > 0);
     }
     function setupNavigationDrawer() {
@@ -106,6 +125,16 @@ var BaseDemoSI;
             return;
         drawerStarted = true;
         menuButton()?.addEventListener("click", () => drawerOpen() ? closeNavigationDrawer(true) : openNavigationDrawer());
+        document.getElementById("si-nav-close")?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.getElementById("si-nav-continue")?.addEventListener("click", () => closeNavigationDrawer(true));
+        document.getElementById("si-nav-group-toggle")?.addEventListener("click", () => {
+            const group = document.getElementById("si-nav-main");
+            const toggle = document.getElementById("si-nav-group-toggle");
+            if (!group || !toggle)
+                return;
+            group.hidden = !group.hidden;
+            toggle.setAttribute("aria-expanded", String(!group.hidden));
+        });
         backdrop()?.addEventListener("click", () => closeNavigationDrawer(true));
         document.addEventListener("keydown", event => {
             if (!drawerOpen())
@@ -139,6 +168,230 @@ var BaseDemoSI;
         }));
     }
     BaseDemoSI.setupNavigationDrawer = setupNavigationDrawer;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
+    // Contrato de menu: preferência local e acesso contextual; nenhum motor científico.
+    const menuGet = (id) => document.getElementById(id);
+    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio" };
+    const prefKey = "family-menu-v1";
+    const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
+    let pref = { ...prefDefault };
+    let activityLink = "";
+    const checkbox = (id, checked) => { const node = menuGet(id); if (node)
+        node.checked = checked; };
+    function menuPreferences(value) {
+        pref = value;
+        const root = document.documentElement;
+        const theme = pref.dark ? "escuro" : "claro";
+        BaseDemoSI.applyTheme(theme);
+        menuGet("theme-choice")?.setAttribute("data-from-menu", theme);
+        const selector = menuGet("theme-choice");
+        if (selector)
+            selector.value = theme;
+        BaseDemoSI.storage.write("theme", theme);
+        root.classList.toggle("si-highcontrast", pref.contrast);
+        root.classList.toggle("si-large-spacing", pref.spacing);
+        root.classList.toggle("si-no-motion", pref.motion);
+        root.classList.toggle("si-simple-reading", pref.simple);
+        root.classList.toggle("si-font-mod", pref.font !== 1);
+        root.style.setProperty("--si-font-factor", String(pref.font));
+        document.body.classList.toggle("si-projector-mode", pref.projector);
+        for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
+            checkbox(id, v);
+        const output = menuGet("si-font-output");
+        if (output)
+            output.textContent = `${Math.round(pref.font * 100)}%`;
+        const minus = menuGet("si-font-minus");
+        const plus = menuGet("si-font-plus");
+        if (minus)
+            minus.disabled = pref.font <= .8;
+        if (plus)
+            plus.disabled = pref.font >= 2;
+        const vision = menuGet("si-vision-select");
+        if (vision)
+            vision.value = pref.vision;
+        const startup = menuGet("si-startup-select");
+        if (startup)
+            startup.value = pref.startup;
+        // Acromatopsia é representável por escala cinza. Os demais perfis
+        // demandam transformações de cor validadas e permanecem informativos.
+        root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+    }
+    function updatePref(key, value) {
+        menuPreferences({ ...pref, [key]: value });
+        if (!BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)))
+            BaseDemoSI.notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.", "warning");
+    }
+    function getActivityContext() {
+        const route = BaseDemoSI.currentRoute(window.location.hash);
+        const item = new URLSearchParams((window.location.hash.split("?")[1] ?? "")).get("item");
+        if (item && (route === "missoes" || route === "roteiros")) {
+            const candidates = [...BaseDemoSI.officialActivities];
+            const match = candidates.find(a => a.id === item);
+            if (match)
+                return { title: match.title, url: `#/${route}?item=${encodeURIComponent(item)}` };
+        }
+        const returnControl = menuGet("si-return-activity");
+        if (route === "ambiente" && returnControl && !returnControl.hidden && returnControl.href) {
+            const path = returnControl.getAttribute("href") ?? "";
+            if (path.startsWith("#/"))
+                return { title: "Atividade orientada", url: path };
+        }
+        return null;
+    }
+    function syncMenuReview() {
+        const ctx = getActivityContext();
+        activityLink = ctx?.url ?? "";
+        const activity = menuGet("si-activity-menu");
+        if (activity)
+            activity.hidden = !ctx;
+        const context = menuGet("si-activity-context");
+        if (context)
+            context.textContent = ctx ? `${ctx.title} · execução local` : "";
+        const title = menuGet("si-menu-title");
+        if (title)
+            title.textContent = ctx ? "Menu da atividade" : "Menu";
+        const now = menuGet("si-now-title"), desc = menuGet("si-now-description");
+        const route = BaseDemoSI.currentRoute(window.location.hash), info = BaseDemoSI.manifest.routes.find(x => x.id === route);
+        if (now)
+            now.textContent = info?.title ?? "Início";
+        if (desc)
+            desc.textContent = route === "ambiente" ? "Ambiente livre · Cena e ferramentas" : info?.subtitle ?? "Seu contexto atual";
+        const button = menuGet("si-nav-continue");
+        if (button)
+            button.textContent = route === "ambiente" ? "Continuar no ambiente" : "Continuar nesta tela";
+    }
+    function openAccessibility() {
+        const menu = menuGet("nav-toggle");
+        if (menu?.getAttribute("aria-expanded") !== "true")
+            menu?.click();
+        const area = menuGet("si-a11y-panel"), expand = menuGet("si-a11y-toggle");
+        if (area)
+            area.hidden = false;
+        if (expand)
+            expand.setAttribute("aria-expanded", "true");
+        expand?.focus({ preventScroll: true });
+        expand?.scrollIntoView({ block: "nearest" });
+    }
+    function togglePanel(triggerId, panelId) {
+        const trigger = menuGet(triggerId);
+        const panel = menuGet(panelId);
+        if (!panel || !trigger)
+            return;
+        panel.hidden = !panel.hidden;
+        trigger.setAttribute("aria-expanded", String(!panel.hidden));
+    }
+    function tour() {
+        window.location.hash = "#/ambiente";
+        BaseDemoSI.closeNavigationDrawer(false);
+        const targets = ["#si-stage", "#si-dock-left", "#si-dock-right", ".si-actionbar"];
+        const captions = ["Esta é a cena principal, que recebe os objetos.", "Montagem reúne objetos e ferramentas.", "Ver e Dados apresentam visualizações e registros.", "A barra de ações reúne operações de edição e histórico."];
+        let index = 0;
+        const root = document.createElement("div");
+        root.className = "si-tour-overlay";
+        root.setAttribute("role", "dialog");
+        root.setAttribute("aria-modal", "true");
+        root.setAttribute("aria-label", "Tour do ambiente");
+        const card = document.createElement("section");
+        card.className = "si-tour-card";
+        const title = document.createElement("h2");
+        const detail = document.createElement("p");
+        const buttons = document.createElement("div");
+        const back = document.createElement("button"), next = document.createElement("button"), exit = document.createElement("button");
+        back.type = next.type = exit.type = "button";
+        back.textContent = "Anterior";
+        exit.textContent = "Encerrar";
+        function done() { document.removeEventListener("keydown", key); root.remove(); }
+        function key(ev) { if (ev.key === "Escape") {
+            ev.preventDefault();
+            done();
+        } }
+        function render() {
+            title.textContent = `Tour do ambiente · ${index + 1}/${captions.length}`;
+            detail.textContent = captions[index];
+            back.disabled = index === 0;
+            next.textContent = index === captions.length - 1 ? "Concluir" : "Próximo";
+            const item = document.querySelector(targets[index]);
+            if (item) {
+                item.scrollIntoView({ block: "center", behavior: "instant" });
+            }
+        }
+        back.addEventListener("click", () => { index = Math.max(index - 1, 0); render(); });
+        next.addEventListener("click", () => { if (index === captions.length - 1)
+            done();
+        else {
+            index++;
+            render();
+        } });
+        exit.addEventListener("click", done);
+        buttons.append(back, next, exit);
+        card.append(title, detail, buttons);
+        root.append(card);
+        document.body.append(root);
+        render();
+        next.focus();
+        document.addEventListener("keydown", key);
+    }
+    function setupMenuReview() {
+        try {
+            const value = BaseDemoSI.storage.read(prefKey);
+            if (value) {
+                const obj = JSON.parse(value);
+                if (obj && typeof obj === "object")
+                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio" };
+            }
+        }
+        catch {
+            pref = { ...prefDefault };
+        }
+        const theme = BaseDemoSI.normalizeTheme(BaseDemoSI.storage.read("theme"));
+        if (theme !== "sistema")
+            pref.dark = theme === "escuro";
+        menuPreferences(pref);
+        // Apenas na abertura sem destino indicado é aplicada a tela inicial.
+        if (!window.location.hash || window.location.hash === "#/")
+            window.location.hash = `#/${pref.startup}`;
+        // A lista de destinos deve iniciar expandida em qualquer tamanho de tela.
+        // O usuário pode recolhê-la manualmente sem perder o acesso ao menu.
+        menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded", "true");
+        const routes = menuGet("si-nav-main");
+        if (routes)
+            routes.hidden = false;
+        menuGet("si-a11y-toggle")?.addEventListener("click", () => togglePanel("si-a11y-toggle", "si-a11y-panel"));
+        menuGet("si-startup-toggle")?.addEventListener("click", () => togglePanel("si-startup-toggle", "si-startup-panel"));
+        menuGet("si-header-access")?.addEventListener("click", openAccessibility);
+        menuGet("nav-toggle")?.addEventListener("click", () => requestAnimationFrame(syncMenuReview));
+        window.addEventListener("si-route-changed", syncMenuReview);
+        menuGet("si-startup-select")?.addEventListener("change", event => updatePref("startup", event.target.value));
+        for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
+            menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
+        }
+        for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
+            menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
+        }
+        menuGet("si-vision-select")?.addEventListener("change", event => { const v = event.target.value; updatePref("vision", v); if (v !== "none" && v !== "acromatopsia")
+            BaseDemoSI.notify("Perfil registrado. A simulação visual dessa alteração ainda requer validação específica.", "info"); });
+        menuGet("si-a11y-reset")?.addEventListener("click", () => { menuPreferences({ ...prefDefault }); BaseDemoSI.storage.write(prefKey, JSON.stringify(pref)); BaseDemoSI.notify("Preferências de acessibilidade restauradas.", "success"); });
+        menuGet("si-drawer-install")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); menuGet("distribution-install")?.click(); });
+        menuGet("si-drawer-tour")?.addEventListener("click", tour);
+        menuGet("si-guide-open")?.addEventListener("click", () => { BaseDemoSI.closeNavigationDrawer(false); window.location.hash = "#/manual"; BaseDemoSI.notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.", "info"); });
+        menuGet("si-activity-about")?.addEventListener("click", () => { if (activityLink) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = activityLink;
+        } });
+        menuGet("si-activity-finish")?.addEventListener("click", () => { if (activityLink) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = activityLink;
+            BaseDemoSI.notify("Confira os critérios e registre a etapa na própria atividade.", "info");
+        } });
+        menuGet("si-activity-exit")?.addEventListener("click", async () => { const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" }); if (decision) {
+            BaseDemoSI.closeNavigationDrawer(false);
+            window.location.hash = "#/roteiros";
+        } });
+        syncMenuReview();
+    }
+    BaseDemoSI.setupMenuReview = setupMenuReview;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
@@ -1815,88 +2068,146 @@ var BaseDemoSI;
         return node;
     }
     function countReadings() { return BaseDemoSI.extensionRecordCount(); }
+    /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
+    let returnToActivity = "";
+    const selectedParam = (key) => {
+        const search = window.location.hash.split("?")[1] ?? "";
+        return new URLSearchParams(search).get(key) ?? "";
+    };
+    function openDetail(route, key, id) {
+        window.location.hash = `#/${route}?${key}=${encodeURIComponent(id)}`;
+        if (BaseDemoSI.currentRoute(window.location.hash) === route)
+            renderAll();
+    }
+    function returnToCatalog(route, id) {
+        window.location.hash = `#/${route}`;
+        window.setTimeout(() => {
+            document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
+        }, 0);
+    }
+    function mountReturnLink() {
+        const control = el("si-return-activity");
+        if (!control)
+            return;
+        control.hidden = !returnToActivity || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
+        if (returnToActivity)
+            control.href = returnToActivity;
+    }
+    function showDetail(catalogId, detailId, open) {
+        const catalog = el(catalogId), detail = el(detailId);
+        if (catalog)
+            catalog.hidden = open;
+        if (detail)
+            detail.hidden = !open;
+        if (open)
+            detail?.replaceChildren();
+        return detail;
+    }
     function renderTopics() {
         const target = el("edu-topic-list");
         if (!target)
             return;
         target.replaceChildren();
         const saved = education.snapshot();
+        const active = BaseDemoSI.learningTopics.find(t => t.id === selectedParam("tema"));
+        const detail = showDetail("edu-topic-list", "edu-topic-detail", !!active);
         for (const topic of BaseDemoSI.learningTopics) {
             const card = document.createElement("article");
             card.className = "edu-card";
             card.dataset.topicId = topic.id;
-            card.append(text("p", saved.topicsDone.includes(topic.id) ? "Concluído" : "Tema", "edu-kicker"), text("h2", topic.title), text("p", topic.summary));
-            const details = document.createElement("details");
-            const summary = text("summary", "Ler conteúdo");
-            details.append(summary);
-            const body = document.createElement("div");
-            body.className = "edu-body";
-            for (const paragraph of topic.paragraphs)
-                body.append(text("p", paragraph));
-            details.append(body);
-            card.append(details);
-            card.append(button(saved.topicsDone.includes(topic.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => { if (education.toggleTopic(topic.id)) {
-                const next = target.querySelector(`[data-topic-id="${topic.id}"] button`);
-                next?.focus({ preventScroll: true });
-            } }));
+            card.append(text("p", saved.topicsDone.includes(topic.id) ? "Concluído" : "Tema disponível", "edu-kicker"), text("h2", topic.title), text("p", topic.summary));
+            const go = button("Abrir tema", () => openDetail("aprender", "tema", topic.id), "outline");
+            go.dataset.catalogId = topic.id;
+            card.append(go);
             target.append(card);
+        }
+        if (active && detail) {
+            const back = button("← Todos os temas", () => returnToCatalog("aprender", active.id));
+            back.classList.add("si-detail-back");
+            const heading = text("h2", active.title);
+            heading.tabIndex = -1;
+            detail.append(back, text("p", "LEITURA ORIENTADA", "edu-kicker"), heading, text("p", active.summary, "si-detail-lead"));
+            const article = document.createElement("article");
+            article.className = "si-detail-reading";
+            for (const paragraph of active.paragraphs)
+                article.append(text("p", paragraph));
+            detail.append(article);
+            detail.append(button(saved.topicsDone.includes(active.id) ? "Desmarcar conclusão" : "Marcar como concluído", () => {
+                education.toggleTopic(active.id);
+                BaseDemoSI.notify("Progresso de leitura atualizado.", "success");
+            }, "primary"));
         }
         const stats = el("edu-topic-summary");
         if (stats)
             stats.textContent = `${saved.topicsDone.length} de ${BaseDemoSI.learningTopics.length} temas concluídos`;
     }
     function renderActivity(kind) {
-        const target = el(kind === "mission" ? "edu-mission-list" : "edu-script-list");
+        const route = kind === "mission" ? "missoes" : "roteiros";
+        const listId = kind === "mission" ? "edu-mission-list" : "edu-script-list";
+        const detailId = kind === "mission" ? "edu-mission-detail" : "edu-script-detail";
+        const target = el(listId);
         if (!target)
             return;
         target.replaceChildren();
         const snapshot = education.snapshot();
-        for (const a of education.list(kind)) {
+        const activities = education.list(kind);
+        const active = activities.find(a => a.id === selectedParam("item") && BaseDemoSI.currentRoute(window.location.hash) === route);
+        const detail = showDetail(listId, detailId, !!active);
+        for (const activity of activities) {
+            const position = snapshot.progress[activity.id] ?? 0, finished = position >= activity.steps.length;
             const card = document.createElement("article");
             card.className = "edu-card";
-            card.dataset.activityId = a.id;
-            const position = snapshot.progress[a.id] ?? 0, finished = position >= a.steps.length;
-            card.append(text("p", `${a.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${a.steps.length} etapas`}`, "edu-kicker"), text("h2", a.title), text("p", a.description));
-            const list = document.createElement("ol");
-            list.className = "edu-steps";
-            for (let i = 0; i < a.steps.length; i++) {
-                const step = a.steps[i], item = document.createElement("li");
-                item.className = i < position ? "edu-step-done" : i === position ? "edu-step-current" : "";
-                item.append(text("strong", step.label));
-                const criterion = step.requirement === "entities" ? `${step.minimum} objeto(s) na cena` : step.requirement === "selection" ? "Um objeto selecionado" : step.requirement === "readings" ? `${step.minimum} leitura(s) registrada(s)` : "Confirmação de realização";
-                item.append(text("small", criterion));
-                list.append(item);
-            }
-            card.append(list);
-            const actions = document.createElement("div");
-            actions.className = "edu-actions";
-            const go = document.createElement("a");
-            go.className = "button outline";
-            go.href = "#/ambiente";
-            go.textContent = "Montar na bancada";
-            actions.append(go);
-            if (!finished) {
-                const step = a.steps[position];
-                const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
-                const confirm = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
-                    const outcome = education.advance(a.id, educationScene.getSnapshot(), countReadings());
-                    BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
-                    if (outcome.ok) {
-                        const current = target.querySelector(`[data-activity-id="${a.id}"]`);
-                        (current?.querySelector("button") ?? current?.querySelector("a"))?.focus({ preventScroll: true });
-                    }
-                }, "primary");
-                confirm.disabled = !allowed;
-                confirm.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
-                actions.append(confirm);
-            }
-            else
-                actions.append(text("span", "Atividade finalizada", "edu-finished"));
-            card.append(actions);
+            card.dataset.activityId = activity.id;
+            card.append(text("p", `${activity.origin === "teacher" ? "Professor · " : ""}${kind === "mission" ? "Missão" : "Roteiro"} · ${finished ? "Concluído" : `${position}/${activity.steps.length} etapas`}`, "edu-kicker"), text("h2", activity.title), text("p", activity.description));
+            const go = button("Ver detalhes", () => openDetail(route, "item", activity.id));
+            go.dataset.catalogId = activity.id;
+            card.append(go);
             target.append(card);
         }
         if (!target.children.length)
             target.append(text("p", "Nenhuma atividade disponível."));
+        if (!active || !detail)
+            return;
+        const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
+        returnToActivity = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
+        back.classList.add("si-detail-back");
+        const heading = text("h2", active.title);
+        heading.tabIndex = -1;
+        detail.append(back, text("p", kind === "mission" ? "MISSÃO · OBJETIVOS" : "ROTEIRO · PROCEDIMENTO", "edu-kicker"), heading, text("p", active.description, "si-detail-lead"));
+        const list = document.createElement("ol");
+        list.className = "edu-steps si-detail-steps";
+        for (let i = 0; i < active.steps.length; i++) {
+            const step = active.steps[i], item = document.createElement("li");
+            item.className = i < position ? "edu-step-done" : i === position ? "edu-step-current" : "";
+            item.append(text("strong", step.label));
+            const criterion = step.requirement === "entities" ? `${step.minimum} objeto(s) na cena` : step.requirement === "selection" ? "Um objeto selecionado" : step.requirement === "readings" ? `${step.minimum} leitura(s) registrada(s)` : "Confirmação de realização";
+            item.append(text("small", criterion));
+            list.append(item);
+        }
+        detail.append(list);
+        const actions = document.createElement("div");
+        actions.className = "edu-actions";
+        const bench = document.createElement("a");
+        bench.className = "button primary";
+        bench.href = "#/ambiente";
+        bench.textContent = "Montar na bancada";
+        actions.append(bench);
+        if (!finished) {
+            const step = active.steps[position];
+            const allowed = BaseDemoSI.meetsRequirement(step, educationScene.getSnapshot(), countReadings());
+            const check = button(step.requirement === "manual" ? "Confirmar etapa" : "Conferir e registrar", () => {
+                const outcome = education.advance(active.id, educationScene.getSnapshot(), countReadings());
+                BaseDemoSI.notify(outcome.message, outcome.ok ? "success" : "warning");
+            }, "outline");
+            check.disabled = !allowed;
+            check.title = allowed ? "Registrar etapa" : "Conclua o critério no ambiente primeiro";
+            actions.append(check);
+        }
+        else
+            actions.append(text("span", "Atividade concluída", "edu-finished"));
+        detail.append(actions);
+        mountReturnLink();
     }
     function renderTeacher() {
         const target = el("edu-teacher-list");
@@ -1922,7 +2233,7 @@ var BaseDemoSI;
             target.append(card);
         }
     }
-    function renderAll() { renderTopics(); renderActivity("mission"); renderActivity("script"); renderTeacher(); }
+    function renderAll() { renderTopics(); renderActivity("mission"); renderActivity("script"); renderTeacher(); mountReturnLink(); }
     const inputValue = (id) => el(id)?.value.trim() ?? "";
     const rule = (id) => el(id).value;
     const step = (prefix) => ({ label: inputValue(`${prefix}-label`), requirement: rule(`${prefix}-rule`), minimum: Number(inputValue(`${prefix}-min`) || 1) });
@@ -1931,6 +2242,42 @@ var BaseDemoSI;
         const second = el("edu-second-step");
         if (second)
             second.hidden = !show;
+    }
+    let currentTeacherStep = 1;
+    function teacherStep(step, validate = true) {
+        const form = el("edu-teacher-form");
+        if (!form || step < 1 || step > 3)
+            return;
+        if (validate && step > currentTeacherStep) {
+            for (let index = currentTeacherStep; index < step; index++) {
+                const panel = form.querySelector(`[data-teacher-panel="${index}"]`);
+                const inputs = Array.from(panel?.querySelectorAll("input,textarea,select") ?? []);
+                const invalid = inputs.find(input => !input.disabled && !input.checkValidity());
+                if (invalid) {
+                    BaseDemoSI.notify("Preencha os campos obrigatórios antes de continuar.", "warning");
+                    invalid.focus();
+                    return;
+                }
+            }
+        }
+        currentTeacherStep = step;
+        for (const panel of form.querySelectorAll("[data-teacher-panel]"))
+            panel.hidden = Number(panel.dataset.teacherPanel) !== step;
+        for (const control of document.querySelectorAll("[data-teacher-step]")) {
+            if (Number(control.dataset.teacherStep) === step)
+                control.setAttribute("aria-current", "step");
+            else
+                control.removeAttribute("aria-current");
+        }
+        const preview = el("edu-teacher-preview");
+        if (preview && step === 3) {
+            preview.replaceChildren();
+            preview.append(text("strong", inputValue("edu-form-title") || "Título não informado"), text("p", inputValue("edu-form-description")));
+            preview.append(text("p", `Tipo: ${el("edu-form-kind").value === "script" ? "Roteiro" : "Missão"}`));
+            preview.append(text("p", `1. ${inputValue("edu-step-one-label")}`));
+            if (el("edu-form-kind").value === "script")
+                preview.append(text("p", `2. ${inputValue("edu-step-two-label")}`));
+        }
     }
     function setupTeacherForm() {
         const kind = el("edu-form-kind");
@@ -1945,6 +2292,10 @@ var BaseDemoSI;
             });
         }
         displayTeacherKind();
+        document.querySelectorAll("[data-teacher-next],[data-teacher-previous],[data-teacher-step]").forEach(control => {
+            control.addEventListener("click", () => teacherStep(Number(control.dataset.teacherNext ?? control.dataset.teacherPrevious ?? control.dataset.teacherStep)));
+        });
+        teacherStep(1, false);
         el("edu-teacher-form")?.addEventListener("submit", event => {
             event.preventDefault();
             const type = kind?.value;
@@ -1957,6 +2308,7 @@ var BaseDemoSI;
             }
             el("edu-teacher-form").reset();
             displayTeacherKind();
+            teacherStep(1, false);
             BaseDemoSI.notify("Atividade personalizada criada.", "success");
         });
         el("edu-export")?.addEventListener("click", () => {
@@ -2320,19 +2672,39 @@ var BaseDemoSI;
     }
     BaseDemoSI.searchManual = searchManual;
     function manualElement(tag, content) { const n = document.createElement(tag); n.textContent = content; return n; }
+    function manualSelectedTopic() {
+        return new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("topic") ?? "";
+    }
     function renderManual() {
-        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count");
+        const list = document.getElementById("manual-topics"), count = document.getElementById("manual-results-count"), index = document.getElementById("manual-index");
         if (!list)
             return;
         const input = document.getElementById("manual-search");
+        const searching = !!input?.value.trim();
         const results = searchManual(input?.value ?? "");
+        const selected = manualSelectedTopic();
         list.replaceChildren();
+        index?.replaceChildren();
+        if (index) {
+            index.append(manualElement("h2", "Índice do Manual"));
+            const group = document.createElement("div");
+            group.className = "si-manual-index-links";
+            for (const topic of results) {
+                const link = document.createElement("a");
+                link.href = `#/manual?topic=${encodeURIComponent(topic.id)}`;
+                link.textContent = topic.title;
+                if (selected === topic.id)
+                    link.setAttribute("aria-current", "true");
+                group.append(link);
+            }
+            index.append(group);
+        }
         for (const topic of results) {
             const article = document.createElement("article");
             article.className = "card si-manual-topic";
             article.id = "manual-" + topic.id;
             const details = document.createElement("details");
-            details.open = !!input?.value.trim() || window.location.hash.includes("topic=" + topic.id);
+            details.open = searching || selected === topic.id;
             details.append(manualElement("summary", topic.title));
             for (const paragraph of topic.paragraphs)
                 details.append(manualElement("p", paragraph));
@@ -2355,6 +2727,13 @@ var BaseDemoSI;
             const current = BaseDemoSI.currentRoute(window.location.hash);
             const topic = BaseDemoSI.manualTopics.find(t => t.routes.includes(current))?.id ?? "inicio";
             window.location.hash = `#/manual?topic=${topic}`;
+        });
+        document.getElementById("manual-index")?.addEventListener("click", event => {
+            const link = event.target.closest("a");
+            if (!link)
+                return;
+            // A mudança de hash conserva a seção e seleciona o item no índice.
+            window.setTimeout(() => document.getElementById("manual-" + manualSelectedTopic())?.querySelector("summary")?.focus({ preventScroll: true }), 0);
         });
         renderManual();
     }
@@ -2510,7 +2889,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
@@ -2524,6 +2903,9 @@ var BaseDemoSI;
         const control = document.getElementById("distribution-install");
         if (control)
             control.hidden = !visible;
+        const menuControl = document.getElementById("si-drawer-install");
+        if (menuControl)
+            menuControl.hidden = !visible;
     }
     function setupDistribution() {
         window.addEventListener("beforeinstallprompt", event => {
@@ -2860,6 +3242,47 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    /** Indicadores reais do catálogo, sem conteúdo disciplinar na Home. */
+    function updateHomeIndicators() {
+        const setText = (id, text) => { const node = document.getElementById(id); if (node)
+            node.textContent = text; };
+        const officialMissions = BaseDemoSI.officialActivities.filter(a => a.kind === "mission").length;
+        const officialScripts = BaseDemoSI.officialActivities.filter(a => a.kind === "script").length;
+        let saved = null;
+        let journal = null;
+        try {
+            const value = BaseDemoSI.storage.read("education-document-v1");
+            if (value)
+                saved = BaseDemoSI.parseEducation(JSON.parse(value));
+        }
+        catch { /* Sem dados acessíveis: catálogo ainda funciona. */ }
+        try {
+            const value = BaseDemoSI.storage.read("journal-document-v1");
+            if (value)
+                journal = BaseDemoSI.parseJournal(JSON.parse(value));
+        }
+        catch { /* Falha de armazenamento não bloqueia a Home. */ }
+        const topicsDone = saved?.topicsDone.length ?? 0;
+        const extraMissions = saved?.teacherActivities.filter(a => a.kind === "mission").length ?? 0;
+        const extraScripts = saved?.teacherActivities.filter(a => a.kind === "script").length ?? 0;
+        const notes = journal?.notes.length ?? 0;
+        setText("si-home-learning-meta", `${BaseDemoSI.learningTopics.length} temas · ${topicsDone} concluído${topicsDone === 1 ? "" : "s"}`);
+        setText("si-home-missions-meta", `${officialMissions + extraMissions} desafios para investigar`);
+        setText("si-home-scripts-meta", `${officialScripts + extraScripts} investigações orientadas`);
+        setText("si-home-notebook-meta", notes ? `${notes} registro${notes === 1 ? "" : "s"} salvo${notes === 1 ? "" : "s"}` : "Pronto para seus registros");
+    }
+    BaseDemoSI.updateHomeIndicators = updateHomeIndicators;
+    function setupHome() {
+        window.addEventListener("si-route-changed", () => {
+            if (BaseDemoSI.currentRoute(window.location.hash) === "inicio")
+                updateHomeIndicators();
+        });
+        updateHomeIndicators();
+    }
+    BaseDemoSI.setupHome = setupHome;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     function initialize() {
         document.documentElement.lang = BaseDemoSI.manifest.language;
         for (const version of document.querySelectorAll("[data-app-version]")) {
@@ -2874,10 +3297,12 @@ var BaseDemoSI;
         BaseDemoSI.updateRoute();
         window.addEventListener("hashchange", BaseDemoSI.updateRoute);
         BaseDemoSI.setupNavigationDrawer();
+        BaseDemoSI.setupMenuReview();
         BaseDemoSI.setupDistribution();
         BaseDemoSI.setupModules();
         BaseDemoSI.setupManual();
         BaseDemoSI.setupSharedActivities();
+        BaseDemoSI.setupHome();
     }
     BaseDemoSI.initialize = initialize;
 })(BaseDemoSI || (BaseDemoSI = {}));

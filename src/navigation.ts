@@ -10,6 +10,7 @@ namespace BaseDemoSI {
     const wasOpen = drawerOpen();
     document.body.classList.remove("nav-open");
     menuButton()?.setAttribute("aria-expanded", "false");
+    drawer()?.setAttribute("aria-hidden", "true");
     const shade = backdrop(); if (shade) shade.hidden = true;
     const page = mainColumn(); if (page) page.inert = false;
     if (restoreFocus && wasOpen) menuButton()?.focus({preventScroll:true});
@@ -18,18 +19,42 @@ namespace BaseDemoSI {
     if (isPlatformDialogOpen()) return;
     document.body.classList.add("nav-open");
     menuButton()?.setAttribute("aria-expanded", "true");
+    drawer()?.setAttribute("aria-hidden", "false");
+    updateMenuContext();
     const shade = backdrop(); if (shade) shade.hidden = false;
     const page = mainColumn(); if (page) page.inert = true;
-    drawer()?.querySelector<HTMLElement>('.nav a[aria-current="page"],.nav a[href]')?.focus({preventScroll:true});
+    // A transição visual não pode impedir a entrada do foco na gaveta modal.
+    window.requestAnimationFrame(() => {
+      if (!drawerOpen()) return;
+      const initial=drawer()?.querySelector<HTMLElement>("#si-nav-close");
+      initial?.focus({preventScroll:true});
+    });
+  }
+  function updateMenuContext(): void {
+    const route = currentRoute(window.location.hash);
+    const found = manifest.routes.find(item=>item.id===route);
+    const title = document.getElementById("si-now-title");
+    const description = document.getElementById("si-now-description");
+    if (title) title.textContent = found?.title ?? "Início";
+    if (description) description.textContent = found?.subtitle ?? "Continue sua atividade.";
   }
   function focusableItems(): HTMLElement[] {
-    return Array.from(drawer()?.querySelectorAll<HTMLElement>('a[href]:not([hidden]),button:not([disabled])') ?? [])
+    return Array.from(drawer()?.querySelectorAll<HTMLElement>('a[href]:not([hidden]),button:not([disabled]),input:not([disabled]),select:not([disabled])') ?? [])
       .filter(item=>item.getClientRects().length>0);
   }
   export function setupNavigationDrawer(): void {
     if (drawerStarted) return;
     drawerStarted = true;
     menuButton()?.addEventListener("click", () => drawerOpen() ? closeNavigationDrawer(true) : openNavigationDrawer());
+    document.getElementById("si-nav-close")?.addEventListener("click", () => closeNavigationDrawer(true));
+    document.getElementById("si-nav-continue")?.addEventListener("click", () => closeNavigationDrawer(true));
+    document.getElementById("si-nav-group-toggle")?.addEventListener("click", () => {
+      const group = document.getElementById("si-nav-main");
+      const toggle = document.getElementById("si-nav-group-toggle");
+      if (!group || !toggle) return;
+      group.hidden = !group.hidden;
+      toggle.setAttribute("aria-expanded",String(!group.hidden));
+    });
     backdrop()?.addEventListener("click", () => closeNavigationDrawer(true));
     document.addEventListener("keydown", event => {
       if (!drawerOpen()) return;

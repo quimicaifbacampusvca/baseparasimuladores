@@ -13,10 +13,12 @@ namespace BaseDemoSI {
     updateRoute();
     window.addEventListener("hashchange", updateRoute);
     setupNavigationDrawer();
+    setupMenuReview();
     setupDistribution();
     setupModules();
     setupManual();
     setupSharedActivities();
+    setupHome();
   }
 }
 
