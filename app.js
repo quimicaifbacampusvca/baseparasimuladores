@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.10",
+        version: "0.9.11",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -171,9 +171,67 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    let soundEnabled = false;
+    let vibrationEnabled = false;
+    let audio = null;
+    function findAudioCtor() {
+        const browser = window;
+        if (typeof browser.AudioContext === "function")
+            return browser.AudioContext;
+        return typeof browser.webkitAudioContext === "function" ? browser.webkitAudioContext : null;
+    }
+    function feedbackCapabilities() {
+        return { sound: !!findAudioCtor(), vibration: typeof navigator.vibrate === "function" };
+    }
+    BaseDemoSI.feedbackCapabilities = feedbackCapabilities;
+    function configureFeedback(sound, vibration) {
+        soundEnabled = sound === true;
+        vibrationEnabled = vibration === true;
+    }
+    BaseDemoSI.configureFeedback = configureFeedback;
+    function currentFeedback() {
+        return { sound: soundEnabled, vibration: vibrationEnabled };
+    }
+    BaseDemoSI.currentFeedback = currentFeedback;
+    /** Não emite sinais até que a pessoa habilite a preferência explicitamente. */
+    function signalFeedback(event) {
+        const support = feedbackCapabilities();
+        if (soundEnabled && support.sound) {
+            try {
+                const ctor = findAudioCtor();
+                if (ctor) {
+                    audio = audio || new ctor();
+                    if (audio.state === "suspended")
+                        void audio.resume().catch(() => { });
+                    const oscillator = audio.createOscillator();
+                    const gain = audio.createGain();
+                    oscillator.type = "sine";
+                    oscillator.frequency.value = event === "success" ? 580 : event === "warning" ? 295 : 440;
+                    const now = audio.currentTime;
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.06, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+                    oscillator.connect(gain).connect(audio.destination);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.2);
+                }
+            }
+            catch { /* A preferência continua ativa; o dispositivo pode bloquear áudio. */ }
+        }
+        if (vibrationEnabled && support.vibration) {
+            try {
+                navigator.vibrate(event === "warning" ? [65, 35, 65] : 55);
+            }
+            catch { /* Nem todo sistema operacional autoriza vibração. */ }
+        }
+    }
+    BaseDemoSI.signalFeedback = signalFeedback;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     // Contrato de menu: preferência local e acesso contextual; nenhum motor científico.
     const menuGet = (id) => document.getElementById(id);
-    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio" };
+    const prefDefault = { dark: true, contrast: false, font: 1, spacing: false, motion: false, intro: true, simple: false, vision: "none", projector: false, startup: "inicio", sound: false, vibrate: false };
     const prefKey = "family-menu-v1";
     const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
     let pref = { ...prefDefault };
@@ -184,6 +242,7 @@ var BaseDemoSI;
     function menuPreferences(value) {
         pref = value;
         const root = document.documentElement;
+        BaseDemoSI.configureFeedback(pref.sound, pref.vibrate);
         const theme = pref.dark ? "escuro" : "claro";
         BaseDemoSI.applyTheme(theme);
         menuGet("theme-choice")?.setAttribute("data-from-menu", theme);
@@ -211,6 +270,21 @@ var BaseDemoSI;
             minus.disabled = pref.font <= .8;
         if (plus)
             plus.disabled = pref.font >= 2;
+        const capabilities = BaseDemoSI.feedbackCapabilities();
+        for (const [id, enabled, supported, noteId] of [
+            ["si-sound", pref.sound, capabilities.sound, "si-sound-support"],
+            ["si-vibrate", pref.vibrate, capabilities.vibration, "si-vibrate-support"]
+        ]) {
+            const control = menuGet(id);
+            if (control) {
+                control.disabled = !supported;
+                control.checked = supported && enabled;
+                control.setAttribute("aria-disabled", String(!supported));
+            }
+            const note = menuGet(noteId);
+            if (note)
+                note.textContent = supported ? `${id === "si-sound" ? "Som" : "Vibração"} ${enabled ? "ativado" : "desativado"}; controle local` : (id === "si-sound" ? "Áudio indisponível neste navegador" : "Vibração indisponível neste dispositivo");
+        }
         const vision = menuGet("si-vision-select");
         if (vision)
             vision.value = pref.vision;
@@ -423,7 +497,7 @@ var BaseDemoSI;
             if (value) {
                 const obj = JSON.parse(value);
                 if (obj && typeof obj === "object")
-                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio" };
+                    pref = { ...prefDefault, ...obj, font: Math.min(2, Math.max(.8, Number(obj.font) || 1)), vision: validVision.includes(obj.vision ?? "") ? obj.vision : "none", startup: ["inicio", "ambiente", "aprender"].includes(obj.startup ?? "") ? obj.startup : "inicio", sound: obj.sound === true, vibrate: obj.vibrate === true };
             }
         }
         catch {
@@ -454,6 +528,19 @@ var BaseDemoSI;
         });
         for (const [id, key] of [["si-dark", "dark"], ["si-contrast", "contrast"], ["si-letter-spacing", "spacing"], ["si-motion", "motion"], ["si-intro", "intro"], ["si-simple", "simple"], ["si-projector", "projector"]]) {
             menuGet(id)?.addEventListener("change", event => updatePref(key, event.target.checked));
+        }
+        for (const [id, key, capability] of [["si-sound", "sound", "sound"], ["si-vibrate", "vibrate", "vibration"]]) {
+            menuGet(id)?.addEventListener("change", event => {
+                const choice = event.target.checked;
+                if (choice && !BaseDemoSI.feedbackCapabilities()[capability]) {
+                    BaseDemoSI.notify("Este dispositivo não oferece o recurso solicitado.", "warning");
+                    menuPreferences(pref);
+                    return;
+                }
+                updatePref(key, choice);
+                if (choice)
+                    BaseDemoSI.signalFeedback("info");
+            });
         }
         for (const [id, delta] of [["si-font-minus", -.1], ["si-font-plus", .1]]) {
             menuGet(id)?.addEventListener("click", () => updatePref("font", Math.round(Math.max(.8, Math.min(2, pref.font + delta)) * 10) / 10));
@@ -2291,6 +2378,7 @@ var BaseDemoSI;
         if (status)
             status.textContent = result.message;
         BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+        BaseDemoSI.signalFeedback(result.ok ? "success" : "warning");
     }
     function renderExtensions(snapshot) {
         if (!extensionsReady)

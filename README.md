@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.10
+# Base Demo Oficial - SI · 0.9.11
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.10 — Montagens prontas, Tour guiado e preferências de apresentação.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.11 — Feedback universal local e preferências acessíveis.**
 
 ## Executar
 
@@ -65,7 +65,7 @@ A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados;
 
 ## Auditoria funcional do menu · 0.9.9
 
-A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline e o feedback de extensões ainda aguardam implementação compatível. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
+A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline ainda aguarda uma integração homologada; feedback sonoro e vibração são optativos e respeitam o suporte do dispositivo. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
 
 ## Revisão de menu · 0.9.10
 
@@ -77,3 +77,17 @@ A gaveta mantém os SVGs locais e a navegação existente. O menu contextual rec
 - Homologação real de WebKit/Safari, Firefox, PWA instalada e dispositivos físicos continua pendente.
 
 Consulte `docs/AUDITORIA-MENU-0.9.10.md`.
+
+## Menu · 0.9.11 — Som e vibração
+
+O feedback da plataforma é estritamente opcional e desligado por padrão. Os controles são locais e
+ativados apenas quando o navegador oferece Web Audio ou `navigator.vibrate`. A escolha é salva no
+armazém local; em navegadores incompatíveis, a interface informa que o recurso está indisponível.
+
+O feedback é chamado por ações de ferramentas e instrumentos da extensão ativa e usa sinais breves
+de informação, sucesso e aviso, sem codificar qualquer fenômeno científico. A primeira ativação
+reproduz uma confirmação para verificar o dispositivo. Preferências ficam em `family-menu-v1`.
+Som e vibração não substituem notificações textuais e nunca são obrigatórios para executar a cena.
+
+A tradução em Libras não é apresentada como operacional: não existe pacote local homologado.
+Nenhuma requisição remota, plugin externo ou dependência de CDN foi adicionada.

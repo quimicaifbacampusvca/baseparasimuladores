@@ -28,5 +28,5 @@ const source=read('src/menu-review.ts'),html=read('index.html'),css=read('menu-r
 assert(html.includes('id="si-drawer-presets"')&&!html.includes('si-menu-pending'));
 for(const token of ['startWorkspaceTour','si-coach-ring','si-coach-card','si-color-protanopia','si-color-deuteranopia','si-color-tritanopia'])assert(source.includes(token)||html.includes(token)||css.includes(token),token);
 assert(source.includes('getActivityContext()'),'tour respeita atividades orientadas');
-assert(!/SIAB/i.test(read('docs/AUDITORIA-MENU-0.9.10.md')));
+assert(!/SIAB/i.test(read('docs/AUDITORIA-MENU-0.9.11.md')));
 console.log('OK: montagem substituível em único histórico, integridade, modelos validados, tour, filtros locais e documentação independente.');

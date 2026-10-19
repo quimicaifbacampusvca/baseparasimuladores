@@ -19,6 +19,7 @@
     "src/config.ts",
     "src/storage.ts",
     "src/navigation.ts",
+    "src/feedback.ts",
     "src/menu-review.ts",
     "src/router.ts",
     "src/preferences.ts",

@@ -1,8 +1,8 @@
 namespace BaseDemoSI {
   // Contrato de menu: preferência local e acesso contextual; nenhum motor científico.
   const menuGet=(id:string):HTMLElement|null=>document.getElementById(id);
-  type MenuPref={dark:boolean;contrast:boolean;font:number;spacing:boolean;motion:boolean;intro:boolean;simple:boolean;vision:string;projector:boolean;startup:string};
-  const prefDefault:MenuPref={dark:true,contrast:false,font:1,spacing:false,motion:false,intro:true,simple:false,vision:"none",projector:false,startup:"inicio"};
+  type MenuPref={dark:boolean;contrast:boolean;font:number;spacing:boolean;motion:boolean;intro:boolean;simple:boolean;vision:string;projector:boolean;startup:string;sound:boolean;vibrate:boolean};
+  const prefDefault:MenuPref={dark:true,contrast:false,font:1,spacing:false,motion:false,intro:true,simple:false,vision:"none",projector:false,startup:"inicio",sound:false,vibrate:false};
   const prefKey="family-menu-v1";
   const validVision=["none","protanopia","deuteranopia","tritanopia","acromatopsia"];
   let pref:MenuPref={...prefDefault};
@@ -13,6 +13,7 @@ namespace BaseDemoSI {
   function menuPreferences(value:MenuPref):void {
     pref=value;
     const root=document.documentElement;
+    configureFeedback(pref.sound,pref.vibrate);
     const theme= pref.dark ? "escuro" : "claro";
     applyTheme(theme);
     (menuGet("theme-choice") as HTMLSelectElement|null)?.setAttribute("data-from-menu",theme);
@@ -32,6 +33,16 @@ namespace BaseDemoSI {
     const minus=menuGet("si-font-minus") as HTMLButtonElement|null;
     const plus=menuGet("si-font-plus") as HTMLButtonElement|null;
     if(minus)minus.disabled=pref.font<=.8;if(plus)plus.disabled=pref.font>=2;
+    const capabilities=feedbackCapabilities();
+    for(const [id,enabled,supported,noteId] of [
+      ["si-sound",pref.sound,capabilities.sound,"si-sound-support"],
+      ["si-vibrate",pref.vibrate,capabilities.vibration,"si-vibrate-support"]
+    ] as [string,boolean,boolean,string][]){
+      const control=menuGet(id) as HTMLInputElement|null;
+      if(control){control.disabled=!supported;control.checked=supported&&enabled;control.setAttribute("aria-disabled",String(!supported));}
+      const note=menuGet(noteId);
+      if(note)note.textContent=supported?`${id==="si-sound"?"Som":"Vibração"} ${enabled?"ativado":"desativado"}; controle local`:(id==="si-sound"?"Áudio indisponível neste navegador":"Vibração indisponível neste dispositivo");
+    }
     const vision=menuGet("si-vision-select") as HTMLSelectElement|null;if(vision)vision.value=pref.vision;
     const startup=menuGet("si-startup-select") as HTMLSelectElement|null;if(startup)startup.value=pref.startup;
     // Acromatopsia é representável por escala cinza. Os demais perfis
@@ -177,7 +188,7 @@ namespace BaseDemoSI {
   }
   export function setupMenuReview():void {
     try {const value=storage.read(prefKey);if(value){const obj=JSON.parse(value) as Partial<MenuPref>;
-      if(obj&&typeof obj==="object")pref={...prefDefault,...obj,font:Math.min(2,Math.max(.8,Number(obj.font)||1)),vision:validVision.includes(obj.vision??"")?obj.vision!:"none",startup:["inicio","ambiente","aprender"].includes(obj.startup??"")?obj.startup!:"inicio"};}}
+      if(obj&&typeof obj==="object")pref={...prefDefault,...obj,font:Math.min(2,Math.max(.8,Number(obj.font)||1)),vision:validVision.includes(obj.vision??"")?obj.vision!:"none",startup:["inicio","ambiente","aprender"].includes(obj.startup??"")?obj.startup!:"inicio",sound:obj.sound===true,vibrate:obj.vibrate===true};}}
     catch{pref={...prefDefault};}
     const theme=normalizeTheme(storage.read("theme"));if(theme!=="sistema")pref.dark=theme==="escuro";
     menuPreferences(pref);
@@ -196,6 +207,16 @@ namespace BaseDemoSI {
     });
     for(const [id,key] of [["si-dark","dark"],["si-contrast","contrast"],["si-letter-spacing","spacing"],["si-motion","motion"],["si-intro","intro"],["si-simple","simple"],["si-projector","projector"]] as [string,keyof MenuPref][]){
       menuGet(id)?.addEventListener("change",event=>updatePref(key,(event.target as HTMLInputElement).checked));
+    }
+    for(const [id,key,capability] of [["si-sound","sound","sound"],["si-vibrate","vibrate","vibration"]] as [string,"sound"|"vibrate","sound"|"vibration"][]){
+      menuGet(id)?.addEventListener("change",event=>{
+        const choice=(event.target as HTMLInputElement).checked;
+        if(choice&&!feedbackCapabilities()[capability]){
+          notify("Este dispositivo não oferece o recurso solicitado.","warning");menuPreferences(pref);return;
+        }
+        updatePref(key,choice);
+        if(choice) signalFeedback("info");
+      });
     }
     for(const [id,delta] of [["si-font-minus",-.1],["si-font-plus",.1]] as [string,number][]){menuGet(id)?.addEventListener("click",()=>updatePref("font",Math.round(Math.max(.8,Math.min(2,pref.font+delta))*10)/10));}
     menuGet("si-vision-select")?.addEventListener("change",event=>{

@@ -8,6 +8,7 @@ namespace BaseDemoSI {
   function showFeedback(result:ExtensionResult):void {
     const status=find("extension-status");if(status)status.textContent=result.message;
     notify(result.message,result.ok?"success":"warning");
+    signalFeedback(result.ok?"success":"warning");
   }
   export function renderExtensions(snapshot:SceneSnapshot):void {
     if(!extensionsReady)return;
