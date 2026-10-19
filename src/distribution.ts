@@ -6,9 +6,9 @@ namespace BaseDemoSI {
   }
   const precacheFiles = [
     "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
-    "./components.css", "./extensions.css", "./education.css", "./records.css",
-    "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
-    "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+    "./components.css", "./mobile-contract.css", "./extensions.css", "./education.css", "./records.css",
+    "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./home-context.css", "./manifest.webmanifest", "./assets/icon.svg",
+    "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
   ];
   let installPrompt: InstallPromptEvent | null = null;
   let changingController = false;

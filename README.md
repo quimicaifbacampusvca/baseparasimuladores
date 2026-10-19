@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.11
+# Base Demo Oficial - SI · 0.9.12
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.11 — Feedback universal local e preferências acessíveis.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.12 — Continuidade da Home e navegação contextual de atividades.**
 
 ## Executar
 
@@ -65,7 +65,7 @@ A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados;
 
 ## Auditoria funcional do menu · 0.9.9
 
-A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline ainda aguarda uma integração homologada; feedback sonoro e vibração são optativos e respeitam o suporte do dispositivo. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
+A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Montagens prontas neutras e Tour guiado foram incorporados na 0.9.10; Libras offline e o feedback de extensões ainda aguardam implementação compatível. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.
 
 ## Revisão de menu · 0.9.10
 
@@ -78,16 +78,6 @@ A gaveta mantém os SVGs locais e a navegação existente. O menu contextual rec
 
 Consulte `docs/AUDITORIA-MENU-0.9.10.md`.
 
-## Menu · 0.9.11 — Som e vibração
+## Auditoria da Home · 0.9.12
 
-O feedback da plataforma é estritamente opcional e desligado por padrão. Os controles são locais e
-ativados apenas quando o navegador oferece Web Audio ou `navigator.vibrate`. A escolha é salva no
-armazém local; em navegadores incompatíveis, a interface informa que o recurso está indisponível.
-
-O feedback é chamado por ações de ferramentas e instrumentos da extensão ativa e usa sinais breves
-de informação, sucesso e aviso, sem codificar qualquer fenômeno científico. A primeira ativação
-reproduz uma confirmação para verificar o dispositivo. Preferências ficam em `family-menu-v1`.
-Som e vibração não substituem notificações textuais e nunca são obrigatórios para executar a cena.
-
-A tradução em Libras não é apresentada como operacional: não existe pacote local homologado.
-Nenhuma requisição remota, plugin externo ou dependência de CDN foi adicionada.
+A Home mantém a identidade visual e os cinco caminhos aprovados. Quando existe uma atividade orientada válida, oferece ações para rever ou retomar essa atividade e para voltar à bancada, sempre consultando o catálogo oficial ou local e o progresso registrado. O vínculo é preservado no armazenamento local, validado a cada abertura e apagado ao encerrar a atividade; referências a atividades excluídas são ignoradas. O resumo de objetos é calculado a partir do projeto válido salvo, sem criar um segundo estado da cena. A navegação pelo teclado transfere o foco ao destino, e o layout adapta as ações contextualizadas a telefones estreitos. Ver `docs/AUDITORIA-HOME-0.9.12.md`.

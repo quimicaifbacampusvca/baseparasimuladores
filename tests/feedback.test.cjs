@@ -33,4 +33,4 @@ assert(menu.includes('si-a11y-reset')&&menu.includes('configureFeedback(pref.sou
 assert(read('src/extensions-ui.ts').includes('signalFeedback(result.ok?"success":"warning")'));
 assert(!/https?:\/\//.test(read('src/feedback.ts')));
 assert(!/SIAB/i.test(read('docs/AUDITORIA-MENU-0.9.11.md')));
-console.log('OK: 0.9.11 — feedback opt-in, Web Audio, vibração, reset, suporte ausente, extensões e independência offline.');
+console.log('OK: 0.9.12 — feedback opt-in, Web Audio, vibração, reset, suporte ausente, extensões e independência offline.');

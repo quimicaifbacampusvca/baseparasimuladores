@@ -1,9 +1,9 @@
-/* Base Demo Oficial - SI 0.9.11. Instalação transacional de recursos locais. */
-const CACHE = "base-demo-si-v0.9.11";
+/* Base Demo Oficial - SI 0.9.12. Instalação transacional de recursos locais. */
+const CACHE = "base-demo-si-v0.9.12";
 const FILES = [
   "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
   "./components.css", "./mobile-contract.css", "./extensions.css", "./education.css", "./records.css",
-  "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
+  "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./home-context.css", "./manifest.webmanifest", "./assets/icon.svg",
   "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
 ];
 self.addEventListener("install", event => {

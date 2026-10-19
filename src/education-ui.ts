@@ -14,6 +14,26 @@ namespace BaseDemoSI {
   function countReadings():number {return extensionRecordCount();}
   /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
   let returnToActivity = "";
+  const guidedKey = "guided-return-v1";
+  /** Vínculo validado sempre contra o catálogo carregado: sem atividade fantasma. */
+  function validatedGuidedLink(value:string):{url:string;activity:LearningActivity;progress:number}|null {
+    const match=/^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
+    if(!match || !education)return null;
+    const kind:ActivityKind=match[1]==="missoes"?"mission":"script";
+    const activity=education.list(kind).find(a=>a.id===match[2]);
+    if(!activity)return null;
+    return {url:`#/${match[1]}?item=${encodeURIComponent(activity.id)}`,activity,progress:education.snapshot().progress[activity.id]??0};
+  }
+  function saveGuidedReturn(value:string):void {
+    returnToActivity=value;
+    storage.write(guidedKey,value);
+    mountReturnLink();
+    window.dispatchEvent(new Event("si-guided-context-changed"));
+  }
+  export function guidedActivityContext():{url:string;title:string;kind:ActivityKind;progress:number;total:number}|null {
+    const result=validatedGuidedLink(returnToActivity);
+    return result?{url:result.url,title:result.activity.title,kind:result.activity.kind,progress:result.progress,total:result.activity.steps.length}:null;
+  }
   const selectedParam = (key:string):string => {
     const search=window.location.hash.split("?")[1]??"";
     return new URLSearchParams(search).get(key)??"";
@@ -34,12 +54,13 @@ namespace BaseDemoSI {
     if(!education || !educationScene)return {ok:false,message:"Nenhuma atividade disponível."};
     return education.advance(id,educationScene.getSnapshot(),extensionRecordCount());
   }
-  export function clearGuidedReturn():void { returnToActivity="";mountReturnLink(); }
+  export function clearGuidedReturn():void { saveGuidedReturn(""); }
   function mountReturnLink():void {
     const control=el("si-return-activity") as HTMLAnchorElement|null;
     if(!control)return;
-    control.hidden=!returnToActivity || currentRoute(window.location.hash)!=="ambiente";
-    if(returnToActivity)control.href=returnToActivity;
+    const guided=guidedActivityContext();
+    control.hidden=!guided || currentRoute(window.location.hash)!=="ambiente";
+    if(guided)control.href=guided.url;
   }
   function showDetail(catalogId:string,detailId:string,open:boolean):HTMLElement|null {
     const catalog=el(catalogId),detail=el(detailId);
@@ -90,7 +111,8 @@ namespace BaseDemoSI {
     if(!target.children.length)target.append(text("p","Nenhuma atividade disponível."));
     if(!active||!detail)return;
     const position=snapshot.progress[active.id]??0,finished=position>=active.steps.length;
-    returnToActivity=`#/${route}?item=${encodeURIComponent(active.id)}`;
+    const nextReturn=`#/${route}?item=${encodeURIComponent(active.id)}`;
+    if(returnToActivity!==nextReturn)saveGuidedReturn(nextReturn);
     const back=button(`← Todas as ${kind==="mission"?"missões":"investigações"}`,()=>returnToCatalog(route,active.id));back.classList.add("si-detail-back");
     const heading=text("h2",active.title);heading.tabIndex=-1;
     detail.append(back,text("p",kind==="mission"?"MISSÃO · OBJETIVOS":"ROTEIRO · PROCEDIMENTO","edu-kicker"),heading,text("p",active.description,"si-detail-lead"));
@@ -207,8 +229,14 @@ namespace BaseDemoSI {
   }
   export function setupEducation(scene:SceneStore):void {
     educationScene=scene;education=createEducationStore(storage);
+    const previous=storage.read(guidedKey)??"";
+    returnToActivity=validatedGuidedLink(previous)?.url??"";
+    if(previous && !returnToActivity)storage.write(guidedKey,"");
     bindEducationForSharing(education);
-    education.subscribe(renderAll);
+    education.subscribe(()=>{
+      if(returnToActivity && !validatedGuidedLink(returnToActivity))saveGuidedReturn("");
+      renderAll();window.dispatchEvent(new Event("si-guided-context-changed"));
+    });
     scene.subscribe(()=>{if(currentRoute(window.location.hash)!=="ambiente")renderAll();});
     window.addEventListener("si-education-observation",()=>renderAll());
     window.addEventListener("si-route-changed",()=>renderAll());

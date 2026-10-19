@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.11",
+        version: "0.9.12",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2706,6 +2706,29 @@ var BaseDemoSI;
     function countReadings() { return BaseDemoSI.extensionRecordCount(); }
     /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
     let returnToActivity = "";
+    const guidedKey = "guided-return-v1";
+    /** Vínculo validado sempre contra o catálogo carregado: sem atividade fantasma. */
+    function validatedGuidedLink(value) {
+        const match = /^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
+        if (!match || !education)
+            return null;
+        const kind = match[1] === "missoes" ? "mission" : "script";
+        const activity = education.list(kind).find(a => a.id === match[2]);
+        if (!activity)
+            return null;
+        return { url: `#/${match[1]}?item=${encodeURIComponent(activity.id)}`, activity, progress: education.snapshot().progress[activity.id] ?? 0 };
+    }
+    function saveGuidedReturn(value) {
+        returnToActivity = value;
+        BaseDemoSI.storage.write(guidedKey, value);
+        mountReturnLink();
+        window.dispatchEvent(new Event("si-guided-context-changed"));
+    }
+    function guidedActivityContext() {
+        const result = validatedGuidedLink(returnToActivity);
+        return result ? { url: result.url, title: result.activity.title, kind: result.activity.kind, progress: result.progress, total: result.activity.steps.length } : null;
+    }
+    BaseDemoSI.guidedActivityContext = guidedActivityContext;
     const selectedParam = (key) => {
         const search = window.location.hash.split("?")[1] ?? "";
         return new URLSearchParams(search).get(key) ?? "";
@@ -2731,15 +2754,16 @@ var BaseDemoSI;
         return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
     }
     BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
-    function clearGuidedReturn() { returnToActivity = ""; mountReturnLink(); }
+    function clearGuidedReturn() { saveGuidedReturn(""); }
     BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)
             return;
-        control.hidden = !returnToActivity || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
-        if (returnToActivity)
-            control.href = returnToActivity;
+        const guided = guidedActivityContext();
+        control.hidden = !guided || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
+        if (guided)
+            control.href = guided.url;
     }
     function showDetail(catalogId, detailId, open) {
         const catalog = el(catalogId), detail = el(detailId);
@@ -2817,7 +2841,9 @@ var BaseDemoSI;
         if (!active || !detail)
             return;
         const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
-        returnToActivity = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        const nextReturn = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        if (returnToActivity !== nextReturn)
+            saveGuidedReturn(nextReturn);
         const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
         back.classList.add("si-detail-back");
         const heading = text("h2", active.title);
@@ -3004,8 +3030,17 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        const previous = BaseDemoSI.storage.read(guidedKey) ?? "";
+        returnToActivity = validatedGuidedLink(previous)?.url ?? "";
+        if (previous && !returnToActivity)
+            BaseDemoSI.storage.write(guidedKey, "");
         BaseDemoSI.bindEducationForSharing(education);
-        education.subscribe(renderAll);
+        education.subscribe(() => {
+            if (returnToActivity && !validatedGuidedLink(returnToActivity))
+                saveGuidedReturn("");
+            renderAll();
+            window.dispatchEvent(new Event("si-guided-context-changed"));
+        });
         scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
             renderAll(); });
         window.addEventListener("si-education-observation", () => renderAll());
@@ -3536,9 +3571,9 @@ var BaseDemoSI;
 (function (BaseDemoSI) {
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
-        "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
-        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+        "./components.css", "./mobile-contract.css", "./extensions.css", "./education.css", "./records.css",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./home-context.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
     ];
     let installPrompt = null;
     let changingController = false;
@@ -4017,12 +4052,69 @@ var BaseDemoSI;
         setText("si-home-missions-meta", `${officialMissions + extraMissions} desafios para investigar`);
         setText("si-home-scripts-meta", `${officialScripts + extraScripts} investigações orientadas`);
         setText("si-home-notebook-meta", notes ? `${notes} registro${notes === 1 ? "" : "s"} salvo${notes === 1 ? "" : "s"}` : "Pronto para seus registros");
+        const active = BaseDemoSI.guidedActivityContext();
+        const resume = document.getElementById("si-home-resume");
+        const resumeLink = document.getElementById("si-home-resume-link");
+        const benchLink = document.getElementById("si-home-resume-bench");
+        if (resume)
+            resume.hidden = !active;
+        if (active) {
+            setText("si-home-resume-title", active.title);
+            setText("si-home-resume-meta", `${active.kind === "mission" ? "Missão" : "Roteiro"} · ${Math.min(active.progress, active.total)}/${active.total} etapa(s) ${active.progress >= active.total ? "concluídas" : "registradas"}`);
+            if (resumeLink) {
+                resumeLink.href = active.url;
+                resumeLink.textContent = active.progress >= active.total ? "Rever atividade" : "Retomar atividade";
+            }
+            if (benchLink)
+                benchLink.href = "#/ambiente";
+        }
+        let scene = null;
+        try {
+            const raw = BaseDemoSI.storage.read("scene-project-v1");
+            if (raw)
+                scene = BaseDemoSI.parseScene(JSON.parse(raw));
+        }
+        catch { /* Projeto não válido: nenhuma retomada é exibida. */ }
+        const count = scene?.entities.length ?? 0;
+        const sceneInfo = document.getElementById("si-home-scene-summary");
+        if (sceneInfo) {
+            sceneInfo.hidden = count === 0;
+            sceneInfo.textContent = count === 1 ? "1 objeto salvo na bancada" : `${count} objetos salvos na bancada`;
+        }
     }
     BaseDemoSI.updateHomeIndicators = updateHomeIndicators;
     function setupHome() {
+        let pendingFromHome = null;
         window.addEventListener("si-route-changed", () => {
+            const current = BaseDemoSI.currentRoute(window.location.hash);
+            if (current === "inicio")
+                updateHomeIndicators();
+            if (current !== pendingFromHome)
+                return;
+            pendingFromHome = null;
+            // Atualizar a rota antes de mover o foco: cabeçalhos ocultos não recebem foco.
+            window.requestAnimationFrame(() => {
+                const view = document.querySelector(`[data-view="${current}"]`);
+                const heading = view?.querySelector("h1,h2");
+                if (heading) {
+                    heading.tabIndex = -1;
+                    heading.focus({ preventScroll: true });
+                }
+                else
+                    document.getElementById("conteudo")?.focus({ preventScroll: true });
+            });
+        });
+        window.addEventListener("si-guided-context-changed", () => {
             if (BaseDemoSI.currentRoute(window.location.hash) === "inicio")
                 updateHomeIndicators();
+        });
+        // O clique apenas marca o destino; a restauração de foco aguarda a rota realmente visível.
+        document.querySelectorAll(".si-home-family a[href^='#/']").forEach(link => {
+            link.addEventListener("click", () => {
+                const next = BaseDemoSI.currentRoute(link.getAttribute("href") ?? "");
+                if (next !== "inicio")
+                    pendingFromHome = next;
+            });
         });
         updateHomeIndicators();
     }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-dVSE10JaB6pdXQWouF9mP0AfX75dfJ67o9v5K95oHkk='; script-src 'sha256-ZX83h/rUMlPP+XCsIte7oZAguqJDrI3Y+7tj9A4SYF0='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-oFP+tqM+Ah8OknGvAOn+lPopfwc/ydE199PnNUFufh0='; script-src 'sha256-NgVfw83OuK+Vd3Jgw0WtDB+T+wp0cPtjoWBeTBFQlJA='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -20,6 +20,7 @@
   
   
   
+    
   
   
 
@@ -680,6 +681,22 @@ body.route-ambiente.nav-open .side.si-menu-drawer{width:min(360px,88vw);transfor
 @media(prefers-reduced-motion:reduce){.si-home-family .si-home-path,.si-home-family .si-path-arrow{transition:none!important;}}
 @media print{.si-home-family .si-home-paths{grid-template-columns:repeat(2,minmax(0,1fr));}.si-home-family .si-home-path-primary{grid-column:1/-1;min-height:0;}}
 
+/* 0.9.12 — Continuidade contextual da Home sem alterar o grid aprovado. */
+.si-home-family .si-home-resume[hidden],.si-home-family .si-home-scene-summary[hidden]{display:none!important}
+.si-home-family .si-home-resume{display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0;margin:0 0 14px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--border));border-left:3px solid var(--accent);border-radius:12px;background:var(--surface)}
+.si-home-resume-content{display:flex;flex-direction:column;min-width:0;gap:3px}
+.si-home-resume-content strong{font-size:16px;overflow-wrap:anywhere}
+.si-home-resume-content span{font-size:12px;color:var(--muted)}
+.si-home-resume-eyebrow{font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);margin:0}
+.si-home-resume-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.si-home-resume-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;color:var(--text);text-decoration:none;font-size:13px;font-weight:700}
+.si-home-resume-actions a:first-child{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.si-home-resume-actions a:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+.si-home-scene-summary{font-size:12px;color:var(--muted);margin:0 0 12px}
+@media(max-width:640px){.si-home-family .si-home-resume{align-items:stretch;flex-direction:column}.si-home-resume-actions a{flex:1 1 150px}}
+@media(max-width:370px){.si-home-resume-actions{flex-direction:column;align-items:stretch}.si-home-resume-actions a{width:100%}}
+@media print{.si-home-family .si-home-resume{break-inside:avoid}}
+
 /* Contrato da gaveta / Família de simuladores · Revisão de fidelidade. */
 .si-drawer-item{display:flex;width:100%;min-height:44px;align-items:center;gap:12px;padding:8px 10px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--text);text-align:left;text-decoration:none;font-size:.9rem;font-weight:600;cursor:pointer;line-height:1.35}
 .si-drawer-item:hover:not(:disabled),.si-drawer-item:focus-visible{background:var(--tint);border-color:var(--border)}
@@ -891,7 +908,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
     <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
   </div>
  </section>
- <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.6</span></p></section>
+ <section class="si-drawer-section" aria-labelledby="si-app-title"><h3 id="si-app-title">Aplicativo</h3><button type="button" class="si-drawer-item" id="si-drawer-install" hidden><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12M8 11l4 4 4-4M4 17v4h16v-4"/></svg><span>Instalar aplicativo</span></button><a class="si-drawer-item" href="#/sobre"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0M12 11v6M12 7h.01"/></svg><span>Sobre a Base Demo Oficial - SI</span></a><p class="si-drawer-version">Versão <span data-app-version>0.9.12</span></p></section>
 </div></aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
@@ -914,7 +931,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         </nav>
         <div class="si-global-actions">
           <button type="button" class="si-header-action" id="si-header-access" aria-label="Abrir acessibilidade no menu" title="Acessibilidade"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4a2 2 0 1 1-4 0 2 2 0 0 1 4 0M4 8l8 2 8-2M12 10v5M7 22l5-7 5 7"/></svg> <span>Acessibilidade</span></button>
-          <span class="version-pill">v<span data-app-version>0.9.6</span></span>
+          <span class="version-pill">v<span data-app-version>0.9.12</span></span>
         </div>
         <span id="current-section" class="sr-only">Início</span>
       </header>
@@ -932,6 +949,14 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
             <img class="si-home-hero-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="144" height="144">
           </header>
           <div class="si-home-heading"><h2>Escolha seu próximo passo</h2><p>Da exploração livre à atividade orientada.</p></div>
+          <section id="si-home-resume" class="si-home-resume" aria-label="Retomar atividade em andamento" hidden>
+            <div class="si-home-resume-content"><p class="si-home-resume-eyebrow">Atividade em andamento</p>
+              <strong id="si-home-resume-title">Atividade</strong>
+              <span id="si-home-resume-meta">Progresso preservado</span></div>
+            <div class="si-home-resume-actions"><a id="si-home-resume-link" href="#/roteiros">Retomar atividade</a>
+              <a id="si-home-resume-bench" href="#/ambiente">Voltar à bancada</a></div>
+          </section>
+          <p id="si-home-scene-summary" class="si-home-scene-summary" hidden></p>
           <nav class="si-home-paths" aria-label="Caminhos principais da plataforma">
             <a class="si-home-path si-home-path-primary" href="#/ambiente" aria-label="Entrar no ambiente de exploração livre">
               <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Ambiente livre</span></span>
@@ -1248,7 +1273,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.6</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.12</strong>.</p></article>
         </section>
       </main>
       <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
@@ -1257,7 +1282,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
         <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
         <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
       </nav>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.6</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.12</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -1278,7 +1303,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.11",
+        version: "0.9.12",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -3978,6 +4003,29 @@ var BaseDemoSI;
     function countReadings() { return BaseDemoSI.extensionRecordCount(); }
     /** Catálogo e leitura têm espaços próprios; nunca substituímos a bancada. */
     let returnToActivity = "";
+    const guidedKey = "guided-return-v1";
+    /** Vínculo validado sempre contra o catálogo carregado: sem atividade fantasma. */
+    function validatedGuidedLink(value) {
+        const match = /^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
+        if (!match || !education)
+            return null;
+        const kind = match[1] === "missoes" ? "mission" : "script";
+        const activity = education.list(kind).find(a => a.id === match[2]);
+        if (!activity)
+            return null;
+        return { url: `#/${match[1]}?item=${encodeURIComponent(activity.id)}`, activity, progress: education.snapshot().progress[activity.id] ?? 0 };
+    }
+    function saveGuidedReturn(value) {
+        returnToActivity = value;
+        BaseDemoSI.storage.write(guidedKey, value);
+        mountReturnLink();
+        window.dispatchEvent(new Event("si-guided-context-changed"));
+    }
+    function guidedActivityContext() {
+        const result = validatedGuidedLink(returnToActivity);
+        return result ? { url: result.url, title: result.activity.title, kind: result.activity.kind, progress: result.progress, total: result.activity.steps.length } : null;
+    }
+    BaseDemoSI.guidedActivityContext = guidedActivityContext;
     const selectedParam = (key) => {
         const search = window.location.hash.split("?")[1] ?? "";
         return new URLSearchParams(search).get(key) ?? "";
@@ -4003,15 +4051,16 @@ var BaseDemoSI;
         return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
     }
     BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
-    function clearGuidedReturn() { returnToActivity = ""; mountReturnLink(); }
+    function clearGuidedReturn() { saveGuidedReturn(""); }
     BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)
             return;
-        control.hidden = !returnToActivity || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
-        if (returnToActivity)
-            control.href = returnToActivity;
+        const guided = guidedActivityContext();
+        control.hidden = !guided || BaseDemoSI.currentRoute(window.location.hash) !== "ambiente";
+        if (guided)
+            control.href = guided.url;
     }
     function showDetail(catalogId, detailId, open) {
         const catalog = el(catalogId), detail = el(detailId);
@@ -4089,7 +4138,9 @@ var BaseDemoSI;
         if (!active || !detail)
             return;
         const position = snapshot.progress[active.id] ?? 0, finished = position >= active.steps.length;
-        returnToActivity = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        const nextReturn = `#/${route}?item=${encodeURIComponent(active.id)}`;
+        if (returnToActivity !== nextReturn)
+            saveGuidedReturn(nextReturn);
         const back = button(`← Todas as ${kind === "mission" ? "missões" : "investigações"}`, () => returnToCatalog(route, active.id));
         back.classList.add("si-detail-back");
         const heading = text("h2", active.title);
@@ -4276,8 +4327,17 @@ var BaseDemoSI;
     function setupEducation(scene) {
         educationScene = scene;
         education = BaseDemoSI.createEducationStore(BaseDemoSI.storage);
+        const previous = BaseDemoSI.storage.read(guidedKey) ?? "";
+        returnToActivity = validatedGuidedLink(previous)?.url ?? "";
+        if (previous && !returnToActivity)
+            BaseDemoSI.storage.write(guidedKey, "");
         BaseDemoSI.bindEducationForSharing(education);
-        education.subscribe(renderAll);
+        education.subscribe(() => {
+            if (returnToActivity && !validatedGuidedLink(returnToActivity))
+                saveGuidedReturn("");
+            renderAll();
+            window.dispatchEvent(new Event("si-guided-context-changed"));
+        });
         scene.subscribe(() => { if (BaseDemoSI.currentRoute(window.location.hash) !== "ambiente")
             renderAll(); });
         window.addEventListener("si-education-observation", () => renderAll());
@@ -4808,9 +4868,9 @@ var BaseDemoSI;
 (function (BaseDemoSI) {
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
-        "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./manifest.webmanifest", "./assets/icon.svg",
-        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+        "./components.css", "./mobile-contract.css", "./extensions.css", "./education.css", "./records.css",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./environment-organization.css", "./menu-fidelity.css", "./menu-review.css", "./home-fidelity.css", "./home-context.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/menu-icons/mount.svg", "./assets/menu-icons/eye.svg", "./assets/menu-icons/report.svg"
     ];
     let installPrompt = null;
     let changingController = false;
@@ -5289,12 +5349,69 @@ var BaseDemoSI;
         setText("si-home-missions-meta", `${officialMissions + extraMissions} desafios para investigar`);
         setText("si-home-scripts-meta", `${officialScripts + extraScripts} investigações orientadas`);
         setText("si-home-notebook-meta", notes ? `${notes} registro${notes === 1 ? "" : "s"} salvo${notes === 1 ? "" : "s"}` : "Pronto para seus registros");
+        const active = BaseDemoSI.guidedActivityContext();
+        const resume = document.getElementById("si-home-resume");
+        const resumeLink = document.getElementById("si-home-resume-link");
+        const benchLink = document.getElementById("si-home-resume-bench");
+        if (resume)
+            resume.hidden = !active;
+        if (active) {
+            setText("si-home-resume-title", active.title);
+            setText("si-home-resume-meta", `${active.kind === "mission" ? "Missão" : "Roteiro"} · ${Math.min(active.progress, active.total)}/${active.total} etapa(s) ${active.progress >= active.total ? "concluídas" : "registradas"}`);
+            if (resumeLink) {
+                resumeLink.href = active.url;
+                resumeLink.textContent = active.progress >= active.total ? "Rever atividade" : "Retomar atividade";
+            }
+            if (benchLink)
+                benchLink.href = "#/ambiente";
+        }
+        let scene = null;
+        try {
+            const raw = BaseDemoSI.storage.read("scene-project-v1");
+            if (raw)
+                scene = BaseDemoSI.parseScene(JSON.parse(raw));
+        }
+        catch { /* Projeto não válido: nenhuma retomada é exibida. */ }
+        const count = scene?.entities.length ?? 0;
+        const sceneInfo = document.getElementById("si-home-scene-summary");
+        if (sceneInfo) {
+            sceneInfo.hidden = count === 0;
+            sceneInfo.textContent = count === 1 ? "1 objeto salvo na bancada" : `${count} objetos salvos na bancada`;
+        }
     }
     BaseDemoSI.updateHomeIndicators = updateHomeIndicators;
     function setupHome() {
+        let pendingFromHome = null;
         window.addEventListener("si-route-changed", () => {
+            const current = BaseDemoSI.currentRoute(window.location.hash);
+            if (current === "inicio")
+                updateHomeIndicators();
+            if (current !== pendingFromHome)
+                return;
+            pendingFromHome = null;
+            // Atualizar a rota antes de mover o foco: cabeçalhos ocultos não recebem foco.
+            window.requestAnimationFrame(() => {
+                const view = document.querySelector(`[data-view="${current}"]`);
+                const heading = view?.querySelector("h1,h2");
+                if (heading) {
+                    heading.tabIndex = -1;
+                    heading.focus({ preventScroll: true });
+                }
+                else
+                    document.getElementById("conteudo")?.focus({ preventScroll: true });
+            });
+        });
+        window.addEventListener("si-guided-context-changed", () => {
             if (BaseDemoSI.currentRoute(window.location.hash) === "inicio")
                 updateHomeIndicators();
+        });
+        // O clique apenas marca o destino; a restauração de foco aguarda a rota realmente visível.
+        document.querySelectorAll(".si-home-family a[href^='#/']").forEach(link => {
+            link.addEventListener("click", () => {
+                const next = BaseDemoSI.currentRoute(link.getAttribute("href") ?? "");
+                if (next !== "inicio")
+                    pendingFromHome = next;
+            });
         });
         updateHomeIndicators();
     }
