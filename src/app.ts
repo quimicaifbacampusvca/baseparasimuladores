@@ -23,13 +23,7 @@ namespace BaseDemoSI {
         toggle?.setAttribute("aria-expanded", "false");
       }
     });
-    if (window.isSecureContext && "serviceWorker" in navigator) {
-      // Sem HTTPS/localhost (ex.: file://), o aplicativo continua funcional sem SW.
-      navigator.serviceWorker.register("./sw.js").catch(() => {
-        const status = document.getElementById("offline-status");
-        if (status) status.textContent = "Execução local disponível; instalação PWA indisponível aqui.";
-      });
-    }
+    setupDistribution();
   }
 }
 

@@ -4,7 +4,7 @@ namespace BaseDemoSI {
     id: "base-demo-oficial-si",
     name: "Base Demo Oficial - SI",
     shortName: "SI",
-    version: "0.7.0",
+    version: "0.8.0",
     language: "pt-BR",
     requiresNetwork: false,
     routes: Object.freeze<RouteDefinition[]>([

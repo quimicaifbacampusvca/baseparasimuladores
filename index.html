@@ -8,12 +8,14 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'">
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
   <link rel="stylesheet" href="./app.css">
   <link rel="stylesheet" href="./workspace.css">
   <link rel="stylesheet" href="./components.css">
   <link rel="stylesheet" href="./extensions.css">
   <link rel="stylesheet" href="./education.css">
   <link rel="stylesheet" href="./records.css">
+  <link rel="stylesheet" href="./distribution.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
@@ -37,21 +39,21 @@
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.7.0</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.8.0</span></small></div>
     </aside>
 
     <div class="main-column">
       <header class="topbar">
         <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
         <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.7.0</span></span>
+        <span class="version-pill">v<span data-app-version>0.8.0</span></span>
       </header>
       <main id="conteudo" tabindex="-1">
         <section class="view" data-view="inicio" aria-labelledby="home-title">
           <div class="hero">
-            <p class="eyebrow">ETAPA 07 · REGISTROS E RELATÓRIOS</p>
-            <h1 id="home-title">Uma plataforma para explorar, registrar e documentar atividades.</h1>
-            <p>Aprender, Missões, Roteiros, Caderno e Relatórios compartilham a mesma bancada, com documentação local e exportação independente.</p>
+            <p class="eyebrow">ETAPA 08 · ACABAMENTO E DISTRIBUIÇÃO</p>
+            <h1 id="home-title">Uma base universal pronta para experimentar, registrar e trabalhar offline.</h1>
+            <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
             <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
           </div>
           <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
@@ -264,15 +266,22 @@
         <section class="view narrow" data-view="configuracoes" aria-labelledby="settings-title" hidden>
           <div class="section-heading"><p class="eyebrow">PREFERÊNCIAS</p><h1 id="settings-title">Seu ambiente, suas escolhas</h1><p>As preferências pertencem à plataforma, independentemente do simulador que será instalado.</p></div>
           <div class="card setting-card"><label for="theme-choice">Aparência</label><p>Escolha o tema da interface.</p><select id="theme-choice"><option value="sistema">Acompanhar sistema</option><option value="claro">Claro</option><option value="escuro">Escuro</option></select><p class="feedback" id="preferences-feedback" role="status" aria-live="polite"></p></div>
-          <p class="notice">O contraste e a redução de movimento respeitam, nesta etapa, as preferências do navegador. Controles adicionais virão na camada de acessibilidade.</p>
+          <section class="card si-distribution-card" aria-labelledby="distribution-title">
+            <h2 id="distribution-title">Instalação e acesso offline</h2>
+            <p>O programa utiliza recursos incorporados. Em HTTPS ou localhost, a PWA pode armazenar os arquivos essenciais; o pacote standalone pode ser aberto diretamente sem conexão.</p>
+            <p id="distribution-status" class="si-distribution-status" role="status" aria-live="polite">Verificando modo de execução...</p>
+            <div class="si-distribution-actions"><button class="button primary" id="distribution-install" type="button" hidden>Instalar aplicativo</button><button class="button outline" id="distribution-check" type="button">Conferir recursos offline</button></div>
+            <p class="si-distribution-note">Caso não apareça a opção de instalação, utilize o menu do navegador quando disponível. O armazenamento local depende das permissões e do espaço do dispositivo; exporte backups regularmente.</p>
+          </section>
+          <p class="notice">O contraste e a redução de movimento respeitam as preferências do navegador. Controles de acessibilidade adicionais permanecem sujeitos à homologação.</p>
         </section>
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.7.0</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.8.0</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.7.0</span></span></footer>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.8.0</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>

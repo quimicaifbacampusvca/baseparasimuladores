@@ -1,41 +1,32 @@
-# Base Demo Oficial - SI · 0.7.0
+# Base Demo Oficial - SI · 0.8.0
 
-Plataforma universal para simuladores educacionais. **Versão 0.7.0 — Caderno e relatórios**.
+Plataforma universal para simuladores educacionais. **Versão 0.8.0 — Acabamentos, PWA e standalone.**
 
-## Como executar
+## Executar sem rede
 
-Abra `index.html` em um navegador para utilizar a aplicação autocontida, sem bibliotecas remotas. No HTTPS ou localhost, a aplicação também dispõe de Service Worker com os arquivos operacionais no pré-cache. A execução via `file://` e a instalação PWA em dispositivos físicos ainda precisam de homologação específica.
+- **Standalone recomendado para distribuição direta:** abra `standalone.html`. É um único arquivo HTML com interface, estilos, código e identidade embutidos. Não exige instalação nem CDN; o armazenamento do navegador ainda pode sofrer limitações de privacidade/permissão.
+- **PWA/web:** abra `index.html` sob HTTPS ou localhost. Após o cache inicial completar, a interface pode ser utilizada offline. A instalação pela interface é oferecida somente quando o navegador a suporta.
+- **Desenvolvimento:** execute `npm run build` para compilar `app.js` e gerar o standalone, `npm test` para validar as camadas ou `npm run check` para compilar e testar. O TypeScript só é necessário no ambiente de desenvolvimento.
 
-Para desenvolvimento: `npm run build`, `npm test` ou `npm run check`. O TypeScript 5.8.3 é necessário apenas para compilar o código-fonte. O aplicativo já é distribuído com `app.js` gerado e todas as folhas de estilo.
+## Recursos preservados
 
-## Funcionalidades existentes
+- Navegação, preferências, cena com objetos universais, comandos e histórico Desfazer/Refazer.
+- Workspace com docas Montagem, Ver e Dados, foco e visão geral, mobile responsivo.
+- Extensões locais de ferramentas e instrumentos e histórico de leituras.
+- Aprender, Missões, Roteiros e autoria de atividades na Área do Professor.
+- Caderno de observações, hipóteses e conclusões; relatórios históricos com impressão, HTML autocontido e backups JSON.
 
-- **Estrutura:** identificação da plataforma, navegação, preferências e interface responsiva.
-- **Bancada universal:** objetos, seleção, ferramentas, histórico Desfazer/Refazer, painéis Montagem, Ver e Dados, visão geral e foco.
-- **Extensões:** registro local de motores, ferramentas e instrumentos, com medições, validação e armazenamento separado do núcleo.
-- **Aprender:** temas independentes com marcador de conclusão.
-- **Missões e Roteiros:** atividades com critérios verificáveis, progresso local e retomada na bancada.
-- **Área do Professor:** criação, importação e exportação de atividades JSON com validação.
-- **Caderno:** observações, hipóteses e conclusões, inclusive vínculo ao objeto selecionado; histórico independente dos instrumentos e backup JSON validado.
-- **Relatórios:** cabeçalho configurável, captura imutável de cena, observações e medições; impressão A4 e HTML estático autocontido.
+## Distribuição técnica
 
-## Contratos e limites
+`index.html`, `app.js`, CSS e ícones são recursos locais. O Service Worker versionado pré-armazenará os recursos em uma origem HTTPS ou localhost, sem guardar dados pessoais. O standalone é gerado pelo script `scripts/build_standalone.py`, com CSS, JS e ícones incorporados e CSP por hash.
 
-- Nenhuma camada do núcleo contém conteúdo exclusivo de uma ciência. Os instrumentos são definidos pelas extensões conectadas.
-- Os relatórios são instantâneos históricos e não são recalculados depois de gerados.
-- Até 80 registros e 20 relatórios no Caderno local. O armazenamento é do navegador e não sincroniza dispositivos.
-- O backup do Caderno substitui somente registros e relatórios após confirmação; os dados da cena e as atividades são preservados.
-- Não há login, conexão externa obrigatória, ranking nem pontuação.
-- Os links de atividades com permissões restritas ainda não foram incluídos.
+A cópia standalone não utiliza Service Worker. Nem PWA nem standalone sincronizam informações com servidores: dados e backups ficam sob controle do usuário.
 
-## Novos arquivos
+## Verificação e limites
 
-- `src/records-contracts.ts`: contratos de registros e relatórios.
-- `src/records.ts`: modelo, validação, persistência e intercâmbio.
-- `src/records-ui.ts`: interface, prévia, impressão e exportação HTML.
-- `records.css`: estilos responsivos e regra de impressão.
-- `tests/records.test.cjs`: testes unitários e negativos.
-- `docs/ACEITE-0.7.0.md`: critérios técnicos e limitações da série.
+A bateria `npm run check` valida os contratos das oito camadas, a existência dos arquivos do pré-cache e a integridade estrutural do standalone. Testes manuais e de navegador, incluindo uso realmente desconectado, constam de `docs/ACEITE-0.8.0.md`.
+
+Ações com permissões de link e homologação em Firefox, Safari/WebKit, aparelhos físicos e impressão permanecem etapas posteriores. A base não contém motor científico especializado e não possui login ou conexão obrigatória.
 
 ## Licença
 

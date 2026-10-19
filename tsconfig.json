@@ -34,6 +34,7 @@
     "src/extensions-ui.ts",
     "src/education-ui.ts",
     "src/records-ui.ts",
+    "src/distribution.ts",
     "src/scene-ui.ts",
     "src/app.ts"
   ]

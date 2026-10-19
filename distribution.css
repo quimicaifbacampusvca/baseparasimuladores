@@ -1,0 +1,11 @@
+/* Distribuição 0.8.0 — refinamentos aditivos sem alterar os contratos do workspace. */
+.si-distribution-card { margin-top: 18px; }
+.si-distribution-card h2 { font-size: 18px; margin-bottom: 9px; }
+.si-distribution-card p { color: var(--muted); font-size: 13px; }
+.si-distribution-actions { display:flex; gap: 10px; flex-wrap:wrap; margin-top:15px; }
+.si-distribution-actions button { cursor:pointer; }
+.si-distribution-status { min-height:44px; padding:12px 14px; border:1px solid var(--border); border-radius:10px; background:var(--tint); color:var(--text) !important; }
+.si-distribution-note { margin:12px 0 0; }
+@media (max-width:420px) { .si-distribution-actions .button { flex:1 1 100%; } .si-distribution-card { padding:18px; } }
+@media print { .si-distribution-card {display:none!important;} }
+.si-distribution-actions button[hidden] { display:none!important; }

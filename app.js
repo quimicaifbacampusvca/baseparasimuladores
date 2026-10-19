@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.7.0",
+        version: "0.8.0",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2024,6 +2024,122 @@ var BaseDemoSI;
 })(BaseDemoSI || (BaseDemoSI = {}));
 var BaseDemoSI;
 (function (BaseDemoSI) {
+    const precacheFiles = [
+        "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
+        "./components.css", "./extensions.css", "./education.css", "./records.css",
+        "./distribution.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
+    ];
+    let installPrompt = null;
+    let changingController = false;
+    function updateStatus(message) {
+        const target = document.getElementById("distribution-status");
+        if (target)
+            target.textContent = message;
+    }
+    function setInstallVisible(visible) {
+        const control = document.getElementById("distribution-install");
+        if (control)
+            control.hidden = !visible;
+    }
+    function setupDistribution() {
+        window.addEventListener("beforeinstallprompt", event => {
+            event.preventDefault();
+            installPrompt = event;
+            setInstallVisible(true);
+        });
+        window.addEventListener("appinstalled", () => {
+            installPrompt = null;
+            setInstallVisible(false);
+            updateStatus("Aplicativo instalado. O uso offline depende da conclusão do cache inicial.");
+            BaseDemoSI.notify("Aplicativo instalado.", "success");
+        });
+        document.getElementById("distribution-install")?.addEventListener("click", async () => {
+            const current = installPrompt;
+            if (!current)
+                return;
+            installPrompt = null;
+            setInstallVisible(false);
+            try {
+                await current.prompt();
+                const choice = await current.userChoice;
+                if (choice.outcome === "dismissed")
+                    updateStatus("Instalação cancelada. A aplicação permanece acessível pelo navegador.");
+            }
+            catch {
+                updateStatus("O navegador não conseguiu concluir a instalação.");
+            }
+        });
+        document.getElementById("distribution-check")?.addEventListener("click", () => void verifyOfflineAssets());
+        if (window.location.protocol === "file:") {
+            updateStatus("Execução local em arquivo. A versão standalone possui os recursos incorporados; a instalação PWA não se aplica a file://.");
+            return;
+        }
+        if (!("serviceWorker" in navigator) || !window.isSecureContext) {
+            updateStatus("Aplicação funcional; PWA indisponível neste navegador ou contexto. Use HTTPS ou localhost para instalação.");
+            return;
+        }
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (!changingController) {
+                changingController = true;
+                updateStatus("Versão offline ativada. Recarregue a página para utilizar todos os recursos atualizados.");
+            }
+        });
+        navigator.serviceWorker.register("./sw.js").then(async () => {
+            try {
+                await navigator.serviceWorker.ready;
+                await verifyOfflineAssets(false);
+            }
+            catch {
+                updateStatus("A verificação da instalação offline não pôde ser concluída.");
+            }
+        }).catch(() => {
+            updateStatus("Não foi possível registrar a PWA. A interface permanece utilizável com os arquivos locais.");
+        });
+    }
+    BaseDemoSI.setupDistribution = setupDistribution;
+    async function verifyOfflineAssets(showNotice = true) {
+        if (window.location.protocol === "file:") {
+            updateStatus("Modo arquivo local: o pacote standalone usa CSS, JavaScript, ícones e dados embutidos, sem arquivos externos.");
+            if (showNotice)
+                BaseDemoSI.notify("Standalone autocontido: sem cache PWA necessário.", "info");
+            return true;
+        }
+        if (!("caches" in window)) {
+            updateStatus("A API de cache offline não está disponível neste contexto.");
+            return false;
+        }
+        try {
+            const registration = await navigator.serviceWorker.getRegistration("./");
+            if (!registration?.active) {
+                updateStatus("O cache offline ainda não está ativado. Aguardando instalação da PWA.");
+                return false;
+            }
+            const cache = await caches.open(`base-demo-si-v${BaseDemoSI.manifest.version}`);
+            let found = 0;
+            for (const path of precacheFiles) {
+                if (await cache.match(new URL(path, document.baseURI).href))
+                    found++;
+            }
+            const complete = found === precacheFiles.length;
+            updateStatus(complete
+                ? `Cache offline preparado: ${found}/${precacheFiles.length} recursos locais presentes. A instalação não depende de servidores externos.`
+                : `Cache offline incompleto: ${found}/${precacheFiles.length} recursos presentes. Conecte-se novamente antes de trabalhar desconectado.`);
+            if (showNotice)
+                BaseDemoSI.notify(complete ? "Recursos offline conferidos." : "O cache ainda não está completo.", complete ? "success" : "warning");
+            return complete;
+        }
+        catch {
+            updateStatus("Não foi possível acessar o cache. Confira as permissões do navegador.");
+            if (showNotice)
+                BaseDemoSI.notify("Não foi possível verificar o cache local.", "warning");
+            return false;
+        }
+    }
+    BaseDemoSI.verifyOfflineAssets = verifyOfflineAssets;
+})(BaseDemoSI || (BaseDemoSI = {}));
+var BaseDemoSI;
+(function (BaseDemoSI) {
     const projectKey = "scene-project-v1";
     let store;
     let serial = 0;
@@ -2279,14 +2395,7 @@ var BaseDemoSI;
                 toggle?.setAttribute("aria-expanded", "false");
             }
         });
-        if (window.isSecureContext && "serviceWorker" in navigator) {
-            // Sem HTTPS/localhost (ex.: file://), o aplicativo continua funcional sem SW.
-            navigator.serviceWorker.register("./sw.js").catch(() => {
-                const status = document.getElementById("offline-status");
-                if (status)
-                    status.textContent = "Execução local disponível; instalação PWA indisponível aqui.";
-            });
-        }
+        BaseDemoSI.setupDistribution();
     }
     BaseDemoSI.initialize = initialize;
 })(BaseDemoSI || (BaseDemoSI = {}));
