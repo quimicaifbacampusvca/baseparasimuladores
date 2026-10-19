@@ -91,6 +91,10 @@ namespace BaseDemoSI {
     dockTriggers[side]=trigger;
     if(side==="right" && tab==="ver")viewerLevel="catalog";
     changeWorkspace({type:"open",side,tab});
+    // Uma categoria nova começa no topo da própria folha, nunca preserva
+    // deslocamento interno da categoria anterior.
+    const scroll=dock(side).querySelector<HTMLElement>(".si-dock-scroll");
+    if(scroll)scroll.scrollTop=0;
     dock(side).querySelector<HTMLElement>("[data-close-dock]")?.focus({preventScroll:true});
   }
   function closeWorkspace(side:WorkspaceSide,returnFocus=true):void {
@@ -98,9 +102,18 @@ namespace BaseDemoSI {
   }
   function updateViewport():void {
     workspaceState=normalizeWorkspace(workspaceState,compact());renderWorkspace();
-    const vv=window.visualViewport;const root=node("si-workspace");
-    if(root&&mobile()&&vv)root.style.setProperty("--si-visible-height",`${vv.height}px`);
-    else root?.style.removeProperty("--si-visible-height");
+    const root=node("si-workspace");if(!root)return;
+    if(mobile()){
+      const vv=window.visualViewport;
+      const size=mobileViewportMetrics(window.innerHeight,vv?.height??window.innerHeight,vv?.offsetTop??0);
+      root.style.setProperty("--si-visible-height",`${size.visibleHeight}px`);
+      // Não reposicionar a cena quando o teclado aparece: apenas a folha e
+      // os lançadores passam a acompanhar a área visível do navegador.
+      root.style.setProperty("--si-keyboard-offset",`${Math.round(size.keyboardOffset)}px`);
+    } else {
+      root.style.removeProperty("--si-visible-height");
+      root.style.removeProperty("--si-keyboard-offset");
+    }
   }
   function focusables(pane:HTMLElement):HTMLElement[]{return Array.from(pane.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex="0"]')).filter(el=>!el.closest('[hidden],[inert]')&&el.getClientRects().length>0);}
   function keyboardHandler(ev:KeyboardEvent):void {
@@ -187,6 +200,19 @@ namespace BaseDemoSI {
     document.addEventListener("keydown",keyboardHandler);
     window.addEventListener("resize",updateViewport);
     window.visualViewport?.addEventListener("resize",updateViewport);
+    window.visualViewport?.addEventListener("scroll",updateViewport);
+    window.addEventListener("orientationchange",updateViewport);
+    for(const side of ["left","right"] as const){
+      const pane=dock(side);
+      pane.addEventListener("focusin",event=>{
+        if(!mobile()||workspaceState[side]!=="open")return;
+        const target=event.target;
+        // Somente campos editáveis precisam ser trazidos para a região visível.
+        if(target instanceof HTMLInputElement||target instanceof HTMLSelectElement||target instanceof HTMLTextAreaElement){
+          target.scrollIntoView({block:"nearest",inline:"nearest",behavior:"auto"});
+        }
+      });
+    }
     window.addEventListener("si-route-changed",(event:Event)=>{
       if((event as CustomEvent).detail!=="ambiente"){
         workspaceState={...workspaceState,left:"collapsed",right:"collapsed",presentation:"standard"};viewerLevel="catalog";

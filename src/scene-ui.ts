@@ -57,6 +57,8 @@ namespace BaseDemoSI {
     if (redoButton) redoButton.disabled = !store.canRedo();
     const clearButton = get("scene-clear") as HTMLButtonElement | null;
     if (clearButton) clearButton.disabled = !snap.entities.length || !sceneManipulationAllowed();
+    const compactClear = get("si-compact-clear") as HTMLButtonElement | null;
+    if (compactClear) compactClear.disabled = !snap.entities.length || !sceneManipulationAllowed();
     const inspector = get("object-inspector");
     if (inspector) inspector.hidden = !snap.selectedId;
     const noSelection = get("no-selection"); if (noSelection) noSelection.hidden = !!snap.selectedId;
@@ -174,6 +176,7 @@ namespace BaseDemoSI {
       if(accepted&&store.dispatch({type:"clear"}))notify("Cena limpa. Use Desfazer para recuperar.","warning");
     });
     setupActionMenu("scene-menu-toggle","scene-tools-menu", action=>{
+      if(action==="clear") { get("scene-clear")?.click(); return; }
       if(action==="help"){
         void confirmDialog({title:"Atalhos disponíveis",description:"Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.",confirmText:"Entendi",cancelText:"Fechar"});
         return;

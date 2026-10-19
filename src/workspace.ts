@@ -47,6 +47,12 @@ namespace BaseDemoSI {
     if(compact&&s.left==="open"&&s.right==="open")return {...s,left:"collapsed"};
     return s;
   }
+  /** Geometria do viewport visual mobile, sem depender do teclado virtual ou da rede. */
+  export function mobileViewportMetrics(innerHeight:number, visibleHeight:number, offsetTop:number):{visibleHeight:number, keyboardOffset:number} {
+    const safeHeight=Number.isFinite(innerHeight)&&innerHeight>0?innerHeight:1;
+    if(!Number.isFinite(visibleHeight)||visibleHeight<=0||!Number.isFinite(offsetTop))return {visibleHeight:safeHeight,keyboardOffset:0};
+    return {visibleHeight:Math.min(safeHeight,Math.max(1,visibleHeight)),keyboardOffset:Math.max(0,Math.min(safeHeight,safeHeight-visibleHeight-Math.max(0,offsetTop)))};
+  }
   /** Migração explícita dos identificadores internos anteriores da doca. */
   export function normalizeLeftCategory(value:unknown):WorkspaceLeftTab|null {
     if(value==="montagem")return "preparo";

@@ -1,0 +1,59 @@
+/* Base Demo Oficial - SI 0.9.8 | contrato mobile, camada final da cascata. */
+/* Este arquivo governa somente a interface compacta; a geometria desktop é preservada. */
+@media (max-width:900px){
+ :root{--si-launcher-h:calc(58px + env(safe-area-inset-bottom,0px))}
+ body.route-ambiente .si-workspace{--si-keyboard-offset:0px;min-width:0;overflow:hidden;padding-bottom:var(--si-launcher-h)}
+ body.route-ambiente .si-workspace-toolbar{flex:0 0 auto;min-height:48px;padding:4px 9px}
+ body.route-ambiente .si-view-tabs button{min-height:44px;padding:8px 7px;font-size:12px}
+ body.route-ambiente .si-scene-region{flex:1 1 0;min-height:0;overflow:hidden}
+ body.route-ambiente .si-focus-view{min-height:0;height:100%;padding:7px 10px 5px;gap:4px}
+ body.route-ambiente .si-stage-name{flex:0 0 auto;min-height:34px;max-height:44px;overflow:hidden}
+ body.route-ambiente .si-stage-name strong{font-size:13px;line-height:1.2;max-width:96%}
+ body.route-ambiente .si-stage-name small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96%;font-size:10px}
+ body.route-ambiente .si-stage-canvas{flex:1 1 0;min-height:0;overflow:hidden}
+ body.route-ambiente .si-stage-footnote{flex:0 0 auto;min-height:12px;max-height:17px;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ body.route-ambiente .si-actionbar{flex:0 0 auto;min-height:48px;max-width:100%;padding:4px 8px;gap:5px;display:flex;flex-wrap:nowrap;justify-content:center;overflow:visible}
+ body.route-ambiente .si-actionbar>.button{flex:1 1 0;min-width:0;min-height:40px;padding:6px 4px;font-size:11px;white-space:nowrap}
+ body.route-ambiente .si-actionbar .si-toolmenu-wrap{flex:0 0 auto}
+ body.route-ambiente .si-actionbar .si-more-trigger{min-height:40px;min-width:58px;padding:6px 5px}
+ body.route-ambiente .si-actionbar .scene-count{margin-left:5px;flex:0 0 auto;font-size:10px}
+ body.route-ambiente .si-item-strip{flex:0 0 56px;min-height:0;padding:4px 9px;overscroll-behavior-x:contain}
+ body.route-ambiente .si-launchers{height:var(--si-launcher-h);bottom:var(--si-keyboard-offset,0px);padding:6px max(8px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px));gap:6px;z-index:73}
+ body.route-ambiente .si-launchers button{flex:1 1 0;min-width:0;height:44px;min-height:44px;max-height:48px;padding:5px 4px;font-size:11px;line-height:1.1;border-radius:9px}
+ body.route-ambiente .si-launchers button .si-launch-icon{width:17px;height:17px;flex:0 0 17px}
+ body.route-ambiente .si-dock.si-bottom-sheet{position:fixed;top:auto;left:0;right:0;bottom:calc(var(--si-launcher-h) + var(--si-keyboard-offset,0px));height:min(73dvh,580px);max-height:calc(var(--si-visible-height,100dvh) - var(--si-launcher-h) - 56px);min-height:0;width:100%;max-width:none;display:flex;flex-direction:column;overflow:hidden;border-radius:16px 16px 0 0}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-header{flex:0 0 52px;min-height:52px;padding:5px 12px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-header button{min-width:44px;min-height:44px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-tabs{flex:0 0 auto;min-height:56px;max-height:86px;align-items:stretch;overflow:visible;padding:6px 7px;gap:4px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-tabs button{min-height:44px;max-width:100%;min-width:0;font-size:clamp(10px,2.8vw,12px);padding:5px 2px;line-height:1.15}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px max(12px,env(safe-area-inset-left,0px)) 20px;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;overflow-anchor:none}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll .button,body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll select,body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll input{min-height:44px}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 calc(var(--si-launcher-h) + var(--si-keyboard-offset,0px)) 0}
+ body.route-ambiente .si-dock-scroll .tool-stack{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ body.route-ambiente .si-dock-scroll .tool-stack button{max-width:100%;white-space:normal;text-align:left}
+}
+@media(max-width:420px){
+ /* Ação destrutiva continua disponível em Mais, sem comprimir desfazer/refazer. */
+ body.route-ambiente .si-actionbar #scene-clear{display:none}
+ body.route-ambiente .si-actionbar .scene-count{position:static!important;clip-path:none!important;width:auto!important;height:auto!important;overflow:visible!important;margin:0 0 0 auto!important;font-size:0!important;white-space:nowrap!important}
+ body.route-ambiente .si-actionbar .scene-count::after{content:attr(data-compact-count);font-size:10px;color:var(--muted)}
+ body.route-ambiente .si-actionbar .si-more-trigger{min-width:57px}
+}
+@media(max-width:900px) and (orientation:landscape) and (max-height:500px){
+ :root{--si-launcher-h:48px}
+ body.route-ambiente .si-workspace{padding-bottom:var(--si-launcher-h)}
+ body.route-ambiente .si-workspace-toolbar{min-height:40px;padding:2px 8px}
+ body.route-ambiente .si-view-tabs button{min-height:36px}
+ body.route-ambiente .si-actionbar{min-height:40px;padding:2px 7px}
+ body.route-ambiente .si-actionbar>.button,body.route-ambiente .si-actionbar .si-more-trigger{min-height:36px}
+ body.route-ambiente .si-item-strip{display:none}
+ body.route-ambiente .si-stage-name{min-height:25px;max-height:26px}
+ body.route-ambiente .si-stage-name small,body.route-ambiente .si-stage-footnote{display:none}
+ body.route-ambiente .si-stage-canvas{min-height:0}
+ body.route-ambiente .si-launchers{height:48px;padding:3px 9px}
+ body.route-ambiente .si-launchers button{min-height:40px;height:40px}
+ body.route-ambiente .si-dock.si-bottom-sheet{height:min(74dvh,350px);max-height:calc(var(--si-visible-height,100dvh) - 52px)}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 calc(48px + var(--si-keyboard-offset,0px)) 0}
+}
+@media(prefers-reduced-motion:reduce){body.route-ambiente .si-dock,body.route-ambiente .si-launchers{transition:none!important;animation:none!important}}
+@media(forced-colors:active){body.route-ambiente .si-dock.si-bottom-sheet,body.route-ambiente .si-launchers button{border:2px solid CanvasText!important}}

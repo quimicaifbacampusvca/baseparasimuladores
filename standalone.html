@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-DeTDzBmux+Q3WIvrjrzumt0wDaCHiqb0StrrNbbhJJ8='; script-src 'sha256-EqJ/nXUURTiOermBfuYjaA+h789qCma+8/qIlctLEc8='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-Dv9wqRZwS55bW2xQD8MryDVhEEIf+M0VT3wCmTUyVYs='; script-src 'sha256-9VlQNoPWr3TlS3UzAjVBobEs8WC3wkQ3gxHn0OJyqVU='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -19,7 +19,8 @@
   
   
   
-    
+  
+  
   
 
   <title>Base Demo Oficial - SI</title>
@@ -741,6 +742,66 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 .si-a11y-label.si-with-icon{display:flex;flex-direction:row;align-items:center;gap:10px}
 .si-a11y-label .si-a11y-svg{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
 .si-a11y-label.si-with-icon small{font-size:.67rem}
+
+/* Base Demo Oficial - SI 0.9.8 | contrato mobile, camada final da cascata. */
+/* Este arquivo governa somente a interface compacta; a geometria desktop é preservada. */
+@media (max-width:900px){
+ :root{--si-launcher-h:calc(58px + env(safe-area-inset-bottom,0px))}
+ body.route-ambiente .si-workspace{--si-keyboard-offset:0px;min-width:0;overflow:hidden;padding-bottom:var(--si-launcher-h)}
+ body.route-ambiente .si-workspace-toolbar{flex:0 0 auto;min-height:48px;padding:4px 9px}
+ body.route-ambiente .si-view-tabs button{min-height:44px;padding:8px 7px;font-size:12px}
+ body.route-ambiente .si-scene-region{flex:1 1 0;min-height:0;overflow:hidden}
+ body.route-ambiente .si-focus-view{min-height:0;height:100%;padding:7px 10px 5px;gap:4px}
+ body.route-ambiente .si-stage-name{flex:0 0 auto;min-height:34px;max-height:44px;overflow:hidden}
+ body.route-ambiente .si-stage-name strong{font-size:13px;line-height:1.2;max-width:96%}
+ body.route-ambiente .si-stage-name small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96%;font-size:10px}
+ body.route-ambiente .si-stage-canvas{flex:1 1 0;min-height:0;overflow:hidden}
+ body.route-ambiente .si-stage-footnote{flex:0 0 auto;min-height:12px;max-height:17px;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ body.route-ambiente .si-actionbar{flex:0 0 auto;min-height:48px;max-width:100%;padding:4px 8px;gap:5px;display:flex;flex-wrap:nowrap;justify-content:center;overflow:visible}
+ body.route-ambiente .si-actionbar>.button{flex:1 1 0;min-width:0;min-height:40px;padding:6px 4px;font-size:11px;white-space:nowrap}
+ body.route-ambiente .si-actionbar .si-toolmenu-wrap{flex:0 0 auto}
+ body.route-ambiente .si-actionbar .si-more-trigger{min-height:40px;min-width:58px;padding:6px 5px}
+ body.route-ambiente .si-actionbar .scene-count{margin-left:5px;flex:0 0 auto;font-size:10px}
+ body.route-ambiente .si-item-strip{flex:0 0 56px;min-height:0;padding:4px 9px;overscroll-behavior-x:contain}
+ body.route-ambiente .si-launchers{height:var(--si-launcher-h);bottom:var(--si-keyboard-offset,0px);padding:6px max(8px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px));gap:6px;z-index:73}
+ body.route-ambiente .si-launchers button{flex:1 1 0;min-width:0;height:44px;min-height:44px;max-height:48px;padding:5px 4px;font-size:11px;line-height:1.1;border-radius:9px}
+ body.route-ambiente .si-launchers button .si-launch-icon{width:17px;height:17px;flex:0 0 17px}
+ body.route-ambiente .si-dock.si-bottom-sheet{position:fixed;top:auto;left:0;right:0;bottom:calc(var(--si-launcher-h) + var(--si-keyboard-offset,0px));height:min(73dvh,580px);max-height:calc(var(--si-visible-height,100dvh) - var(--si-launcher-h) - 56px);min-height:0;width:100%;max-width:none;display:flex;flex-direction:column;overflow:hidden;border-radius:16px 16px 0 0}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-header{flex:0 0 52px;min-height:52px;padding:5px 12px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-header button{min-width:44px;min-height:44px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-tabs{flex:0 0 auto;min-height:56px;max-height:86px;align-items:stretch;overflow:visible;padding:6px 7px;gap:4px}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-tabs button{min-height:44px;max-width:100%;min-width:0;font-size:clamp(10px,2.8vw,12px);padding:5px 2px;line-height:1.15}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:12px max(12px,env(safe-area-inset-left,0px)) 20px;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;overflow-anchor:none}
+ body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll .button,body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll select,body.route-ambiente .si-dock.si-bottom-sheet .si-dock-scroll input{min-height:44px}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 calc(var(--si-launcher-h) + var(--si-keyboard-offset,0px)) 0}
+ body.route-ambiente .si-dock-scroll .tool-stack{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ body.route-ambiente .si-dock-scroll .tool-stack button{max-width:100%;white-space:normal;text-align:left}
+}
+@media(max-width:420px){
+ /* Ação destrutiva continua disponível em Mais, sem comprimir desfazer/refazer. */
+ body.route-ambiente .si-actionbar #scene-clear{display:none}
+ body.route-ambiente .si-actionbar .scene-count{position:static!important;clip-path:none!important;width:auto!important;height:auto!important;overflow:visible!important;margin:0 0 0 auto!important;font-size:0!important;white-space:nowrap!important}
+ body.route-ambiente .si-actionbar .scene-count::after{content:attr(data-compact-count);font-size:10px;color:var(--muted)}
+ body.route-ambiente .si-actionbar .si-more-trigger{min-width:57px}
+}
+@media(max-width:900px) and (orientation:landscape) and (max-height:500px){
+ :root{--si-launcher-h:48px}
+ body.route-ambiente .si-workspace{padding-bottom:var(--si-launcher-h)}
+ body.route-ambiente .si-workspace-toolbar{min-height:40px;padding:2px 8px}
+ body.route-ambiente .si-view-tabs button{min-height:36px}
+ body.route-ambiente .si-actionbar{min-height:40px;padding:2px 7px}
+ body.route-ambiente .si-actionbar>.button,body.route-ambiente .si-actionbar .si-more-trigger{min-height:36px}
+ body.route-ambiente .si-item-strip{display:none}
+ body.route-ambiente .si-stage-name{min-height:25px;max-height:26px}
+ body.route-ambiente .si-stage-name small,body.route-ambiente .si-stage-footnote{display:none}
+ body.route-ambiente .si-stage-canvas{min-height:0}
+ body.route-ambiente .si-launchers{height:48px;padding:3px 9px}
+ body.route-ambiente .si-launchers button{min-height:40px;height:40px}
+ body.route-ambiente .si-dock.si-bottom-sheet{height:min(74dvh,350px);max-height:calc(var(--si-visible-height,100dvh) - 52px)}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 calc(48px + var(--si-keyboard-offset,0px)) 0}
+}
+@media(prefers-reduced-motion:reduce){body.route-ambiente .si-dock,body.route-ambiente .si-launchers{transition:none!important;animation:none!important}}
+@media(forced-colors:active){body.route-ambiente .si-dock.si-bottom-sheet,body.route-ambiente .si-launchers button{border:2px solid CanvasText!important}}
 </style>
 </head>
 <body>
@@ -908,6 +969,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
                   <button role="menuitem" type="button" data-menu-action="add-circle">Adicionar círculo</button>
                   <button role="menuitem" type="button" data-menu-action="add-label">Adicionar etiqueta</button>
                   <span role="separator" class="si-menu-divider"></span>
+                  <button role="menuitem" type="button" data-menu-action="clear" id="si-compact-clear" disabled>Limpar cena</button>
                   <button role="menuitem" type="button" data-menu-action="help">Atalhos de teclado</button>
                 </div>
               </div>
@@ -1175,7 +1237,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.7",
+        version: "0.9.8",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2527,6 +2589,14 @@ var BaseDemoSI;
         return s;
     }
     BaseDemoSI.normalizeWorkspace = normalizeWorkspace;
+    /** Geometria do viewport visual mobile, sem depender do teclado virtual ou da rede. */
+    function mobileViewportMetrics(innerHeight, visibleHeight, offsetTop) {
+        const safeHeight = Number.isFinite(innerHeight) && innerHeight > 0 ? innerHeight : 1;
+        if (!Number.isFinite(visibleHeight) || visibleHeight <= 0 || !Number.isFinite(offsetTop))
+            return { visibleHeight: safeHeight, keyboardOffset: 0 };
+        return { visibleHeight: Math.min(safeHeight, Math.max(1, visibleHeight)), keyboardOffset: Math.max(0, Math.min(safeHeight, safeHeight - visibleHeight - Math.max(0, offsetTop))) };
+    }
+    BaseDemoSI.mobileViewportMetrics = mobileViewportMetrics;
     /** Migração explícita dos identificadores internos anteriores da doca. */
     function normalizeLeftCategory(value) {
         if (value === "montagem")
@@ -2694,6 +2764,11 @@ var BaseDemoSI;
         if (side === "right" && tab === "ver")
             viewerLevel = "catalog";
         changeWorkspace({ type: "open", side, tab });
+        // Uma categoria nova começa no topo da própria folha, nunca preserva
+        // deslocamento interno da categoria anterior.
+        const scroll = dock(side).querySelector(".si-dock-scroll");
+        if (scroll)
+            scroll.scrollTop = 0;
         dock(side).querySelector("[data-close-dock]")?.focus({ preventScroll: true });
     }
     function closeWorkspace(side, returnFocus = true) {
@@ -2704,12 +2779,21 @@ var BaseDemoSI;
     function updateViewport() {
         workspaceState = BaseDemoSI.normalizeWorkspace(workspaceState, compact());
         renderWorkspace();
-        const vv = window.visualViewport;
         const root = node("si-workspace");
-        if (root && mobile() && vv)
-            root.style.setProperty("--si-visible-height", `${vv.height}px`);
-        else
-            root?.style.removeProperty("--si-visible-height");
+        if (!root)
+            return;
+        if (mobile()) {
+            const vv = window.visualViewport;
+            const size = BaseDemoSI.mobileViewportMetrics(window.innerHeight, vv?.height ?? window.innerHeight, vv?.offsetTop ?? 0);
+            root.style.setProperty("--si-visible-height", `${size.visibleHeight}px`);
+            // Não reposicionar a cena quando o teclado aparece: apenas a folha e
+            // os lançadores passam a acompanhar a área visível do navegador.
+            root.style.setProperty("--si-keyboard-offset", `${Math.round(size.keyboardOffset)}px`);
+        }
+        else {
+            root.style.removeProperty("--si-visible-height");
+            root.style.removeProperty("--si-keyboard-offset");
+        }
     }
     function focusables(pane) { return Array.from(pane.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex="0"]')).filter(el => !el.closest('[hidden],[inert]') && el.getClientRects().length > 0); }
     function keyboardHandler(ev) {
@@ -2908,6 +2992,20 @@ var BaseDemoSI;
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);
+        window.visualViewport?.addEventListener("scroll", updateViewport);
+        window.addEventListener("orientationchange", updateViewport);
+        for (const side of ["left", "right"]) {
+            const pane = dock(side);
+            pane.addEventListener("focusin", event => {
+                if (!mobile() || workspaceState[side] !== "open")
+                    return;
+                const target = event.target;
+                // Somente campos editáveis precisam ser trazidos para a região visível.
+                if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
+                    target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+                }
+            });
+        }
         window.addEventListener("si-route-changed", (event) => {
             if (event.detail !== "ambiente") {
                 workspaceState = { ...workspaceState, left: "collapsed", right: "collapsed", presentation: "standard" };
@@ -4456,6 +4554,9 @@ var BaseDemoSI;
         const clearButton = get("scene-clear");
         if (clearButton)
             clearButton.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
+        const compactClear = get("si-compact-clear");
+        if (compactClear)
+            compactClear.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
         const inspector = get("object-inspector");
         if (inspector)
             inspector.hidden = !snap.selectedId;
@@ -4615,6 +4716,10 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Cena limpa. Use Desfazer para recuperar.", "warning");
         });
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
+            if (action === "clear") {
+                get("scene-clear")?.click();
+                return;
+            }
             if (action === "help") {
                 void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
                 return;

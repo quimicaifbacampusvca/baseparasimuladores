@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.7",
+        version: "0.9.8",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1358,6 +1358,14 @@ var BaseDemoSI;
         return s;
     }
     BaseDemoSI.normalizeWorkspace = normalizeWorkspace;
+    /** Geometria do viewport visual mobile, sem depender do teclado virtual ou da rede. */
+    function mobileViewportMetrics(innerHeight, visibleHeight, offsetTop) {
+        const safeHeight = Number.isFinite(innerHeight) && innerHeight > 0 ? innerHeight : 1;
+        if (!Number.isFinite(visibleHeight) || visibleHeight <= 0 || !Number.isFinite(offsetTop))
+            return { visibleHeight: safeHeight, keyboardOffset: 0 };
+        return { visibleHeight: Math.min(safeHeight, Math.max(1, visibleHeight)), keyboardOffset: Math.max(0, Math.min(safeHeight, safeHeight - visibleHeight - Math.max(0, offsetTop))) };
+    }
+    BaseDemoSI.mobileViewportMetrics = mobileViewportMetrics;
     /** Migração explícita dos identificadores internos anteriores da doca. */
     function normalizeLeftCategory(value) {
         if (value === "montagem")
@@ -1525,6 +1533,11 @@ var BaseDemoSI;
         if (side === "right" && tab === "ver")
             viewerLevel = "catalog";
         changeWorkspace({ type: "open", side, tab });
+        // Uma categoria nova começa no topo da própria folha, nunca preserva
+        // deslocamento interno da categoria anterior.
+        const scroll = dock(side).querySelector(".si-dock-scroll");
+        if (scroll)
+            scroll.scrollTop = 0;
         dock(side).querySelector("[data-close-dock]")?.focus({ preventScroll: true });
     }
     function closeWorkspace(side, returnFocus = true) {
@@ -1535,12 +1548,21 @@ var BaseDemoSI;
     function updateViewport() {
         workspaceState = BaseDemoSI.normalizeWorkspace(workspaceState, compact());
         renderWorkspace();
-        const vv = window.visualViewport;
         const root = node("si-workspace");
-        if (root && mobile() && vv)
-            root.style.setProperty("--si-visible-height", `${vv.height}px`);
-        else
-            root?.style.removeProperty("--si-visible-height");
+        if (!root)
+            return;
+        if (mobile()) {
+            const vv = window.visualViewport;
+            const size = BaseDemoSI.mobileViewportMetrics(window.innerHeight, vv?.height ?? window.innerHeight, vv?.offsetTop ?? 0);
+            root.style.setProperty("--si-visible-height", `${size.visibleHeight}px`);
+            // Não reposicionar a cena quando o teclado aparece: apenas a folha e
+            // os lançadores passam a acompanhar a área visível do navegador.
+            root.style.setProperty("--si-keyboard-offset", `${Math.round(size.keyboardOffset)}px`);
+        }
+        else {
+            root.style.removeProperty("--si-visible-height");
+            root.style.removeProperty("--si-keyboard-offset");
+        }
     }
     function focusables(pane) { return Array.from(pane.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),[tabindex="0"]')).filter(el => !el.closest('[hidden],[inert]') && el.getClientRects().length > 0); }
     function keyboardHandler(ev) {
@@ -1739,6 +1761,20 @@ var BaseDemoSI;
         document.addEventListener("keydown", keyboardHandler);
         window.addEventListener("resize", updateViewport);
         window.visualViewport?.addEventListener("resize", updateViewport);
+        window.visualViewport?.addEventListener("scroll", updateViewport);
+        window.addEventListener("orientationchange", updateViewport);
+        for (const side of ["left", "right"]) {
+            const pane = dock(side);
+            pane.addEventListener("focusin", event => {
+                if (!mobile() || workspaceState[side] !== "open")
+                    return;
+                const target = event.target;
+                // Somente campos editáveis precisam ser trazidos para a região visível.
+                if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
+                    target.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "auto" });
+                }
+            });
+        }
         window.addEventListener("si-route-changed", (event) => {
             if (event.detail !== "ambiente") {
                 workspaceState = { ...workspaceState, left: "collapsed", right: "collapsed", presentation: "standard" };
@@ -3287,6 +3323,9 @@ var BaseDemoSI;
         const clearButton = get("scene-clear");
         if (clearButton)
             clearButton.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
+        const compactClear = get("si-compact-clear");
+        if (compactClear)
+            compactClear.disabled = !snap.entities.length || !BaseDemoSI.sceneManipulationAllowed();
         const inspector = get("object-inspector");
         if (inspector)
             inspector.hidden = !snap.selectedId;
@@ -3446,6 +3485,10 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Cena limpa. Use Desfazer para recuperar.", "warning");
         });
         BaseDemoSI.setupActionMenu("scene-menu-toggle", "scene-tools-menu", action => {
+            if (action === "clear") {
+                get("scene-clear")?.click();
+                return;
+            }
             if (action === "help") {
                 void BaseDemoSI.confirmDialog({ title: "Atalhos disponíveis", description: "Arrastar: mover objeto com mouse ou toque.\nSetas: mover o objeto focado.\nCtrl/⌘ + Z: desfazer.\nCtrl/⌘ + Shift + Z: refazer.\nEscape: fechar menus, diálogos e docas.\nTab: navegar pelos controles.", confirmText: "Entendi", cancelText: "Fechar" });
                 return;

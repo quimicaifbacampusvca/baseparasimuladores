@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.7
+# Base Demo Oficial - SI · 0.9.8
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.7 — Organização e estilização de Ver e Dados.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.8 — Bloco 05: manipulação e estabilidade mobile.**
 
 ## Executar
 
@@ -22,7 +22,7 @@ Todas as bibliotecas necessárias à execução e dados de demonstração estão
 
 **Permissões dos links são controles de interface, não segurança ou autenticação.** O conteúdo do endereço pode ser modificado por terceiros; não utilize links como mecanismo para proteger informações confidenciais. Links `file://` não são portáveis entre dispositivos sem distribuir o próprio aplicativo.
 
-A 0.9.7 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-BLOCO-04-0.9.7.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
+A 0.9.8 **não é a homologação 1.0.0**. Consulte `docs/ACEITE-BLOCO-05-0.9.8.md`, `docs/CONTRATO-FAMILIA-SIMULADORES.md` e `docs/VISTORIA-FUNCIONAL-0.9.0.md`.
 
 ## Licença
 
@@ -56,3 +56,9 @@ A doca de Montagem apresenta Resumo, Preparo, Objetos e Módulo; Missão é exib
 - Dados é aberto pelo lançador próprio, exibindo informações da cena, leituras e acesso aos documentos.
 - A navegação é operável por teclado e adapta-se à doca desktop e à folha inferior mobile.
 - Módulos, estado da bancada e recursos já aprovados permanecem compatíveis.
+
+## Bloco 05 — Contrato responsivo e interação mobile (0.9.8)
+
+A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados; as folhas inferiores usam rolagem própria e seus controles têm alvos mínimos de 44 px. Em telas estreitas, a ação de limpar fica no menu Mais e conserva confirmação, Desfazer e recuperação. A altura visível e o teclado virtual são considerados no posicionamento das folhas, sem redesenhar o estado científico. Novos estilos de geometria compacta ficam concentrados em `mobile-contract.css`. Consulte `docs/ACEITE-BLOCO-05-0.9.8.md`.
+
+**Escopo dos testes:** Chromium por carregamento isolado do HTML em nove tamanhos; abrir `file://`, HTTPS/localhost, PWA instalada e outros navegadores requer validação adicional.
