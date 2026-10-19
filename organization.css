@@ -1,0 +1,133 @@
+/* Estrutura de navegação e comportamento responsivo nativo — versão 0.9.2. */
+:root{--si-header-height:66px;--si-mobile-bottom-height:calc(62px + env(safe-area-inset-bottom,0px));}
+.app-shell{display:block;min-height:100dvh;}
+.main-column{min-height:100dvh;min-width:0;}
+/* O menu lateral nunca ocupa espaço estrutural: funciona como auxiliar acessível. */
+.side{position:fixed;inset:0 auto 0 0;width:min(310px,calc(100vw - 38px));z-index:101;transform:translateX(-110%);visibility:hidden;overflow-y:auto;overscroll-behavior:contain;box-shadow:10px 0 30px #07152233;padding:24px 18px;gap:25px;transition:transform .2s ease,visibility .2s ease;}
+body.nav-open .side{transform:translateX(0);visibility:visible;display:flex!important;z-index:101;box-shadow:10px 0 36px #07152244;}
+.nav-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:100;background:rgba(7,21,34,.68);}
+/* A navegação do cabeçalho mantém a posição dos destinos nos desktops. */
+.topbar.si-global-header{height:var(--si-header-height);min-height:var(--si-header-height);padding:8px clamp(15px,2vw,32px);gap:16px;position:relative;z-index:10;}
+.si-global-header .menu-toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:44px;min-height:44px;background:transparent;}
+.si-global-brand{display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;min-width:0;flex:none;}
+.si-global-brand img{border-radius:9px;flex:0 0 auto;}
+.si-global-brand span{display:flex;flex-direction:column;line-height:1.2;}
+.si-global-brand strong{font-size:18px;letter-spacing:.05em;}
+.si-global-brand small{font-size:10px;color:var(--muted);}
+.si-global-nav{display:flex;align-items:stretch;gap:2px;margin-left:clamp(3px,1.2vw,25px);height:100%;min-width:0;}
+.si-global-nav a{font-size:13px;font-weight:700;display:flex;align-items:center;text-decoration:none;padding:0 clamp(7px,1vw,15px);color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
+.si-global-nav a:hover,.si-global-nav a[aria-current=page]{color:var(--accent);background:var(--tint);border-bottom-color:var(--accent);}
+.si-global-actions{display:flex;align-items:center;gap:9px;margin-left:auto;flex:none;}
+.si-header-action{padding:8px 10px;border:1px solid var(--border);border-radius:9px;text-decoration:none;font-size:12px;min-height:40px;display:flex;align-items:center;gap:7px;}
+.si-header-action:hover{background:var(--tint);}
+.si-global-actions .version-pill{margin:0;}
+/* Organização de uma Home orientada a caminhos, não a status técnico. */
+.si-organized-home{max-width:1150px;margin:0 auto;}
+.si-home-hero{display:flex;gap:24px;align-items:center;justify-content:space-between;padding:clamp(22px,3vw,38px) clamp(22px,4vw,48px);background:linear-gradient(110deg,var(--surface),var(--tint));border:1px solid var(--border);border-radius:18px;}
+.si-home-hero h1{font-size:clamp(29px,4vw,47px);max-width:600px;margin:0 0 12px;line-height:1.1;}
+.si-home-hero .eyebrow{margin-bottom:10px;}
+.si-home-motto{color:var(--muted);font-size:15px;margin:0;}
+.si-home-hero-icon{flex:none;width:clamp(72px,10vw,120px);height:auto;}
+.si-home-heading{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:26px 0 13px;}
+.si-home-heading h2{font-size:21px;margin:0;}
+.si-home-heading p{font-size:13px;color:var(--muted);margin:0;}
+.si-home-paths{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+.si-home-path{display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-width:0;border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:18px;text-decoration:none;min-height:210px;box-shadow:var(--shadow);transition:transform .16s,border-color .16s;}
+.si-home-path:hover{transform:translateY(-2px);border-color:var(--accent);}
+.si-home-path:focus-visible{outline:3px solid var(--ring);outline-offset:3px;}
+.si-home-path strong{font-size:19px;line-height:1.15;}
+.si-path-description{font-size:13px;color:var(--muted);line-height:1.5;}
+.si-path-action{margin-top:auto;font-size:12px;font-weight:800;color:var(--accent);}
+.si-path-icon{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--tint);color:var(--accent);font-size:22px;}
+.si-home-path-primary{grid-column:span 4;min-height:190px;padding:24px 28px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-content:start;gap:5px 18px;background:linear-gradient(120deg,var(--tint),var(--surface));}
+.si-home-path-primary .si-path-upper{display:flex;align-items:center;gap:12px;grid-column:1 / -1;}
+.si-path-tag{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--accent);letter-spacing:.07em;}
+.si-home-path-primary strong{font-size:25px;}
+.si-home-path-primary .si-path-kicker{font-size:12px;color:var(--accent);font-weight:700;grid-column:1 / -1;}
+.si-home-path-primary .si-path-description{max-width:560px;}
+.si-home-path-primary .si-path-action{grid-column:2;grid-row:3 / 5;align-self:end;justify-self:end;}
+.si-home-support{margin:18px 0 2px;border-top:1px solid var(--border);padding-top:17px;}
+.si-home-support nav{display:flex;flex-wrap:wrap;gap:12px 22px;}
+.si-home-support a{font-size:12px;font-weight:700;color:var(--muted);}
+.si-mobile-bottom-nav{display:none;}
+/* No ambiente, a área central permanece autônoma e não recebe a barra de páginas. */
+body.route-ambiente .si-global-header{height:60px;min-height:60px;}
+body.route-ambiente.nav-open .side{transform:translateX(0);visibility:visible;display:flex!important;z-index:101;box-shadow:10px 0 36px #07152244;}
+body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
+@media(max-width:1140px){.si-global-nav a{padding:0 7px;font-size:12px;}.si-header-action span{display:none;}.si-global-actions .version-pill{display:none;}}
+@media(max-width:900px){
+ .si-global-nav{display:none;}.si-global-header .menu-toggle{display:inline-flex;}
+ .si-global-actions .version-pill{display:inline-flex;}
+ .si-home-paths{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .si-home-path-primary{grid-column:span 2;}
+}
+@media(max-width:760px){
+ .topbar.si-global-header{height:58px;min-height:58px;padding:7px 12px;gap:9px;}
+ .si-global-brand img{width:30px;height:30px;}
+ .si-global-brand strong{font-size:16px;}
+ .si-global-brand small{font-size:10px;}
+ .si-global-actions .version-pill{display:none;}
+ body:not(.route-ambiente) .main-column{padding-bottom:var(--si-mobile-bottom-height);}
+ .si-mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:45;height:var(--si-mobile-bottom-height);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--surface);border-top:1px solid var(--border);}
+ .si-mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:44px;text-align:center;font-weight:700;font-size:11px;text-decoration:none;color:var(--muted);border-radius:9px;}
+ .si-mobile-bottom-nav a span{font-size:22px;line-height:1.2;}
+ .si-mobile-bottom-nav a[aria-current=page]{color:var(--accent);background:var(--tint);}
+ body.route-ambiente .si-mobile-bottom-nav{display:none!important;}
+ body.route-ambiente .si-global-actions{display:none;}
+ body.route-ambiente .si-global-header{height:58px;min-height:58px;}
+ body.route-ambiente .main-column{padding-bottom:0;}
+ .si-home-hero{padding:23px 21px;}
+ .si-home-hero-icon{width:72px;}
+ .si-home-hero h1{font-size:clamp(26px,7vw,36px);}
+ .si-home-heading{margin:20px 0 12px;}
+ .si-home-path{min-height:185px;}
+ .si-home-path-primary{min-height:194px;}
+}
+@media(max-width:390px){
+ .si-home-paths{gap:9px;}
+ .si-home-path{padding:14px;min-height:185px;gap:7px;}
+ .si-home-path strong{font-size:17px;}
+ .si-home-path-primary{padding:17px 19px;}
+ .si-home-path-primary strong{font-size:23px;}
+ .si-home-path-primary .si-path-action{grid-column:1;grid-row:auto;justify-self:start;align-self:start;}
+ .si-home-hero-icon{width:58px;}
+ .si-home-hero{gap:10px;}
+ .si-home-heading h2{font-size:19px;}
+}
+@media(prefers-reduced-motion:reduce){.si-home-path,.side{transition:none!important;}}
+@media print{.si-global-header,.si-mobile-bottom-nav,.side,.nav-backdrop{display:none!important;}body:not(.route-ambiente) .main-column{padding-bottom:0!important;}}
+/* Tablets preservam a navegação inferior fora da área experimental. */
+@media(min-width:761px) and (max-width:900px){
+ body:not(.route-ambiente) .main-column{padding-bottom:var(--si-mobile-bottom-height);}
+ .si-mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:45;height:var(--si-mobile-bottom-height);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--surface);border-top:1px solid var(--border);}
+ .si-mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:44px;text-align:center;text-decoration:none;color:var(--muted);font-size:11px;font-weight:700;border-radius:9px;}
+ .si-mobile-bottom-nav a span{font-size:22px;line-height:1.2;}
+ .si-mobile-bottom-nav a[aria-current=page]{background:var(--tint);color:var(--accent);}
+ body.route-ambiente .si-mobile-bottom-nav{display:none!important;}
+}
+/* A visualização em paisagem compacta não pode encolher a cena até desaparecer. */
+@media(max-width:900px) and (max-height:500px) and (orientation:landscape){
+ body.route-ambiente .si-storage-warning{padding:3px 12px;font-size:10px;line-height:1.15;max-height:30px;overflow:auto;}
+ body.route-ambiente .si-workspace-toolbar{min-height:42px;padding:3px 8px;}
+ body.route-ambiente .si-workspace-toolbar button{min-height:36px;}
+ body.route-ambiente .si-launchers{height:48px;padding:3px 9px;}
+ body.route-ambiente .si-launchers button{min-height:40px;}
+ body.route-ambiente .si-workspace{padding-bottom:48px;}
+ body.route-ambiente .si-actionbar{min-height:40px;padding:2px 7px;}
+ body.route-ambiente .si-actionbar button{min-height:35px;}
+ body.route-ambiente .si-item-strip{display:none;}
+ body.route-ambiente .si-focus-view{padding:3px 9px 0;gap:2px;}
+ body.route-ambiente .si-stage-name{min-height:22px;gap:0;}
+ body.route-ambiente .si-stage-name strong{font-size:12px;}
+ body.route-ambiente .si-stage-name small{display:none;}
+ body.route-ambiente .si-stage-canvas{min-height:110px;}
+ body.route-ambiente .si-stage-footnote{display:none;}
+ body.route-ambiente .si-dock.si-bottom-sheet{bottom:48px;height:min(76dvh,370px);}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 48px 0;}
+}
+/* Fluxo vertical estável no cartão principal inclusive com textos longos e zoom. */
+.si-home-path-primary{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.si-home-path-primary .si-path-upper{display:flex;align-items:center;gap:12px;}
+.si-home-path-primary .si-path-kicker{display:block;}
+.si-home-path-primary .si-path-description{max-width:560px;}
+.si-home-path-primary .si-path-action{display:block;margin-top:auto;align-self:flex-start;}

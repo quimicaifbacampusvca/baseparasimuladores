@@ -7,7 +7,7 @@ namespace BaseDemoSI {
   const precacheFiles = [
     "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
     "./components.css", "./extensions.css", "./education.css", "./records.css",
-    "./distribution.css", "./inspection.css", "./completion.css", "./manifest.webmanifest", "./assets/icon.svg",
+    "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./manifest.webmanifest", "./assets/icon.svg",
     "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
   ];
   let installPrompt: InstallPromptEvent | null = null;

@@ -1,0 +1,23 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=f=>fs.readFileSync(path.join(root,f),'utf8');
+const html=read('index.html'),css=read('organization.css'),nav=read('src/navigation.ts');
+assert(html.includes('class="si-global-nav"'));
+assert(html.includes('class="si-mobile-bottom-nav"'));
+assert(html.includes('class="si-home-path si-home-path-primary"'));
+assert.equal((html.match(/class="si-home-path(?: si-home-path-primary)?"/g)||[]).length,5);
+assert(html.includes('class="si-global-brand"'));
+assert(!html.includes('Uma base universal com recursos configuráveis e documentação integrada.'));
+for (const route of ['inicio','aprender','ambiente','caderno'])
+ assert(html.includes(`class="si-mobile-bottom-nav"`)&&html.includes(`data-route="${route}"`));
+assert(css.includes('body.route-ambiente .si-mobile-bottom-nav{display:none!important;}'));
+assert(css.includes('env(safe-area-inset-bottom'));
+assert(css.includes('min-height:44px'));
+assert(!nav.includes('mobileMenu()'));
+assert(read('sw.js').includes('"./organization.css"'));
+assert(read('src/distribution.ts').includes('"./organization.css"'));
+assert(read('standalone.html').includes('.si-global-nav'));
+for(const p of ['README.md','docs/ACEITE-0.9.2.md','organization.css','src/navigation.ts'])assert(!/SIAB/i.test(read(p)));
+console.log('OK: hierarquia de telas, navegação universal, Home por caminhos, acessos mobile, isolamento da bancada e distribuição offline.');

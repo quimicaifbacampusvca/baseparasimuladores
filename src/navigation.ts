@@ -4,7 +4,6 @@ namespace BaseDemoSI {
   const drawer = () => document.getElementById("sidebar") as HTMLElement | null;
   const backdrop = () => document.getElementById("nav-backdrop") as HTMLElement | null;
   const mainColumn = () => document.getElementById("main-column") as HTMLElement | null;
-  const mobileMenu = () => window.matchMedia("(max-width:970px)").matches;
   const drawerOpen = () => document.body.classList.contains("nav-open");
 
   export function closeNavigationDrawer(restoreFocus = false): void {
@@ -16,7 +15,7 @@ namespace BaseDemoSI {
     if (restoreFocus && wasOpen) menuButton()?.focus({preventScroll:true});
   }
   function openNavigationDrawer(): void {
-    if (!mobileMenu() || isPlatformDialogOpen()) return;
+    if (isPlatformDialogOpen()) return;
     document.body.classList.add("nav-open");
     menuButton()?.setAttribute("aria-expanded", "true");
     const shade = backdrop(); if (shade) shade.hidden = false;
@@ -41,7 +40,6 @@ namespace BaseDemoSI {
       if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
       else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
     });
-    window.addEventListener("resize", ()=>{if(!mobileMenu())closeNavigationDrawer(false);});
     document.querySelectorAll<HTMLAnchorElement>("#sidebar a[href]").forEach(link=>link.addEventListener("click",()=>{
       if(!drawerOpen()) return;
       closeNavigationDrawer(false);

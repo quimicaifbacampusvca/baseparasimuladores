@@ -6,7 +6,7 @@ const ctx={document:doc,window:{},navigator:{},Set,Map,Object,Date,console,URL,B
 vm.createContext(ctx);vm.runInContext(read('app.js'),ctx,{filename:'app.js'});const api=ctx.BaseDemoSI;
 const teacher={id:'teacher-link-01',kind:'script',origin:'teacher',title:'Atividade Ágil',description:'Observe a cena e conclua duas ações.',steps:[{label:'Criar objeto',requirement:'entities',minimum:1},{label:'Selecionar objeto',requirement:'selection',minimum:1}]};
 const bad={...teacher,id:'teacher-script-02',steps:[{label:'invalid',requirement:'script',minimum:1}]};
-assert.equal(api.manifest.version,'0.9.1');
+assert.equal(api.manifest.version,'0.9.2');
 assert.equal(api.currentRoute('#/manual'),'manual');
 assert.equal(api.searchManual('painéis').some(x=>x.id==='bancada'),true);
 assert(api.searchManual('INTERNET').length>0);
@@ -53,5 +53,5 @@ assert(api.availableViewers().some(x=>x.id==='viewer-extra'));
 assert(read('index.html').includes('id="si-shared-activity"'));
 assert(read('index.html').includes('data-view="manual"'));
 assert(read('sw.js').includes('"./completion.css"'));
-for(const p of ['README.md','docs/ACEITE-0.9.1.md','src/modules.ts','src/manual.ts','src/viewers.ts','src/sharing.ts'])assert(!/SIAB/i.test(read(p)),p);
+for(const p of ['README.md','docs/ACEITE-0.9.2.md','src/modules.ts','src/manual.ts','src/viewers.ts','src/sharing.ts'])assert(!/SIAB/i.test(read(p)),p);
 console.log('OK: Manual contextual, módulos, ferramentas bloqueadas por módulo, visualizadores e links validados de consulta/execução.');

@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-4FrwUemXmFQ40MwKZSnKqRmmI+i9Hljov4w1OanPTto='; script-src 'sha256-6uLhlFf0hk00KRSClk2xJopMcba1hKA8KgYiIRs/00k='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-cCdljY3RvRRu+lLL/RSvoJoXC3ufK/i2Agi8z+iwW4g='; script-src 'sha256-SgV36uk0EaiRuSOBIbth4rkUi63aebqFfm9217M5rDk='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
+  
   
   
   
@@ -308,12 +309,146 @@ body.si-modal-active{overflow:hidden}
 @media(max-width:900px){.si-module-control{margin-inline:.15rem 0}.si-module-control label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.si-module-control select{max-width:110px;min-width:78px;font-size:.75rem}}
 @media(max-width:390px){.si-module-control select{max-width:91px;min-width:75px}.si-workspace-toolbar{flex-wrap:wrap}}
 [hidden]{display:none!important}
+
+/* Estrutura de navegação e comportamento responsivo nativo — versão 0.9.2. */
+:root{--si-header-height:66px;--si-mobile-bottom-height:calc(62px + env(safe-area-inset-bottom,0px));}
+.app-shell{display:block;min-height:100dvh;}
+.main-column{min-height:100dvh;min-width:0;}
+/* O menu lateral nunca ocupa espaço estrutural: funciona como auxiliar acessível. */
+.side{position:fixed;inset:0 auto 0 0;width:min(310px,calc(100vw - 38px));z-index:101;transform:translateX(-110%);visibility:hidden;overflow-y:auto;overscroll-behavior:contain;box-shadow:10px 0 30px #07152233;padding:24px 18px;gap:25px;transition:transform .2s ease,visibility .2s ease;}
+body.nav-open .side{transform:translateX(0);visibility:visible;display:flex!important;z-index:101;box-shadow:10px 0 36px #07152244;}
+.nav-backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:100;background:rgba(7,21,34,.68);}
+/* A navegação do cabeçalho mantém a posição dos destinos nos desktops. */
+.topbar.si-global-header{height:var(--si-header-height);min-height:var(--si-header-height);padding:8px clamp(15px,2vw,32px);gap:16px;position:relative;z-index:10;}
+.si-global-header .menu-toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:44px;min-height:44px;background:transparent;}
+.si-global-brand{display:flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;min-width:0;flex:none;}
+.si-global-brand img{border-radius:9px;flex:0 0 auto;}
+.si-global-brand span{display:flex;flex-direction:column;line-height:1.2;}
+.si-global-brand strong{font-size:18px;letter-spacing:.05em;}
+.si-global-brand small{font-size:10px;color:var(--muted);}
+.si-global-nav{display:flex;align-items:stretch;gap:2px;margin-left:clamp(3px,1.2vw,25px);height:100%;min-width:0;}
+.si-global-nav a{font-size:13px;font-weight:700;display:flex;align-items:center;text-decoration:none;padding:0 clamp(7px,1vw,15px);color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
+.si-global-nav a:hover,.si-global-nav a[aria-current=page]{color:var(--accent);background:var(--tint);border-bottom-color:var(--accent);}
+.si-global-actions{display:flex;align-items:center;gap:9px;margin-left:auto;flex:none;}
+.si-header-action{padding:8px 10px;border:1px solid var(--border);border-radius:9px;text-decoration:none;font-size:12px;min-height:40px;display:flex;align-items:center;gap:7px;}
+.si-header-action:hover{background:var(--tint);}
+.si-global-actions .version-pill{margin:0;}
+/* Organização de uma Home orientada a caminhos, não a status técnico. */
+.si-organized-home{max-width:1150px;margin:0 auto;}
+.si-home-hero{display:flex;gap:24px;align-items:center;justify-content:space-between;padding:clamp(22px,3vw,38px) clamp(22px,4vw,48px);background:linear-gradient(110deg,var(--surface),var(--tint));border:1px solid var(--border);border-radius:18px;}
+.si-home-hero h1{font-size:clamp(29px,4vw,47px);max-width:600px;margin:0 0 12px;line-height:1.1;}
+.si-home-hero .eyebrow{margin-bottom:10px;}
+.si-home-motto{color:var(--muted);font-size:15px;margin:0;}
+.si-home-hero-icon{flex:none;width:clamp(72px,10vw,120px);height:auto;}
+.si-home-heading{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin:26px 0 13px;}
+.si-home-heading h2{font-size:21px;margin:0;}
+.si-home-heading p{font-size:13px;color:var(--muted);margin:0;}
+.si-home-paths{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+.si-home-path{display:flex;flex-direction:column;align-items:flex-start;gap:9px;min-width:0;border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:18px;text-decoration:none;min-height:210px;box-shadow:var(--shadow);transition:transform .16s,border-color .16s;}
+.si-home-path:hover{transform:translateY(-2px);border-color:var(--accent);}
+.si-home-path:focus-visible{outline:3px solid var(--ring);outline-offset:3px;}
+.si-home-path strong{font-size:19px;line-height:1.15;}
+.si-path-description{font-size:13px;color:var(--muted);line-height:1.5;}
+.si-path-action{margin-top:auto;font-size:12px;font-weight:800;color:var(--accent);}
+.si-path-icon{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;background:var(--tint);color:var(--accent);font-size:22px;}
+.si-home-path-primary{grid-column:span 4;min-height:190px;padding:24px 28px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-content:start;gap:5px 18px;background:linear-gradient(120deg,var(--tint),var(--surface));}
+.si-home-path-primary .si-path-upper{display:flex;align-items:center;gap:12px;grid-column:1 / -1;}
+.si-path-tag{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--accent);letter-spacing:.07em;}
+.si-home-path-primary strong{font-size:25px;}
+.si-home-path-primary .si-path-kicker{font-size:12px;color:var(--accent);font-weight:700;grid-column:1 / -1;}
+.si-home-path-primary .si-path-description{max-width:560px;}
+.si-home-path-primary .si-path-action{grid-column:2;grid-row:3 / 5;align-self:end;justify-self:end;}
+.si-home-support{margin:18px 0 2px;border-top:1px solid var(--border);padding-top:17px;}
+.si-home-support nav{display:flex;flex-wrap:wrap;gap:12px 22px;}
+.si-home-support a{font-size:12px;font-weight:700;color:var(--muted);}
+.si-mobile-bottom-nav{display:none;}
+/* No ambiente, a área central permanece autônoma e não recebe a barra de páginas. */
+body.route-ambiente .si-global-header{height:60px;min-height:60px;}
+body.route-ambiente.nav-open .side{transform:translateX(0);visibility:visible;display:flex!important;z-index:101;box-shadow:10px 0 36px #07152244;}
+body.route-ambiente .nav-backdrop:not([hidden]){z-index:100;}
+@media(max-width:1140px){.si-global-nav a{padding:0 7px;font-size:12px;}.si-header-action span{display:none;}.si-global-actions .version-pill{display:none;}}
+@media(max-width:900px){
+ .si-global-nav{display:none;}.si-global-header .menu-toggle{display:inline-flex;}
+ .si-global-actions .version-pill{display:inline-flex;}
+ .si-home-paths{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .si-home-path-primary{grid-column:span 2;}
+}
+@media(max-width:760px){
+ .topbar.si-global-header{height:58px;min-height:58px;padding:7px 12px;gap:9px;}
+ .si-global-brand img{width:30px;height:30px;}
+ .si-global-brand strong{font-size:16px;}
+ .si-global-brand small{font-size:10px;}
+ .si-global-actions .version-pill{display:none;}
+ body:not(.route-ambiente) .main-column{padding-bottom:var(--si-mobile-bottom-height);}
+ .si-mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:45;height:var(--si-mobile-bottom-height);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--surface);border-top:1px solid var(--border);}
+ .si-mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:44px;text-align:center;font-weight:700;font-size:11px;text-decoration:none;color:var(--muted);border-radius:9px;}
+ .si-mobile-bottom-nav a span{font-size:22px;line-height:1.2;}
+ .si-mobile-bottom-nav a[aria-current=page]{color:var(--accent);background:var(--tint);}
+ body.route-ambiente .si-mobile-bottom-nav{display:none!important;}
+ body.route-ambiente .si-global-actions{display:none;}
+ body.route-ambiente .si-global-header{height:58px;min-height:58px;}
+ body.route-ambiente .main-column{padding-bottom:0;}
+ .si-home-hero{padding:23px 21px;}
+ .si-home-hero-icon{width:72px;}
+ .si-home-hero h1{font-size:clamp(26px,7vw,36px);}
+ .si-home-heading{margin:20px 0 12px;}
+ .si-home-path{min-height:185px;}
+ .si-home-path-primary{min-height:194px;}
+}
+@media(max-width:390px){
+ .si-home-paths{gap:9px;}
+ .si-home-path{padding:14px;min-height:185px;gap:7px;}
+ .si-home-path strong{font-size:17px;}
+ .si-home-path-primary{padding:17px 19px;}
+ .si-home-path-primary strong{font-size:23px;}
+ .si-home-path-primary .si-path-action{grid-column:1;grid-row:auto;justify-self:start;align-self:start;}
+ .si-home-hero-icon{width:58px;}
+ .si-home-hero{gap:10px;}
+ .si-home-heading h2{font-size:19px;}
+}
+@media(prefers-reduced-motion:reduce){.si-home-path,.side{transition:none!important;}}
+@media print{.si-global-header,.si-mobile-bottom-nav,.side,.nav-backdrop{display:none!important;}body:not(.route-ambiente) .main-column{padding-bottom:0!important;}}
+/* Tablets preservam a navegação inferior fora da área experimental. */
+@media(min-width:761px) and (max-width:900px){
+ body:not(.route-ambiente) .main-column{padding-bottom:var(--si-mobile-bottom-height);}
+ .si-mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:45;height:var(--si-mobile-bottom-height);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--surface);border-top:1px solid var(--border);}
+ .si-mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:44px;text-align:center;text-decoration:none;color:var(--muted);font-size:11px;font-weight:700;border-radius:9px;}
+ .si-mobile-bottom-nav a span{font-size:22px;line-height:1.2;}
+ .si-mobile-bottom-nav a[aria-current=page]{background:var(--tint);color:var(--accent);}
+ body.route-ambiente .si-mobile-bottom-nav{display:none!important;}
+}
+/* A visualização em paisagem compacta não pode encolher a cena até desaparecer. */
+@media(max-width:900px) and (max-height:500px) and (orientation:landscape){
+ body.route-ambiente .si-storage-warning{padding:3px 12px;font-size:10px;line-height:1.15;max-height:30px;overflow:auto;}
+ body.route-ambiente .si-workspace-toolbar{min-height:42px;padding:3px 8px;}
+ body.route-ambiente .si-workspace-toolbar button{min-height:36px;}
+ body.route-ambiente .si-launchers{height:48px;padding:3px 9px;}
+ body.route-ambiente .si-launchers button{min-height:40px;}
+ body.route-ambiente .si-workspace{padding-bottom:48px;}
+ body.route-ambiente .si-actionbar{min-height:40px;padding:2px 7px;}
+ body.route-ambiente .si-actionbar button{min-height:35px;}
+ body.route-ambiente .si-item-strip{display:none;}
+ body.route-ambiente .si-focus-view{padding:3px 9px 0;gap:2px;}
+ body.route-ambiente .si-stage-name{min-height:22px;gap:0;}
+ body.route-ambiente .si-stage-name strong{font-size:12px;}
+ body.route-ambiente .si-stage-name small{display:none;}
+ body.route-ambiente .si-stage-canvas{min-height:110px;}
+ body.route-ambiente .si-stage-footnote{display:none;}
+ body.route-ambiente .si-dock.si-bottom-sheet{bottom:48px;height:min(76dvh,370px);}
+ body.route-ambiente .si-sheet-backdrop:not([hidden]){inset:0 0 48px 0;}
+}
+/* Fluxo vertical estável no cartão principal inclusive com textos longos e zoom. */
+.si-home-path-primary{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.si-home-path-primary .si-path-upper{display:flex;align-items:center;gap:12px;}
+.si-home-path-primary .si-path-kicker{display:block;}
+.si-home-path-primary .si-path-description{max-width:560px;}
+.si-home-path-primary .si-path-action{display:block;margin-top:auto;align-self:flex-start;}
 </style>
 </head>
 <body>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <div class="app-shell">
-    <aside class="side" id="sidebar" aria-label="Navegação principal">
+    <aside class="side" id="sidebar" aria-label="Menu de navegação">
       <a href="#/inicio" class="identity" aria-label="Base Demo Oficial - SI, início">
         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" width="48" height="48" alt="">
         <span><strong>Base Demo Oficial</strong><small>SI · Plataforma de simuladores</small></span>
@@ -331,37 +466,60 @@ body.si-modal-active{overflow:hidden}
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.1</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.2</span></small></div>
     </aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
 
     <div class="main-column" id="main-column">
-      <header class="topbar">
-        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.9.1</span></span>
+      <header class="topbar si-global-header">
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu de navegação" title="Menu">☰</button>
+        <a class="si-global-brand" href="#/inicio" aria-label="Base Demo Oficial - SI, início">
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" width="34" height="34" alt="">
+          <span><strong>SI</strong><small>Base Demo Oficial</small></span>
+        </a>
+        <nav class="si-global-nav" aria-label="Destinos principais">
+          <a data-route="inicio" href="#/inicio">Início</a>
+          <a data-route="aprender" href="#/aprender">Aprender</a>
+          <a data-route="missoes" href="#/missoes">Missões</a>
+          <a data-route="roteiros" href="#/roteiros">Roteiros</a>
+          <a data-route="ambiente" href="#/ambiente">Ambiente</a>
+          <a data-route="caderno" href="#/caderno">Caderno</a>
+          <a data-route="manual" href="#/manual">Manual</a>
+        </nav>
+        <div class="si-global-actions">
+          <a class="si-header-action" href="#/configuracoes" aria-label="Preferências e acessibilidade" title="Preferências e acessibilidade">⚙ <span>Preferências</span></a>
+          <span class="version-pill">v<span data-app-version>0.9.2</span></span>
+        </div>
+        <span id="current-section" class="sr-only">Início</span>
       </header>
       <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
         </div>
       <main id="conteudo" tabindex="-1">
-        <section class="view" data-view="inicio" aria-labelledby="home-title">
-          <div class="hero">
-            <p class="eyebrow">ETAPA 09 · COMPLEMENTAÇÃO FUNCIONAL</p>
-            <h1 id="home-title">Uma base universal com recursos configuráveis e documentação integrada.</h1>
-            <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
-            <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
-          </div>
-          <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
-          <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Aprender</h3><p>Temas com leitura contextual e registro de conclusão.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Missões</h3><p>Objetivos associados a estados verificáveis da cena.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Roteiros</h3><p>Procedimentos em etapas conectadas ao workspace.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Área do Professor</h3><p>Criação e intercâmbio local de atividades em JSON.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">▧</span><h3>Caderno</h3><p>Observações, hipóteses, conclusões e backup local.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">▤</span><h3>Relatórios</h3><p>Modelos configuráveis com impressão e HTML autocontido.</p><span class="mini-state">Implementado</span></article>
-          </div>
+        <section class="view si-organized-home" data-view="inicio" aria-labelledby="home-title">
+          <header class="si-home-hero">
+            <div class="si-home-hero-copy">
+              <p class="eyebrow">BASE DEMO OFICIAL · SI</p>
+              <h1 id="home-title">Um ambiente. Muitas possibilidades.</h1>
+              <p class="si-home-motto">Explore. Construa. Observe. Investigue.</p>
+            </div>
+            <img class="si-home-hero-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" alt="" width="110" height="110">
+          </header>
+          <div class="si-home-heading"><h2>Escolha seu próximo passo</h2><p>Da exploração livre à atividade orientada.</p></div>
+          <nav class="si-home-paths" aria-label="Caminhos principais da plataforma">
+            <a class="si-home-path si-home-path-primary" href="#/ambiente">
+              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Cena livre</span></span>
+              <span class="si-path-kicker">Experimente na prática</span><strong>Ambiente</strong>
+              <span class="si-path-description">Organize objetos, experimente ferramentas e acompanhe suas observações.</span>
+              <span class="si-path-action">Entrar no ambiente <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="si-home-path" href="#/aprender"><span class="si-path-icon" aria-hidden="true">▤</span><strong>Aprender</strong><span class="si-path-description">Conheça os temas disponíveis.</span><span class="si-path-action">Explorar temas →</span></a>
+            <a class="si-home-path" href="#/missoes"><span class="si-path-icon" aria-hidden="true">◈</span><strong>Missões</strong><span class="si-path-description">Investigue objetivos e desafios.</span><span class="si-path-action">Ver missões →</span></a>
+            <a class="si-home-path" href="#/roteiros"><span class="si-path-icon" aria-hidden="true">☷</span><strong>Roteiros</strong><span class="si-path-description">Realize percursos por etapas.</span><span class="si-path-action">Abrir roteiros →</span></a>
+            <a class="si-home-path" href="#/caderno"><span class="si-path-icon" aria-hidden="true">▧</span><strong>Caderno</strong><span class="si-path-description">Registre e recupere investigações.</span><span class="si-path-action">Abrir caderno →</span></a>
+          </nav>
+          <footer class="si-home-support"><nav aria-label="Apoio e configuração"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
         </section>
 
         <section class="view si-environment" data-view="ambiente" aria-labelledby="environment-title" hidden>
@@ -594,10 +752,16 @@ body.si-modal-active{overflow:hidden}
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.1</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.2</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.1</span></span></footer>
+      <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
+        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span>Início</a>
+        <a data-route="aprender" href="#/aprender"><span aria-hidden="true">▤</span>Aprender</a>
+        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
+        <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
+      </nav>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.2</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>
@@ -618,7 +782,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.1",
+        version: "0.9.2",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -681,7 +845,6 @@ var BaseDemoSI;
     const drawer = () => document.getElementById("sidebar");
     const backdrop = () => document.getElementById("nav-backdrop");
     const mainColumn = () => document.getElementById("main-column");
-    const mobileMenu = () => window.matchMedia("(max-width:970px)").matches;
     const drawerOpen = () => document.body.classList.contains("nav-open");
     function closeNavigationDrawer(restoreFocus = false) {
         const wasOpen = drawerOpen();
@@ -698,7 +861,7 @@ var BaseDemoSI;
     }
     BaseDemoSI.closeNavigationDrawer = closeNavigationDrawer;
     function openNavigationDrawer() {
-        if (!mobileMenu() || BaseDemoSI.isPlatformDialogOpen())
+        if (BaseDemoSI.isPlatformDialogOpen())
             return;
         document.body.classList.add("nav-open");
         menuButton()?.setAttribute("aria-expanded", "true");
@@ -743,8 +906,6 @@ var BaseDemoSI;
                 first.focus();
             }
         });
-        window.addEventListener("resize", () => { if (!mobileMenu())
-            closeNavigationDrawer(false); });
         document.querySelectorAll("#sidebar a[href]").forEach(link => link.addEventListener("click", () => {
             if (!drawerOpen())
                 return;
@@ -3125,7 +3286,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;

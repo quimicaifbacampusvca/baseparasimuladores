@@ -18,13 +18,14 @@
   <link rel="stylesheet" href="./distribution.css">
   <link rel="stylesheet" href="./inspection.css">
   <link rel="stylesheet" href="./completion.css">
+  <link rel="stylesheet" href="./organization.css">
   <script src="./app.js" defer></script>
   <title>Base Demo Oficial - SI</title>
 </head>
 <body>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <div class="app-shell">
-    <aside class="side" id="sidebar" aria-label="Navegação principal">
+    <aside class="side" id="sidebar" aria-label="Menu de navegação">
       <a href="#/inicio" class="identity" aria-label="Base Demo Oficial - SI, início">
         <img src="./assets/icon.svg" width="48" height="48" alt="">
         <span><strong>Base Demo Oficial</strong><small>SI · Plataforma de simuladores</small></span>
@@ -42,37 +43,60 @@
         <a data-route="configuracoes" href="#/configuracoes"><span aria-hidden="true">⚙</span> Preferências</a>
         <a data-route="sobre" href="#/sobre"><span aria-hidden="true">ⓘ</span> Sobre a base</a>
       </nav>
-      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.1</span></small></div>
+      <div class="side-footer"><span class="status-dot" aria-hidden="true"></span> Núcleo independente<br><small>Versão <span data-app-version>0.9.2</span></small></div>
     </aside>
 
     <div id="nav-backdrop" class="nav-backdrop" hidden aria-hidden="true"></div>
 
     <div class="main-column" id="main-column">
-      <header class="topbar">
-        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir ou fechar menu">☰</button>
-        <div class="topbar-title"><span class="eyebrow">BASE DEMONSTRATIVA UNIVERSAL</span><strong id="current-section">Ambientes educacionais</strong></div>
-        <span class="version-pill">v<span data-app-version>0.9.1</span></span>
+      <header class="topbar si-global-header">
+        <button id="nav-toggle" class="menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu de navegação" title="Menu">☰</button>
+        <a class="si-global-brand" href="#/inicio" aria-label="Base Demo Oficial - SI, início">
+          <img src="./assets/icon.svg" width="34" height="34" alt="">
+          <span><strong>SI</strong><small>Base Demo Oficial</small></span>
+        </a>
+        <nav class="si-global-nav" aria-label="Destinos principais">
+          <a data-route="inicio" href="#/inicio">Início</a>
+          <a data-route="aprender" href="#/aprender">Aprender</a>
+          <a data-route="missoes" href="#/missoes">Missões</a>
+          <a data-route="roteiros" href="#/roteiros">Roteiros</a>
+          <a data-route="ambiente" href="#/ambiente">Ambiente</a>
+          <a data-route="caderno" href="#/caderno">Caderno</a>
+          <a data-route="manual" href="#/manual">Manual</a>
+        </nav>
+        <div class="si-global-actions">
+          <a class="si-header-action" href="#/configuracoes" aria-label="Preferências e acessibilidade" title="Preferências e acessibilidade">⚙ <span>Preferências</span></a>
+          <span class="version-pill">v<span data-app-version>0.9.2</span></span>
+        </div>
+        <span id="current-section" class="sr-only">Início</span>
       </header>
       <div id="storage-warning" class="si-storage-warning" role="alert" hidden>
           <strong>Atenção: armazenamento local indisponível.</strong> Alterações podem desaparecer ao fechar esta página. Exporte os seus registros e confirme se o navegador permite salvar dados locais.
         </div>
       <main id="conteudo" tabindex="-1">
-        <section class="view" data-view="inicio" aria-labelledby="home-title">
-          <div class="hero">
-            <p class="eyebrow">ETAPA 09 · COMPLEMENTAÇÃO FUNCIONAL</p>
-            <h1 id="home-title">Uma base universal com recursos configuráveis e documentação integrada.</h1>
-            <p>A bancada e os ambientes educacionais compartilham a mesma estrutura. Todos os recursos essenciais podem ser distribuídos localmente, sem serviços remotos.</p>
-            <div class="hero-actions"><a class="button primary" href="#/ambiente">Abrir workspace</a><a class="button outline" href="#/aprender">Explorar temas</a><a class="button outline" href="#/professor">Área do Professor</a></div>
-          </div>
-          <div class="section-heading"><h2>Capacidades desta versão</h2><p>Ações estruturais demonstráveis, com tipagem, validação e testes.</p></div>
-          <div class="card-grid">
-            <article class="card"><span class="card-icon" aria-hidden="true">▦</span><h3>Aprender</h3><p>Temas com leitura contextual e registro de conclusão.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">◈</span><h3>Missões</h3><p>Objetivos associados a estados verificáveis da cena.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⌁</span><h3>Roteiros</h3><p>Procedimentos em etapas conectadas ao workspace.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">⊞</span><h3>Área do Professor</h3><p>Criação e intercâmbio local de atividades em JSON.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">▧</span><h3>Caderno</h3><p>Observações, hipóteses, conclusões e backup local.</p><span class="mini-state">Implementado</span></article>
-            <article class="card"><span class="card-icon" aria-hidden="true">▤</span><h3>Relatórios</h3><p>Modelos configuráveis com impressão e HTML autocontido.</p><span class="mini-state">Implementado</span></article>
-          </div>
+        <section class="view si-organized-home" data-view="inicio" aria-labelledby="home-title">
+          <header class="si-home-hero">
+            <div class="si-home-hero-copy">
+              <p class="eyebrow">BASE DEMO OFICIAL · SI</p>
+              <h1 id="home-title">Um ambiente. Muitas possibilidades.</h1>
+              <p class="si-home-motto">Explore. Construa. Observe. Investigue.</p>
+            </div>
+            <img class="si-home-hero-icon" src="./assets/icon.svg" alt="" width="110" height="110">
+          </header>
+          <div class="si-home-heading"><h2>Escolha seu próximo passo</h2><p>Da exploração livre à atividade orientada.</p></div>
+          <nav class="si-home-paths" aria-label="Caminhos principais da plataforma">
+            <a class="si-home-path si-home-path-primary" href="#/ambiente">
+              <span class="si-path-upper"><span class="si-path-icon" aria-hidden="true">▣</span><span class="si-path-tag">Cena livre</span></span>
+              <span class="si-path-kicker">Experimente na prática</span><strong>Ambiente</strong>
+              <span class="si-path-description">Organize objetos, experimente ferramentas e acompanhe suas observações.</span>
+              <span class="si-path-action">Entrar no ambiente <span aria-hidden="true">→</span></span>
+            </a>
+            <a class="si-home-path" href="#/aprender"><span class="si-path-icon" aria-hidden="true">▤</span><strong>Aprender</strong><span class="si-path-description">Conheça os temas disponíveis.</span><span class="si-path-action">Explorar temas →</span></a>
+            <a class="si-home-path" href="#/missoes"><span class="si-path-icon" aria-hidden="true">◈</span><strong>Missões</strong><span class="si-path-description">Investigue objetivos e desafios.</span><span class="si-path-action">Ver missões →</span></a>
+            <a class="si-home-path" href="#/roteiros"><span class="si-path-icon" aria-hidden="true">☷</span><strong>Roteiros</strong><span class="si-path-description">Realize percursos por etapas.</span><span class="si-path-action">Abrir roteiros →</span></a>
+            <a class="si-home-path" href="#/caderno"><span class="si-path-icon" aria-hidden="true">▧</span><strong>Caderno</strong><span class="si-path-description">Registre e recupere investigações.</span><span class="si-path-action">Abrir caderno →</span></a>
+          </nav>
+          <footer class="si-home-support"><nav aria-label="Apoio e configuração"><a href="#/manual">Manual de uso</a><a href="#/professor">Área do Professor</a><a href="#/configuracoes">Preferências</a></nav></footer>
         </section>
 
         <section class="view si-environment" data-view="ambiente" aria-labelledby="environment-title" hidden>
@@ -305,10 +329,16 @@
 
         <section class="view narrow" data-view="sobre" aria-labelledby="about-title" hidden>
           <div class="section-heading"><p class="eyebrow">IDENTIDADE E ENGENHARIA</p><h1 id="about-title" data-app-name>Base Demo Oficial - SI</h1><p>Uma infraestrutura independente, destinada a receber diferentes simuladores educativos.</p></div>
-          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.1</strong>.</p></article>
+          <article class="card prose"><h2>Princípios do projeto</h2><p><strong>Universalidade:</strong> o núcleo não contém regras de uma disciplina científica.</p><p><strong>Autonomia:</strong> nenhuma conexão é exigida para executar a aplicação.</p><p><strong>Camadas:</strong> implementação progressiva, com contratos e critérios de aceite a cada fase.</p><p><strong>Evolução:</strong> a plataforma será ampliada gradualmente, com testes de compatibilidade e comportamento antes de cada homologação.</p><hr><p>Versão da plataforma: <strong data-app-version>0.9.2</strong>.</p></article>
         </section>
       </main>
-      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.1</span></span></footer>
+      <nav class="si-mobile-bottom-nav" aria-label="Navegação principal para dispositivos móveis">
+        <a data-route="inicio" href="#/inicio"><span aria-hidden="true">⌂</span>Início</a>
+        <a data-route="aprender" href="#/aprender"><span aria-hidden="true">▤</span>Aprender</a>
+        <a data-route="ambiente" href="#/ambiente"><span aria-hidden="true">▣</span>Ambiente</a>
+        <a data-route="caderno" href="#/caderno"><span aria-hidden="true">▧</span>Caderno</a>
+      </nav>
+      <footer class="footer"><span>Base Demo Oficial - SI</span><span>Construção por camadas · <span data-app-version>0.9.2</span></span></footer>
     </div>
   </div>
   <section id="si-print-sheet" class="si-print-sheet" aria-label="Versão para impressão" hidden></section>

@@ -10,7 +10,7 @@
 | 0.6.x | Ambientes | Aprender, missões, roteiros, professor | Implementada, homologação parcial |
 | 0.7.x | Documentação | Registros, Caderno, relatórios configuráveis e impressão | Implementada, homologação parcial |
 | 0.8.x | Acabamentos | Identidade, distribuição e PWA/standalone final | Implementada, homologação parcial |
-| 0.9.x | Vistoria | Regressões, responsividade e cross-browser | 0.9.1 implementada, homologação parcial |
+| 0.9.x | Vistoria | Regressões, responsividade e cross-browser | 0.9.2 implementada, homologação parcial |
 | 1.0.0 | Homologação | Contratos estáveis e base universal validada | Planejada |
 
 Regra permanente: nenhuma etapa introduz conteúdo científico específico no núcleo. Toda dependência de execução deve ser distribuída localmente. A documentação registra apenas a identidade da própria plataforma.

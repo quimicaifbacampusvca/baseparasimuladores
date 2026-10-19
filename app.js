@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.1",
+        version: "0.9.2",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -69,7 +69,6 @@ var BaseDemoSI;
     const drawer = () => document.getElementById("sidebar");
     const backdrop = () => document.getElementById("nav-backdrop");
     const mainColumn = () => document.getElementById("main-column");
-    const mobileMenu = () => window.matchMedia("(max-width:970px)").matches;
     const drawerOpen = () => document.body.classList.contains("nav-open");
     function closeNavigationDrawer(restoreFocus = false) {
         const wasOpen = drawerOpen();
@@ -86,7 +85,7 @@ var BaseDemoSI;
     }
     BaseDemoSI.closeNavigationDrawer = closeNavigationDrawer;
     function openNavigationDrawer() {
-        if (!mobileMenu() || BaseDemoSI.isPlatformDialogOpen())
+        if (BaseDemoSI.isPlatformDialogOpen())
             return;
         document.body.classList.add("nav-open");
         menuButton()?.setAttribute("aria-expanded", "true");
@@ -131,8 +130,6 @@ var BaseDemoSI;
                 first.focus();
             }
         });
-        window.addEventListener("resize", () => { if (!mobileMenu())
-            closeNavigationDrawer(false); });
         document.querySelectorAll("#sidebar a[href]").forEach(link => link.addEventListener("click", () => {
             if (!drawerOpen())
                 return;
@@ -2513,7 +2510,7 @@ var BaseDemoSI;
     const precacheFiles = [
         "./", "./index.html", "./app.js", "./app.css", "./workspace.css",
         "./components.css", "./extensions.css", "./education.css", "./records.css",
-        "./distribution.css", "./inspection.css", "./completion.css", "./manifest.webmanifest", "./assets/icon.svg",
+        "./distribution.css", "./inspection.css", "./completion.css", "./organization.css", "./manifest.webmanifest", "./assets/icon.svg",
         "./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png"
     ];
     let installPrompt = null;
