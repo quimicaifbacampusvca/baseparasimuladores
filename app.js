@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.8",
+        version: "0.9.9",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -178,6 +178,7 @@ var BaseDemoSI;
     const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
     let pref = { ...prefDefault };
     let activityLink = "";
+    let activeActivity = null;
     const checkbox = (id, checked) => { const node = menuGet(id); if (node)
         node.checked = checked; };
     function menuPreferences(value) {
@@ -195,6 +196,8 @@ var BaseDemoSI;
         root.classList.toggle("si-no-motion", pref.motion);
         root.classList.toggle("si-simple-reading", pref.simple);
         root.classList.toggle("si-font-mod", pref.font !== 1);
+        // Rem afeta a aplicação inteira, não apenas os rótulos da gaveta.
+        root.style.fontSize = pref.font === 1 ? "" : `${16 * pref.font}px`;
         root.style.setProperty("--si-font-factor", String(pref.font));
         document.body.classList.toggle("si-projector-mode", pref.projector);
         for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
@@ -217,6 +220,7 @@ var BaseDemoSI;
         // Acromatopsia é representável por escala cinza. Os demais perfis
         // demandam transformações de cor validadas e permanecem informativos.
         root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+        root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
         menuPreferences({ ...pref, [key]: value });
@@ -225,30 +229,35 @@ var BaseDemoSI;
     }
     function getActivityContext() {
         const route = BaseDemoSI.currentRoute(window.location.hash);
-        const item = new URLSearchParams((window.location.hash.split("?")[1] ?? "")).get("item");
-        if (item && (route === "missoes" || route === "roteiros")) {
-            const candidates = [...BaseDemoSI.officialActivities];
-            const match = candidates.find(a => a.id === item);
-            if (match)
-                return { title: match.title, url: `#/${route}?item=${encodeURIComponent(item)}` };
+        let destination = window.location.hash;
+        if (route === "ambiente") {
+            const returnControl = menuGet("si-return-activity");
+            if (!returnControl || returnControl.hidden)
+                return null;
+            destination = returnControl.getAttribute("href") ?? "";
         }
-        const returnControl = menuGet("si-return-activity");
-        if (route === "ambiente" && returnControl && !returnControl.hidden && returnControl.href) {
-            const path = returnControl.getAttribute("href") ?? "";
-            if (path.startsWith("#/"))
-                return { title: "Atividade orientada", url: path };
-        }
-        return null;
+        const activityRoute = BaseDemoSI.currentRoute(destination);
+        if (activityRoute !== "missoes" && activityRoute !== "roteiros")
+            return null;
+        const id = new URLSearchParams(destination.split("?")[1] ?? "").get("item");
+        if (!id)
+            return null;
+        const kind = activityRoute === "missoes" ? "mission" : "script";
+        const activity = BaseDemoSI.menuActivity(kind, id);
+        return activity ? { id, kind, title: activity.title, url: `#/${activityRoute}?item=${encodeURIComponent(id)}`, steps: activity.steps } : null;
     }
     function syncMenuReview() {
         const ctx = getActivityContext();
+        activeActivity = ctx;
         activityLink = ctx?.url ?? "";
         const activity = menuGet("si-activity-menu");
         if (activity)
             activity.hidden = !ctx;
         const context = menuGet("si-activity-context");
-        if (context)
-            context.textContent = ctx ? `${ctx.title} · execução local` : "";
+        if (context) {
+            const done = ctx ? BaseDemoSI.menuActivityProgress(ctx.id) : 0;
+            context.textContent = ctx ? `${ctx.title} · ${Math.min(done, ctx.steps.length)}/${ctx.steps.length} etapas` : "";
+        }
         const title = menuGet("si-menu-title");
         if (title)
             title.textContent = ctx ? "Menu da atividade" : "Menu";
@@ -378,15 +387,36 @@ var BaseDemoSI;
             BaseDemoSI.closeNavigationDrawer(false);
             window.location.hash = activityLink;
         } });
-        menuGet("si-activity-finish")?.addEventListener("click", () => { if (activityLink) {
+        menuGet("si-activity-finish")?.addEventListener("click", () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = activityLink;
-            BaseDemoSI.notify("Confira os critérios e registre a etapa na própria atividade.", "info");
-        } });
-        menuGet("si-activity-exit")?.addEventListener("click", async () => { const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" }); if (decision) {
+            const progress = BaseDemoSI.menuActivityProgress(ctx.id);
+            if (progress >= ctx.steps.length) {
+                BaseDemoSI.notify("Esta atividade já está concluída.", "info");
+                window.location.hash = ctx.url;
+                return;
+            }
+            const result = BaseDemoSI.advanceActivityFromMenu(ctx.id);
+            BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+            if (result.ok) {
+                window.location.hash = ctx.url;
+                syncMenuReview();
+            }
+        });
+        menuGet("si-activity-exit")?.addEventListener("click", async () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
+            const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" });
+            if (!decision)
+                return;
+            BaseDemoSI.clearGuidedReturn();
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = "#/roteiros";
-        } });
+            window.location.hash = ctx.kind === "mission" ? "#/missoes" : "#/roteiros";
+            syncMenuReview();
+        });
         syncMenuReview();
     }
     BaseDemoSI.setupMenuReview = setupMenuReview;
@@ -2322,6 +2352,18 @@ var BaseDemoSI;
             document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
         }, 0);
     }
+    function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
+    BaseDemoSI.menuActivity = menuActivity;
+    function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
+    BaseDemoSI.menuActivityProgress = menuActivityProgress;
+    function advanceActivityFromMenu(id) {
+        if (!education || !educationScene)
+            return { ok: false, message: "Nenhuma atividade disponível." };
+        return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
+    }
+    BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
+    function clearGuidedReturn() { returnToActivity = ""; mountReturnLink(); }
+    BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)

@@ -6,7 +6,9 @@ namespace BaseDemoSI {
   const prefKey="family-menu-v1";
   const validVision=["none","protanopia","deuteranopia","tritanopia","acromatopsia"];
   let pref:MenuPref={...prefDefault};
+  type ActiveMenuActivity={id:string;kind:ActivityKind;title:string;url:string;steps:readonly LearningStep[]};
   let activityLink="";
+  let activeActivity:ActiveMenuActivity|null=null;
   const checkbox=(id:string,checked:boolean)=>{const node=menuGet(id) as HTMLInputElement|null;if(node)node.checked=checked;};
   function menuPreferences(value:MenuPref):void {
     pref=value;
@@ -21,6 +23,8 @@ namespace BaseDemoSI {
     root.classList.toggle("si-no-motion",pref.motion);
     root.classList.toggle("si-simple-reading",pref.simple);
     root.classList.toggle("si-font-mod",pref.font!==1);
+    // Rem afeta a aplicação inteira, não apenas os rótulos da gaveta.
+    root.style.fontSize=pref.font===1?"":`${16*pref.font}px`;
     root.style.setProperty("--si-font-factor",String(pref.font));
     document.body.classList.toggle("si-projector-mode",pref.projector);
     for(const [id,v] of [["si-dark",pref.dark],["si-contrast",pref.contrast],["si-letter-spacing",pref.spacing],["si-motion",pref.motion],["si-intro",pref.intro],["si-simple",pref.simple],["si-projector",pref.projector]] as [string,boolean][])checkbox(id,v);
@@ -33,30 +37,36 @@ namespace BaseDemoSI {
     // Acromatopsia é representável por escala cinza. Os demais perfis
     // demandam transformações de cor validadas e permanecem informativos.
     root.classList.toggle("si-achromatopsia",pref.vision==="acromatopsia");
+    root.dataset.siIntro=pref.intro?"on":"off";
   }
   function updatePref<K extends keyof MenuPref>(key:K,value:MenuPref[K]):void {
     menuPreferences({...pref,[key]:value});
     if(!storage.write(prefKey,JSON.stringify(pref)))notify("Preferência aplicada nesta sessão. O navegador bloqueou o armazenamento.","warning");
   }
-  function getActivityContext():{title:string;url:string}|null {
+  function getActivityContext():ActiveMenuActivity|null {
     const route=currentRoute(window.location.hash);
-    const item=new URLSearchParams((window.location.hash.split("?")[1]??"")).get("item");
-    if(item&&(route==="missoes"||route==="roteiros")){
-      const candidates=[...officialActivities];
-      const match=candidates.find(a=>a.id===item);
-      if(match)return {title:match.title,url:`#/${route}?item=${encodeURIComponent(item)}`};
+    let destination=window.location.hash;
+    if(route==="ambiente") {
+      const returnControl=menuGet("si-return-activity") as HTMLAnchorElement|null;
+      if(!returnControl || returnControl.hidden)return null;
+      destination=returnControl.getAttribute("href")??"";
     }
-    const returnControl=menuGet("si-return-activity") as HTMLAnchorElement|null;
-    if(route==="ambiente"&&returnControl&&!returnControl.hidden&&returnControl.href){
-      const path=returnControl.getAttribute("href")??"";
-      if(path.startsWith("#/"))return {title:"Atividade orientada",url:path};
-    }
-    return null;
+    const activityRoute=currentRoute(destination);
+    if(activityRoute!=="missoes" && activityRoute!=="roteiros")return null;
+    const id=new URLSearchParams(destination.split("?")[1]??"").get("item");
+    if(!id)return null;
+    const kind:ActivityKind=activityRoute==="missoes"?"mission":"script";
+    const activity=menuActivity(kind,id);
+    return activity?{id,kind,title:activity.title,url:`#/${activityRoute}?item=${encodeURIComponent(id)}`,steps:activity.steps}:null;
   }
   function syncMenuReview():void {
-    const ctx=getActivityContext();activityLink=ctx?.url??"";
+    const ctx=getActivityContext();activeActivity=ctx;activityLink=ctx?.url??"";
     const activity=menuGet("si-activity-menu");if(activity)activity.hidden=!ctx;
-    const context=menuGet("si-activity-context");if(context)context.textContent=ctx?`${ctx.title} · execução local`:"";
+    const context=menuGet("si-activity-context");
+    if(context) {
+      const done=ctx?menuActivityProgress(ctx.id):0;
+      context.textContent=ctx?`${ctx.title} · ${Math.min(done,ctx.steps.length)}/${ctx.steps.length} etapas`:"";
+    }
     const title=menuGet("si-menu-title");if(title)title.textContent=ctx?"Menu da atividade":"Menu";
     const now=menuGet("si-now-title"),desc=menuGet("si-now-description");
     const route=currentRoute(window.location.hash),info=manifest.routes.find(x=>x.id===route);
@@ -101,10 +111,8 @@ namespace BaseDemoSI {
     menuPreferences(pref);
     // Apenas na abertura sem destino indicado é aplicada a tela inicial.
     if(!window.location.hash || window.location.hash==="#/")window.location.hash=`#/${pref.startup}`;
-    // A lista de destinos deve iniciar expandida em qualquer tamanho de tela.
-    // O usuário pode recolhê-la manualmente sem perder o acesso ao menu.
-    menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded","true");
-    const routes=menuGet("si-nav-main");if(routes)routes.hidden=false;
+    menuGet("si-nav-group-toggle")?.setAttribute("aria-expanded",String(window.matchMedia("(max-width:900px)").matches));
+    const routes=menuGet("si-nav-main");if(routes)routes.hidden=!window.matchMedia("(max-width:900px)").matches;
     menuGet("si-a11y-toggle")?.addEventListener("click",()=>togglePanel("si-a11y-toggle","si-a11y-panel"));
     menuGet("si-startup-toggle")?.addEventListener("click",()=>togglePanel("si-startup-toggle","si-startup-panel"));
     menuGet("si-header-access")?.addEventListener("click",openAccessibility);
@@ -121,8 +129,26 @@ namespace BaseDemoSI {
     menuGet("si-drawer-tour")?.addEventListener("click",tour);
     menuGet("si-guide-open")?.addEventListener("click",()=>{closeNavigationDrawer(false);window.location.hash="#/manual";notify("Consulte as orientações de acessibilidade e os recursos para mediação em sala.","info");});
     menuGet("si-activity-about")?.addEventListener("click",()=>{if(activityLink){closeNavigationDrawer(false);window.location.hash=activityLink;}});
-    menuGet("si-activity-finish")?.addEventListener("click",()=>{if(activityLink){closeNavigationDrawer(false);window.location.hash=activityLink;notify("Confira os critérios e registre a etapa na própria atividade.","info");}});
-    menuGet("si-activity-exit")?.addEventListener("click",async()=>{const decision=await confirmDialog({title:"Encerrar atividade?",description:"Você retornará ao catálogo. O progresso local já registrado será preservado.",confirmText:"Encerrar"});if(decision){closeNavigationDrawer(false);window.location.hash="#/roteiros";}});
+    menuGet("si-activity-finish")?.addEventListener("click",()=>{
+      const ctx=activeActivity;
+      if(!ctx)return;
+      closeNavigationDrawer(false);
+      const progress=menuActivityProgress(ctx.id);
+      if(progress>=ctx.steps.length){notify("Esta atividade já está concluída.","info");window.location.hash=ctx.url;return;}
+      const result=advanceActivityFromMenu(ctx.id);
+      notify(result.message,result.ok?"success":"warning");
+      if(result.ok){window.location.hash=ctx.url;syncMenuReview();}
+    });
+    menuGet("si-activity-exit")?.addEventListener("click",async()=>{
+      const ctx=activeActivity;
+      if(!ctx)return;
+      const decision=await confirmDialog({title:"Encerrar atividade?",description:"Você retornará ao catálogo. O progresso local já registrado será preservado.",confirmText:"Encerrar"});
+      if(!decision)return;
+      clearGuidedReturn();
+      closeNavigationDrawer(false);
+      window.location.hash=ctx.kind==="mission"?"#/missoes":"#/roteiros";
+      syncMenuReview();
+    });
     syncMenuReview();
   }
 }

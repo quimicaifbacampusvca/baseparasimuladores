@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.8
+# Base Demo Oficial - SI · 0.9.9
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.8 — Bloco 05: manipulação e estabilidade mobile.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.9 — Auditoria funcional do menu e dos controles contextuais.**
 
 ## Executar
 
@@ -62,3 +62,7 @@ A doca de Montagem apresenta Resumo, Preparo, Objetos e Módulo; Missão é exib
 A cena permanece geometricamente estável ao abrir/trocar Montagem, Ver e Dados; as folhas inferiores usam rolagem própria e seus controles têm alvos mínimos de 44 px. Em telas estreitas, a ação de limpar fica no menu Mais e conserva confirmação, Desfazer e recuperação. A altura visível e o teclado virtual são considerados no posicionamento das folhas, sem redesenhar o estado científico. Novos estilos de geometria compacta ficam concentrados em `mobile-contract.css`. Consulte `docs/ACEITE-BLOCO-05-0.9.8.md`.
 
 **Escopo dos testes:** Chromium por carregamento isolado do HTML em nove tamanhos; abrir `file://`, HTTPS/localhost, PWA instalada e outros navegadores requer validação adicional.
+
+## Auditoria funcional do menu · 0.9.9
+
+A gaveta mantém os SVGs locais e a navegação existente. O menu contextual reconhece missões, roteiros e atividades do professor, apresenta o progresso real, valida critérios ao registrar etapas e retorna ao catálogo correspondente ao encerrar com confirmação. As preferências de leitura, espaçamento e tamanho da fonte passam a atingir a aplicação e não somente a gaveta. Permanecem fora desta rodada Montagens prontas, Libras offline e os perfis de visão de cores sem filtro validado. Consulte `docs/AUDITORIA-MENU-0.9.9.md`.

@@ -42,7 +42,7 @@
 :root.si-highcontrast{--surface:#050505;--text:#fff;--border:#fff;--tint:#171717;--muted:#ddd;--accent:#ffeb3b}
 :root.si-large-spacing .si-menu-drawer{letter-spacing:.045em}
 :root.si-simple-reading .si-menu-drawer .si-drawer-item{font-size:1rem;font-weight:700}
-:root.si-font-mod .app-shell{font-size:calc(100% * var(--si-font-factor,1))}
+:root.si-font-mod .app-shell{font-size:inherit}
 :root.si-no-motion .si-menu-drawer,:root.si-no-motion .si-drawer-nav-toggle .si-menu-svg{transition:none!important}
 body.si-projector-mode .si-global-nav{display:none}
 body.si-projector-mode #conteudo{max-width:1800px;margin-inline:auto}
@@ -60,3 +60,11 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 .si-a11y-label.si-with-icon{display:flex;flex-direction:row;align-items:center;gap:10px}
 .si-a11y-label .si-a11y-svg{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
 .si-a11y-label.si-with-icon small{font-size:.67rem}
+
+/* Auditoria menu 0.9.9: preferências aplicadas à plataforma inteira. */
+:root.si-large-spacing .app-shell {letter-spacing:.035em}
+:root.si-simple-reading body {line-height:1.65}
+:root.si-simple-reading .app-shell p {line-height:1.7}
+:root.si-simple-reading .si-home-family .si-home-path {font-weight:600}
+:root.si-no-motion *, :root.si-no-motion *::before, :root.si-no-motion *::after {animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
+@media(max-width:640px){:root.si-font-mod .si-drawer-body{overflow-x:hidden}}

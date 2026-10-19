@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-Dv9wqRZwS55bW2xQD8MryDVhEEIf+M0VT3wCmTUyVYs='; script-src 'sha256-9VlQNoPWr3TlS3UzAjVBobEs8WC3wkQ3gxHn0OJyqVU='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-VtLWOrjlcaHxZPAR9dx17YbbwAGLIVKQTXzA1ok4GIw='; script-src 'sha256-f5F2Tb+RQpL9gjgk9WNJhX3MRvrXerhvbFAbg4B/OF4='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -724,7 +724,7 @@ body.route-ambiente.nav-open .side.si-menu-drawer{width:min(360px,88vw);transfor
 :root.si-highcontrast{--surface:#050505;--text:#fff;--border:#fff;--tint:#171717;--muted:#ddd;--accent:#ffeb3b}
 :root.si-large-spacing .si-menu-drawer{letter-spacing:.045em}
 :root.si-simple-reading .si-menu-drawer .si-drawer-item{font-size:1rem;font-weight:700}
-:root.si-font-mod .app-shell{font-size:calc(100% * var(--si-font-factor,1))}
+:root.si-font-mod .app-shell{font-size:inherit}
 :root.si-no-motion .si-menu-drawer,:root.si-no-motion .si-drawer-nav-toggle .si-menu-svg{transition:none!important}
 body.si-projector-mode .si-global-nav{display:none}
 body.si-projector-mode #conteudo{max-width:1800px;margin-inline:auto}
@@ -742,6 +742,14 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 .si-a11y-label.si-with-icon{display:flex;flex-direction:row;align-items:center;gap:10px}
 .si-a11y-label .si-a11y-svg{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
 .si-a11y-label.si-with-icon small{font-size:.67rem}
+
+/* Auditoria menu 0.9.9: preferências aplicadas à plataforma inteira. */
+:root.si-large-spacing .app-shell {letter-spacing:.035em}
+:root.si-simple-reading body {line-height:1.65}
+:root.si-simple-reading .app-shell p {line-height:1.7}
+:root.si-simple-reading .si-home-family .si-home-path {font-weight:600}
+:root.si-no-motion *, :root.si-no-motion *::before, :root.si-no-motion *::after {animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
+@media(max-width:640px){:root.si-font-mod .si-drawer-body{overflow-x:hidden}}
 
 /* Base Demo Oficial - SI 0.9.8 | contrato mobile, camada final da cascata. */
 /* Este arquivo governa somente a interface compacta; a geometria desktop é preservada. */
@@ -844,7 +852,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
 <button class="si-drawer-item" id="si-a11y-reset" type="button"><svg aria-hidden="true" class="si-menu-svg" fill="none" focusable="false" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 8a9 9 0 1 1-1 7M3 3v6h6M12 7v6l4 2"></path></svg><span>Restaurar padrões</span></button>
 </div>
   <div class="si-drawer-links si-present-settings">
-    <button type="button" id="si-startup-toggle" class="si-drawer-item"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Tela inicial</span></button>
+    <button type="button" id="si-startup-toggle" class="si-drawer-item" aria-controls="si-startup-panel" aria-expanded="false"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Tela inicial</span></button>
     <div id="si-startup-panel" class="si-startup-panel" hidden><label>Ao abrir a plataforma<select id="si-startup-select"><option value="inicio">Início</option><option value="ambiente">Ambiente</option><option value="aprender">Aprender</option></select></label></div>
     <label class="si-drawer-item si-projector-row"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h18v13H3ZM8 22l4-5 4 5M12 17v5"/></svg><span>Apresentação · Modo projetor</span><input id="si-projector" type="checkbox" role="switch" aria-label="Modo projetor"></label>
     <a class="si-drawer-item" href="#/manual"><svg class="si-menu-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5C8 3 4 3 2 4v16c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-6-1-10 1ZM12 5v16M16 6v7l2-2 2 2V6"/></svg><span>Como apresentar à turma</span></a>
@@ -1237,7 +1245,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.8",
+        version: "0.9.9",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1409,6 +1417,7 @@ var BaseDemoSI;
     const validVision = ["none", "protanopia", "deuteranopia", "tritanopia", "acromatopsia"];
     let pref = { ...prefDefault };
     let activityLink = "";
+    let activeActivity = null;
     const checkbox = (id, checked) => { const node = menuGet(id); if (node)
         node.checked = checked; };
     function menuPreferences(value) {
@@ -1426,6 +1435,8 @@ var BaseDemoSI;
         root.classList.toggle("si-no-motion", pref.motion);
         root.classList.toggle("si-simple-reading", pref.simple);
         root.classList.toggle("si-font-mod", pref.font !== 1);
+        // Rem afeta a aplicação inteira, não apenas os rótulos da gaveta.
+        root.style.fontSize = pref.font === 1 ? "" : `${16 * pref.font}px`;
         root.style.setProperty("--si-font-factor", String(pref.font));
         document.body.classList.toggle("si-projector-mode", pref.projector);
         for (const [id, v] of [["si-dark", pref.dark], ["si-contrast", pref.contrast], ["si-letter-spacing", pref.spacing], ["si-motion", pref.motion], ["si-intro", pref.intro], ["si-simple", pref.simple], ["si-projector", pref.projector]])
@@ -1448,6 +1459,7 @@ var BaseDemoSI;
         // Acromatopsia é representável por escala cinza. Os demais perfis
         // demandam transformações de cor validadas e permanecem informativos.
         root.classList.toggle("si-achromatopsia", pref.vision === "acromatopsia");
+        root.dataset.siIntro = pref.intro ? "on" : "off";
     }
     function updatePref(key, value) {
         menuPreferences({ ...pref, [key]: value });
@@ -1456,30 +1468,35 @@ var BaseDemoSI;
     }
     function getActivityContext() {
         const route = BaseDemoSI.currentRoute(window.location.hash);
-        const item = new URLSearchParams((window.location.hash.split("?")[1] ?? "")).get("item");
-        if (item && (route === "missoes" || route === "roteiros")) {
-            const candidates = [...BaseDemoSI.officialActivities];
-            const match = candidates.find(a => a.id === item);
-            if (match)
-                return { title: match.title, url: `#/${route}?item=${encodeURIComponent(item)}` };
+        let destination = window.location.hash;
+        if (route === "ambiente") {
+            const returnControl = menuGet("si-return-activity");
+            if (!returnControl || returnControl.hidden)
+                return null;
+            destination = returnControl.getAttribute("href") ?? "";
         }
-        const returnControl = menuGet("si-return-activity");
-        if (route === "ambiente" && returnControl && !returnControl.hidden && returnControl.href) {
-            const path = returnControl.getAttribute("href") ?? "";
-            if (path.startsWith("#/"))
-                return { title: "Atividade orientada", url: path };
-        }
-        return null;
+        const activityRoute = BaseDemoSI.currentRoute(destination);
+        if (activityRoute !== "missoes" && activityRoute !== "roteiros")
+            return null;
+        const id = new URLSearchParams(destination.split("?")[1] ?? "").get("item");
+        if (!id)
+            return null;
+        const kind = activityRoute === "missoes" ? "mission" : "script";
+        const activity = BaseDemoSI.menuActivity(kind, id);
+        return activity ? { id, kind, title: activity.title, url: `#/${activityRoute}?item=${encodeURIComponent(id)}`, steps: activity.steps } : null;
     }
     function syncMenuReview() {
         const ctx = getActivityContext();
+        activeActivity = ctx;
         activityLink = ctx?.url ?? "";
         const activity = menuGet("si-activity-menu");
         if (activity)
             activity.hidden = !ctx;
         const context = menuGet("si-activity-context");
-        if (context)
-            context.textContent = ctx ? `${ctx.title} · execução local` : "";
+        if (context) {
+            const done = ctx ? BaseDemoSI.menuActivityProgress(ctx.id) : 0;
+            context.textContent = ctx ? `${ctx.title} · ${Math.min(done, ctx.steps.length)}/${ctx.steps.length} etapas` : "";
+        }
         const title = menuGet("si-menu-title");
         if (title)
             title.textContent = ctx ? "Menu da atividade" : "Menu";
@@ -1609,15 +1626,36 @@ var BaseDemoSI;
             BaseDemoSI.closeNavigationDrawer(false);
             window.location.hash = activityLink;
         } });
-        menuGet("si-activity-finish")?.addEventListener("click", () => { if (activityLink) {
+        menuGet("si-activity-finish")?.addEventListener("click", () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = activityLink;
-            BaseDemoSI.notify("Confira os critérios e registre a etapa na própria atividade.", "info");
-        } });
-        menuGet("si-activity-exit")?.addEventListener("click", async () => { const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" }); if (decision) {
+            const progress = BaseDemoSI.menuActivityProgress(ctx.id);
+            if (progress >= ctx.steps.length) {
+                BaseDemoSI.notify("Esta atividade já está concluída.", "info");
+                window.location.hash = ctx.url;
+                return;
+            }
+            const result = BaseDemoSI.advanceActivityFromMenu(ctx.id);
+            BaseDemoSI.notify(result.message, result.ok ? "success" : "warning");
+            if (result.ok) {
+                window.location.hash = ctx.url;
+                syncMenuReview();
+            }
+        });
+        menuGet("si-activity-exit")?.addEventListener("click", async () => {
+            const ctx = activeActivity;
+            if (!ctx)
+                return;
+            const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "Você retornará ao catálogo. O progresso local já registrado será preservado.", confirmText: "Encerrar" });
+            if (!decision)
+                return;
+            BaseDemoSI.clearGuidedReturn();
             BaseDemoSI.closeNavigationDrawer(false);
-            window.location.hash = "#/roteiros";
-        } });
+            window.location.hash = ctx.kind === "mission" ? "#/missoes" : "#/roteiros";
+            syncMenuReview();
+        });
         syncMenuReview();
     }
     BaseDemoSI.setupMenuReview = setupMenuReview;
@@ -3553,6 +3591,18 @@ var BaseDemoSI;
             document.querySelector(`[data-catalog-id="${id}"]`)?.focus({ preventScroll: true });
         }, 0);
     }
+    function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
+    BaseDemoSI.menuActivity = menuActivity;
+    function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
+    BaseDemoSI.menuActivityProgress = menuActivityProgress;
+    function advanceActivityFromMenu(id) {
+        if (!education || !educationScene)
+            return { ok: false, message: "Nenhuma atividade disponível." };
+        return education.advance(id, educationScene.getSnapshot(), BaseDemoSI.extensionRecordCount());
+    }
+    BaseDemoSI.advanceActivityFromMenu = advanceActivityFromMenu;
+    function clearGuidedReturn() { returnToActivity = ""; mountReturnLink(); }
+    BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function mountReturnLink() {
         const control = el("si-return-activity");
         if (!control)

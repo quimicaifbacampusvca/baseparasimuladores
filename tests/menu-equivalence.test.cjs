@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');const path=require('node:path');
+const read=name=>fs.readFileSync(path.resolve(__dirname,'..',name),'utf8');
+const menu=read('src/menu-review.ts'), edu=read('src/education-ui.ts'),style=read('menu-review.css'),html=read('index.html');
+assert(menu.includes('menuActivity(kind,id)'),'Deve reconhecer atividades de catálogo e professor');
+assert(menu.includes('menuActivityProgress(ctx.id)'),'O menu deve refletir o progresso verdadeiro');
+assert(menu.includes('advanceActivityFromMenu(ctx.id)'),'Finalização valida etapa real');
+assert(menu.includes('clearGuidedReturn()'),'Encerrar deve limpar contexto contextual');
+assert(menu.includes('ctx.kind==="mission"?"#/missoes":"#/roteiros"'),'Catálogo de origem por modalidade');
+assert(edu.includes('export function clearGuidedReturn()'));
+assert(style.includes(':root.si-simple-reading body'));
+assert(style.includes(':root.si-no-motion *'));
+assert(menu.includes('root.style.fontSize=pref.font===1'));
+assert(html.includes('aria-controls="si-startup-panel" aria-expanded="false"'));
+assert.equal(JSON.parse(read('package.json')).version,'0.9.9');
+assert(!/SIAB/i.test(read('docs/AUDITORIA-MENU-0.9.9.md')));
+console.log('OK: contexto, finalização, encerramento de atividades e preferências de leitura.');

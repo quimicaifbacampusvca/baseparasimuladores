@@ -28,6 +28,13 @@ namespace BaseDemoSI {
       document.querySelector<HTMLElement>(`[data-catalog-id="${id}"]`)?.focus({preventScroll:true});
     },0);
   }
+  export function menuActivity(kind:ActivityKind,id:string):LearningActivity|undefined {return education?.list(kind).find(a=>a.id===id);}
+  export function menuActivityProgress(id:string):number {return education?.snapshot().progress[id]??0;}
+  export function advanceActivityFromMenu(id:string):{ok:boolean;message:string} {
+    if(!education || !educationScene)return {ok:false,message:"Nenhuma atividade disponível."};
+    return education.advance(id,educationScene.getSnapshot(),extensionRecordCount());
+  }
+  export function clearGuidedReturn():void { returnToActivity="";mountReturnLink(); }
   function mountReturnLink():void {
     const control=el("si-return-activity") as HTMLAnchorElement|null;
     if(!control)return;
