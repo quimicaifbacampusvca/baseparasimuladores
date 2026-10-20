@@ -57,3 +57,14 @@
 }
 
 .si-guided-report-context{border:1px solid var(--border,#cbd3dd);border-inline-start:4px solid var(--accent,#3b83ad);border-radius:8px;padding:11px 13px;margin:10px 0 14px;overflow-wrap:anywhere;background:var(--surface,#fff);color:var(--text,#1e2b37)}
+
+/* 0.9.17 — controles documentais, filtro acessível e folha de escrita. */
+.si-record-filter-label{display:block;font-size:.86rem;font-weight:650;margin:0 0 5px}
+.si-record-filter{display:block;min-height:44px;max-width:320px;width:100%;border:1px solid var(--border,#a5b5c3);border-radius:10px;padding:9px 12px;background:var(--surface,#fff);color:var(--text,#172d40);font:inherit;margin:0 0 10px}
+.si-record-filter:focus-visible{outline:3px solid var(--accent,#1875a0);outline-offset:2px}
+.si-journal-paper .si-report-section{break-inside:avoid}
+.si-writing-line{height:29px;border-bottom:1px solid #aab6c0;margin:0 0 4px}
+.si-blank-report .si-report-section{break-inside:auto}
+.si-blank-report h3{break-after:avoid}
+@media(max-width:450px){.si-record-file-actions .button{min-height:44px}.si-records-card-top{align-items:start}.si-report-preview-card .si-journal-actions{justify-content:start}}
+@media print{.si-blank-report .si-report-section{break-inside:auto}.si-writing-line{break-inside:avoid}}

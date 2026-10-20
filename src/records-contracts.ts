@@ -49,6 +49,7 @@ namespace BaseDemoSI {
     snapshot(): JournalDocument;
     addNote(value: unknown, scene: SceneSnapshot, attemptId?: string): boolean;
     removeNote(id: string): boolean;
+    clearNotes(): boolean;
     makeReport(value: unknown, scene: SceneSnapshot, readings: readonly ReadingRecord[]): boolean;
     removeReport(id: string): boolean;
     importJSON(value: unknown): boolean;

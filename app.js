@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.16",
+        version: "0.9.17",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -1433,6 +1433,11 @@ var BaseDemoSI;
                 if (!state.notes.some(n => n.id === noteId))
                     return false;
                 return persist({ ...state, notes: state.notes.filter(n => n.id !== noteId) });
+            },
+            clearNotes() {
+                if (!state.notes.length)
+                    return true;
+                return persist({ ...state, notes: [] });
             },
             makeReport(value, scene, readings) {
                 if (state.reports.length >= MAX_REPORTS || !value || typeof value !== "object" || Array.isArray(value))
@@ -3598,6 +3603,7 @@ var BaseDemoSI;
     let journal;
     let journalScene;
     let openReportId = null;
+    let journalFilter = "todos";
     let registered = false;
     const j = (id) => document.getElementById(id);
     function element(tag, content, className) {
@@ -3689,9 +3695,10 @@ var BaseDemoSI;
         const state = journal.snapshot();
         j("journal-total").textContent = `${state.notes.length} de 80 registros`;
         j("journal-readings").textContent = `${extensionRecords().length} leituras instrumentais disponíveis`;
-        if (!state.notes.length)
-            target.append(element("p", "Nenhuma observação registrada. Use o formulário para iniciar o Caderno.", "si-records-empty"));
-        for (const note of [...state.notes].reverse()) {
+        const visible = state.notes.filter(n => journalFilter === "todos" || n.kind === journalFilter);
+        if (!visible.length)
+            target.append(element("p", state.notes.length ? "Nenhum registro corresponde ao filtro." : "Nenhuma observação registrada. Use o formulário para iniciar o Caderno.", "si-records-empty"));
+        for (const note of [...visible].reverse()) {
             const entry = document.createElement("article");
             entry.className = "si-journal-entry";
             const header = document.createElement("div");
@@ -3775,6 +3782,73 @@ var BaseDemoSI;
         link.click();
         link.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+    /** CSV com separador consistente, preservando textos e bloqueando fórmulas em planilhas. */
+    function journalCSV(notes) {
+        const cell = (value) => {
+            const safe = /^[\s]*[=+@-]/.test(value) ? "'" + value : value;
+            return '"' + safe.replace(/"/g, '""') + '"';
+        };
+        const rows = [["data", "tipo", "descricao", "objeto", "tentativa"], ...notes.map(n => [
+                n.createdAt, kindName(n.kind), n.body, n.entityLabel ?? "", n.attemptId ?? ""
+            ])];
+        return "\uFEFF" + rows.map(r => r.map(cell).join(";")).join("\r\n") + "\r\n";
+    }
+    BaseDemoSI.journalCSV = journalCSV;
+    function journalPrintSheet() {
+        const paper = document.createElement("article");
+        paper.className = "si-report-paper si-journal-paper";
+        paper.append(element("p", "BASE DEMO OFICIAL - SI · CADERNO", "si-report-kicker"), element("h2", "Caderno de registros"), element("p", `Emissão: ${localDate(new Date().toISOString())} · ${journal.snapshot().notes.length} registros`, "si-report-byline"));
+        for (const note of journal.snapshot().notes) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", `${kindName(note.kind)} · ${localDate(note.createdAt)}`), element("p", `Referência: ${note.entityLabel ?? "Cena"}${note.attemptId ? " · Registro de atividade orientada" : ""}`), element("p", note.body));
+            paper.append(section);
+        }
+        if (!journal.snapshot().notes.length)
+            paper.append(element("p", "Nenhum registro disponível."));
+        return paper;
+    }
+    function blankReportSheet() {
+        const value = (id) => (j(id)?.value ?? "").trim();
+        const paper = document.createElement("article");
+        paper.className = "si-report-paper si-blank-report";
+        paper.append(element("p", "BASE DEMO OFICIAL - SI · FOLHA PARA PREENCHER", "si-report-kicker"), element("h2", value("report-title") || "Relatório de investigação"), element("p", `Responsável: ${value("report-author") || "________________________"} · Data: ${value("report-date") || "____/____/______"}`, "si-report-byline"));
+        const objective = value("report-objective");
+        if (objective) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", "Objetivo"), element("p", objective));
+            paper.append(section);
+        }
+        for (const name of ["Montagem e procedimentos", "Observações e medições", "Análise e interpretação", "Conclusão"]) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", name));
+            for (let i = 0; i < 8; i++) {
+                const line = document.createElement("div");
+                line.className = "si-writing-line";
+                line.setAttribute("aria-hidden", "true");
+                section.append(line);
+            }
+            paper.append(section);
+        }
+        return paper;
+    }
+    function printSheet(content) {
+        const sheet = j("si-print-sheet");
+        if (!sheet)
+            return;
+        sheet.replaceChildren(content);
+        sheet.hidden = false;
+        try {
+            window.print();
+        }
+        catch {
+            sheet.hidden = true;
+            sheet.replaceChildren();
+            BaseDemoSI.notify("Impressão indisponível neste navegador.", "warning");
+        }
     }
     function reportHTML(report) {
         const reportNode = reportContent(report);
@@ -3870,6 +3944,38 @@ var BaseDemoSI;
         if (date && !date.value)
             date.value = (() => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); })();
         j("journal-export")?.addEventListener("click", () => exportFile("base-si-caderno-backup.json", journal.exportJSON(), "application/json;charset=utf-8"));
+        j("journal-csv")?.addEventListener("click", () => exportFile("base-si-caderno.csv", journalCSV(journal.snapshot().notes), "text/csv;charset=utf-8"));
+        j("journal-print")?.addEventListener("click", () => printSheet(journalPrintSheet()));
+        j("journal-filter")?.addEventListener("change", event => {
+            const filter = event.currentTarget.value;
+            if (filter === "todos" || filter === "observacao" || filter === "hipotese" || filter === "conclusao") {
+                journalFilter = filter;
+                renderJournal();
+            }
+        });
+        j("journal-clear")?.addEventListener("click", () => {
+            void (async () => {
+                if (BaseDemoSI.guidedActivityContext()) {
+                    BaseDemoSI.notify("Encerre a investigação antes de limpar os registros.", "warning");
+                    return;
+                }
+                if (!journal.snapshot().notes.length) {
+                    BaseDemoSI.notify("O Caderno já está vazio.", "info");
+                    return;
+                }
+                const yes = await BaseDemoSI.confirmDialog({ title: "Limpar Caderno?", description: "Exporte uma cópia antes de apagar. Relatórios já emitidos serão preservados. Esta ação não pode ser desfeita.", confirmText: "Limpar Caderno", destructive: true });
+                if (!yes)
+                    return;
+                if (BaseDemoSI.guidedActivityContext()) {
+                    BaseDemoSI.notify("Atividade em andamento; o Caderno não foi alterado.", "warning");
+                    return;
+                }
+                if (journal.clearNotes())
+                    BaseDemoSI.notify("Registros do Caderno removidos. Relatórios preservados.", "success");
+                else
+                    BaseDemoSI.notify("Não foi possível limpar o Caderno; os registros foram preservados.", "warning");
+            })();
+        });
         j("journal-import")?.addEventListener("change", event => {
             void (async () => {
                 const field = event.currentTarget, file = field.files?.[0];
@@ -3911,13 +4017,11 @@ var BaseDemoSI;
             })();
         });
         j("reports-print")?.addEventListener("click", () => {
-            const report = currentReport(), sheet = j("si-print-sheet");
-            if (!report || !sheet)
-                return;
-            sheet.replaceChildren(reportContent(report));
-            sheet.hidden = false;
-            window.print();
+            const report = currentReport();
+            if (report)
+                printSheet(reportContent(report));
         });
+        j("reports-blank")?.addEventListener("click", () => printSheet(blankReportSheet()));
         window.addEventListener("afterprint", () => { const sheet = j("si-print-sheet"); if (sheet) {
             sheet.hidden = true;
             sheet.replaceChildren();

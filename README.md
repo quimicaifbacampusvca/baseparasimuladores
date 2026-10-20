@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.16
+# Base Demo Oficial - SI · 0.9.17
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.16 — Recuperação em situações excepcionais, importações seguras e conflitos entre abas.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.17 — Caderno, exportação CSV, impressão e folhas de relatório para preenchimento manual.**
 
 ## Executar
 
@@ -106,3 +106,13 @@ As transições entre a bancada livre e uma investigação orientada não compar
 - **Offline:** sem serviços de rede ou bibliotecas novas. Testes de execução em PWA instalada e navegadores alternativos continuam pendentes.
 
 Consulte `docs/ACEITE-0.9.16.md` para o escopo e os resultados dos testes.
+
+## 0.9.17 — Auditoria documental
+
+- **Caderno:** filtros por observações, hipóteses e conclusões, com cronologia preservada.
+- **Exportações:** backup JSON continua completo; CSV independente oferece codificação UTF-8, tratamento de campos, aspas e valores potencialmente interpretados como fórmulas.
+- **Impressão:** Caderno com cabeçalhos e entradas históricas e relatório para preenchimento manual com identificação e campos de escrita. O modelo manual não cria dados ou relatórios artificiais.
+- **Limpeza:** apagar registros exige confirmação, é bloqueado durante atividades e não remove cópias históricas dos relatórios emitidos.
+- **Compatibilidade:** contratos JSON, edição de cena e fluxo educacional das versões anteriores preservados.
+
+Consulte `docs/ACEITE-0.9.17.md` para os cenários executados e as limitações de homologação.

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#13273b">
   <meta name="description" content="Base Demo Oficial - SI: núcleo de plataforma universal para simuladores educacionais.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-2/+wAc9qDgqlySymyXKnAq4ZCFje0mfP2X45kYo8agk='; script-src 'sha256-9MBwYhbb585BP51KXYPho1XVcHA+82nSJ1DXRSM/pp8='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'sha256-k9oIR2cqqPjv8tQwilqmFRfOcj5DKPazCIu3sAZ5mFE='; script-src 'sha256-QaRv3MEiBS7Cl17W5/BNmVzyQfUZVfCI0X6lRPyuBxw='; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9Ik1hcmNhIFNJIj4KIDxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMzgiIGZpbGw9IiMxNTM0NGEiLz4KIDxwYXRoIGQ9Ik0zNSA2MSA5NSAyOWw2MSAzMnY2OWwtNjEgMzMtNjAtMzN6IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogPHBhdGggZD0iTTM1IDYxIDk1IDk1bDYxLTM0TTk1IDk1djY4IiBmaWxsPSJub25lIiBzdHJva2U9IiM5MWRiZDMiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjY1Ii8+CiA8dGV4dCB4PSI5NSIgeT0iMTEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MyIgZm9udC13ZWlnaHQ9IjgwMCIgZmlsbD0iI2ZmZiI+U0k8L3RleHQ+Cjwvc3ZnPgo=" type="image/svg+xml">
   
   
@@ -367,6 +367,17 @@ body.si-modal-active{overflow:hidden}
 }
 
 .si-guided-report-context{border:1px solid var(--border,#cbd3dd);border-inline-start:4px solid var(--accent,#3b83ad);border-radius:8px;padding:11px 13px;margin:10px 0 14px;overflow-wrap:anywhere;background:var(--surface,#fff);color:var(--text,#1e2b37)}
+
+/* 0.9.17 — controles documentais, filtro acessível e folha de escrita. */
+.si-record-filter-label{display:block;font-size:.86rem;font-weight:650;margin:0 0 5px}
+.si-record-filter{display:block;min-height:44px;max-width:320px;width:100%;border:1px solid var(--border,#a5b5c3);border-radius:10px;padding:9px 12px;background:var(--surface,#fff);color:var(--text,#172d40);font:inherit;margin:0 0 10px}
+.si-record-filter:focus-visible{outline:3px solid var(--accent,#1875a0);outline-offset:2px}
+.si-journal-paper .si-report-section{break-inside:avoid}
+.si-writing-line{height:29px;border-bottom:1px solid #aab6c0;margin:0 0 4px}
+.si-blank-report .si-report-section{break-inside:auto}
+.si-blank-report h3{break-after:avoid}
+@media(max-width:450px){.si-record-file-actions .button{min-height:44px}.si-records-card-top{align-items:start}.si-report-preview-card .si-journal-actions{justify-content:start}}
+@media print{.si-blank-report .si-report-section{break-inside:auto}.si-writing-line{break-inside:avoid}}
 
 /* Distribuição 0.8.0 — refinamentos aditivos sem alterar os contratos do workspace. */
 .si-distribution-card { margin-top: 18px; }
@@ -1232,6 +1243,9 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
               </form>
               <div class="si-record-file-actions">
                 <button id="journal-export" class="button outline" type="button">Exportar backup JSON</button>
+                <button id="journal-csv" class="button outline" type="button">Baixar Caderno CSV</button>
+                <button id="journal-print" class="button outline" type="button">Imprimir Caderno</button>
+                <button id="journal-clear" class="button outline" type="button">Limpar Caderno</button>
                 <label class="button outline si-record-upload" for="journal-import">Restaurar backup
                   <input id="journal-import" type="file" accept=".json,application/json" aria-label="Selecionar backup do Caderno">
                 </label>
@@ -1240,6 +1254,8 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
             </section>
             <section class="si-records-card" aria-labelledby="journal-list-title">
               <div class="si-records-card-top"><h2 id="journal-list-title">Histórico do Caderno</h2><span id="journal-total" aria-live="polite"></span></div>
+              <label for="journal-filter" class="si-record-filter-label">Filtrar registros</label>
+              <select id="journal-filter" class="si-record-filter"><option value="todos">Todos</option><option value="observacao">Observações</option><option value="hipotese">Hipóteses</option><option value="conclusao">Conclusões</option></select>
               <p id="journal-readings" class="si-records-help" aria-live="polite"></p>
               <div id="journal-entries" class="si-journal-list"></div>
             </section>
@@ -1272,7 +1288,7 @@ body.si-projector-mode .si-global-brand{font-size:1.12em}
           </div>
           <section class="si-records-card si-report-preview-card" aria-labelledby="reports-preview-title">
             <div class="si-records-card-top"><h2 id="reports-preview-title">Pré-visualização</h2>
-              <div class="si-journal-actions"><button id="reports-print" class="button outline" type="button" disabled>Imprimir</button><button id="reports-html" class="button outline" type="button" disabled>Baixar HTML</button></div>
+              <div class="si-journal-actions"><button id="reports-blank" class="button outline" type="button">Folha para preencher</button><button id="reports-print" class="button outline" type="button" disabled>Imprimir</button><button id="reports-html" class="button outline" type="button" disabled>Baixar HTML</button></div>
             </div>
             <div id="report-preview" class="si-report-preview"></div>
           </section>
@@ -1332,7 +1348,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.16",
+        version: "0.9.17",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -2759,6 +2775,11 @@ var BaseDemoSI;
                 if (!state.notes.some(n => n.id === noteId))
                     return false;
                 return persist({ ...state, notes: state.notes.filter(n => n.id !== noteId) });
+            },
+            clearNotes() {
+                if (!state.notes.length)
+                    return true;
+                return persist({ ...state, notes: [] });
             },
             makeReport(value, scene, readings) {
                 if (state.reports.length >= MAX_REPORTS || !value || typeof value !== "object" || Array.isArray(value))
@@ -4924,6 +4945,7 @@ var BaseDemoSI;
     let journal;
     let journalScene;
     let openReportId = null;
+    let journalFilter = "todos";
     let registered = false;
     const j = (id) => document.getElementById(id);
     function element(tag, content, className) {
@@ -5015,9 +5037,10 @@ var BaseDemoSI;
         const state = journal.snapshot();
         j("journal-total").textContent = `${state.notes.length} de 80 registros`;
         j("journal-readings").textContent = `${extensionRecords().length} leituras instrumentais disponíveis`;
-        if (!state.notes.length)
-            target.append(element("p", "Nenhuma observação registrada. Use o formulário para iniciar o Caderno.", "si-records-empty"));
-        for (const note of [...state.notes].reverse()) {
+        const visible = state.notes.filter(n => journalFilter === "todos" || n.kind === journalFilter);
+        if (!visible.length)
+            target.append(element("p", state.notes.length ? "Nenhum registro corresponde ao filtro." : "Nenhuma observação registrada. Use o formulário para iniciar o Caderno.", "si-records-empty"));
+        for (const note of [...visible].reverse()) {
             const entry = document.createElement("article");
             entry.className = "si-journal-entry";
             const header = document.createElement("div");
@@ -5101,6 +5124,73 @@ var BaseDemoSI;
         link.click();
         link.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 1200);
+    }
+    /** CSV com separador consistente, preservando textos e bloqueando fórmulas em planilhas. */
+    function journalCSV(notes) {
+        const cell = (value) => {
+            const safe = /^[\s]*[=+@-]/.test(value) ? "'" + value : value;
+            return '"' + safe.replace(/"/g, '""') + '"';
+        };
+        const rows = [["data", "tipo", "descricao", "objeto", "tentativa"], ...notes.map(n => [
+                n.createdAt, kindName(n.kind), n.body, n.entityLabel ?? "", n.attemptId ?? ""
+            ])];
+        return "\uFEFF" + rows.map(r => r.map(cell).join(";")).join("\r\n") + "\r\n";
+    }
+    BaseDemoSI.journalCSV = journalCSV;
+    function journalPrintSheet() {
+        const paper = document.createElement("article");
+        paper.className = "si-report-paper si-journal-paper";
+        paper.append(element("p", "BASE DEMO OFICIAL - SI · CADERNO", "si-report-kicker"), element("h2", "Caderno de registros"), element("p", `Emissão: ${localDate(new Date().toISOString())} · ${journal.snapshot().notes.length} registros`, "si-report-byline"));
+        for (const note of journal.snapshot().notes) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", `${kindName(note.kind)} · ${localDate(note.createdAt)}`), element("p", `Referência: ${note.entityLabel ?? "Cena"}${note.attemptId ? " · Registro de atividade orientada" : ""}`), element("p", note.body));
+            paper.append(section);
+        }
+        if (!journal.snapshot().notes.length)
+            paper.append(element("p", "Nenhum registro disponível."));
+        return paper;
+    }
+    function blankReportSheet() {
+        const value = (id) => (j(id)?.value ?? "").trim();
+        const paper = document.createElement("article");
+        paper.className = "si-report-paper si-blank-report";
+        paper.append(element("p", "BASE DEMO OFICIAL - SI · FOLHA PARA PREENCHER", "si-report-kicker"), element("h2", value("report-title") || "Relatório de investigação"), element("p", `Responsável: ${value("report-author") || "________________________"} · Data: ${value("report-date") || "____/____/______"}`, "si-report-byline"));
+        const objective = value("report-objective");
+        if (objective) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", "Objetivo"), element("p", objective));
+            paper.append(section);
+        }
+        for (const name of ["Montagem e procedimentos", "Observações e medições", "Análise e interpretação", "Conclusão"]) {
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", name));
+            for (let i = 0; i < 8; i++) {
+                const line = document.createElement("div");
+                line.className = "si-writing-line";
+                line.setAttribute("aria-hidden", "true");
+                section.append(line);
+            }
+            paper.append(section);
+        }
+        return paper;
+    }
+    function printSheet(content) {
+        const sheet = j("si-print-sheet");
+        if (!sheet)
+            return;
+        sheet.replaceChildren(content);
+        sheet.hidden = false;
+        try {
+            window.print();
+        }
+        catch {
+            sheet.hidden = true;
+            sheet.replaceChildren();
+            BaseDemoSI.notify("Impressão indisponível neste navegador.", "warning");
+        }
     }
     function reportHTML(report) {
         const reportNode = reportContent(report);
@@ -5196,6 +5286,38 @@ var BaseDemoSI;
         if (date && !date.value)
             date.value = (() => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); })();
         j("journal-export")?.addEventListener("click", () => exportFile("base-si-caderno-backup.json", journal.exportJSON(), "application/json;charset=utf-8"));
+        j("journal-csv")?.addEventListener("click", () => exportFile("base-si-caderno.csv", journalCSV(journal.snapshot().notes), "text/csv;charset=utf-8"));
+        j("journal-print")?.addEventListener("click", () => printSheet(journalPrintSheet()));
+        j("journal-filter")?.addEventListener("change", event => {
+            const filter = event.currentTarget.value;
+            if (filter === "todos" || filter === "observacao" || filter === "hipotese" || filter === "conclusao") {
+                journalFilter = filter;
+                renderJournal();
+            }
+        });
+        j("journal-clear")?.addEventListener("click", () => {
+            void (async () => {
+                if (BaseDemoSI.guidedActivityContext()) {
+                    BaseDemoSI.notify("Encerre a investigação antes de limpar os registros.", "warning");
+                    return;
+                }
+                if (!journal.snapshot().notes.length) {
+                    BaseDemoSI.notify("O Caderno já está vazio.", "info");
+                    return;
+                }
+                const yes = await BaseDemoSI.confirmDialog({ title: "Limpar Caderno?", description: "Exporte uma cópia antes de apagar. Relatórios já emitidos serão preservados. Esta ação não pode ser desfeita.", confirmText: "Limpar Caderno", destructive: true });
+                if (!yes)
+                    return;
+                if (BaseDemoSI.guidedActivityContext()) {
+                    BaseDemoSI.notify("Atividade em andamento; o Caderno não foi alterado.", "warning");
+                    return;
+                }
+                if (journal.clearNotes())
+                    BaseDemoSI.notify("Registros do Caderno removidos. Relatórios preservados.", "success");
+                else
+                    BaseDemoSI.notify("Não foi possível limpar o Caderno; os registros foram preservados.", "warning");
+            })();
+        });
         j("journal-import")?.addEventListener("change", event => {
             void (async () => {
                 const field = event.currentTarget, file = field.files?.[0];
@@ -5237,13 +5359,11 @@ var BaseDemoSI;
             })();
         });
         j("reports-print")?.addEventListener("click", () => {
-            const report = currentReport(), sheet = j("si-print-sheet");
-            if (!report || !sheet)
-                return;
-            sheet.replaceChildren(reportContent(report));
-            sheet.hidden = false;
-            window.print();
+            const report = currentReport();
+            if (report)
+                printSheet(reportContent(report));
         });
+        j("reports-blank")?.addEventListener("click", () => printSheet(blankReportSheet()));
         window.addEventListener("afterprint", () => { const sheet = j("si-print-sheet"); if (sheet) {
             sheet.hidden = true;
             sheet.replaceChildren();

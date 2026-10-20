@@ -114,6 +114,10 @@ namespace BaseDemoSI {
         if(!state.notes.some(n=>n.id===noteId))return false;
         return persist({...state,notes:state.notes.filter(n=>n.id!==noteId)});
       },
+      clearNotes():boolean {
+        if(!state.notes.length)return true;
+        return persist({...state,notes:[]});
+      },
       makeReport(value,scene,readings):boolean {
         if(state.reports.length>=MAX_REPORTS || !value || typeof value!=="object" || Array.isArray(value))return false;
         const v=value as Partial<ReportInput>;

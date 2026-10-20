@@ -2,6 +2,7 @@ namespace BaseDemoSI {
   let journal:JournalStore;
   let journalScene:SceneStore;
   let openReportId:string|null=null;
+  let journalFilter:NoteKind|"todos"="todos";
   let registered=false;
   const j=(id:string):HTMLElement|null=>document.getElementById(id);
   function element(tag:string,content:string,className?:string):HTMLElement {
@@ -54,8 +55,9 @@ namespace BaseDemoSI {
     const target=j("journal-entries");if(!target)return;target.replaceChildren();
     const state=journal.snapshot();
     j("journal-total")!.textContent=`${state.notes.length} de 80 registros`;j("journal-readings")!.textContent=`${extensionRecords().length} leituras instrumentais disponíveis`;
-    if(!state.notes.length)target.append(element("p","Nenhuma observação registrada. Use o formulário para iniciar o Caderno.","si-records-empty"));
-    for(const note of [...state.notes].reverse()){
+    const visible=state.notes.filter(n=>journalFilter==="todos"||n.kind===journalFilter);
+    if(!visible.length)target.append(element("p",state.notes.length?"Nenhum registro corresponde ao filtro.":"Nenhuma observação registrada. Use o formulário para iniciar o Caderno.","si-records-empty"));
+    for(const note of [...visible].reverse()){
       const entry=document.createElement("article");entry.className="si-journal-entry";
       const header=document.createElement("div");header.className="si-journal-entry-head";
       header.append(element("strong",kindName(note.kind)),element("span",`${localDate(note.createdAt)} · ${note.entityLabel??"Cena"}`));
@@ -96,6 +98,52 @@ namespace BaseDemoSI {
     const blob=new Blob([body],{type});const url=URL.createObjectURL(blob);
     const link=document.createElement("a");link.href=url;link.download=name;document.body.append(link);link.click();link.remove();
     window.setTimeout(()=>URL.revokeObjectURL(url),1200);
+  }
+  /** CSV com separador consistente, preservando textos e bloqueando fórmulas em planilhas. */
+  export function journalCSV(notes:readonly JournalNote[]):string {
+    const cell=(value:string):string=>{
+      const safe=/^[\s]*[=+@-]/.test(value)?"'"+value:value;
+      return '"'+safe.replace(/"/g,'""')+'"';
+    };
+    const rows=[["data","tipo","descricao","objeto","tentativa"],...notes.map(n=>[
+      n.createdAt,kindName(n.kind),n.body,n.entityLabel??"",n.attemptId??""
+    ])];
+    return "\uFEFF"+rows.map(r=>r.map(cell).join(";")).join("\r\n")+"\r\n";
+  }
+  function journalPrintSheet():HTMLElement {
+    const paper=document.createElement("article");paper.className="si-report-paper si-journal-paper";
+    paper.append(element("p","BASE DEMO OFICIAL - SI · CADERNO","si-report-kicker"),element("h2","Caderno de registros"),
+      element("p",`Emissão: ${localDate(new Date().toISOString())} · ${journal.snapshot().notes.length} registros`,"si-report-byline"));
+    for(const note of journal.snapshot().notes){
+      const section=document.createElement("section");section.className="si-report-section";
+      section.append(element("h3",`${kindName(note.kind)} · ${localDate(note.createdAt)}`),
+        element("p",`Referência: ${note.entityLabel??"Cena"}${note.attemptId?" · Registro de atividade orientada":""}`),
+        element("p",note.body));paper.append(section);
+    }
+    if(!journal.snapshot().notes.length)paper.append(element("p","Nenhum registro disponível."));
+    return paper;
+  }
+  function blankReportSheet():HTMLElement {
+    const value=(id:string)=>((j(id) as HTMLInputElement|HTMLTextAreaElement|null)?.value??"").trim();
+    const paper=document.createElement("article");paper.className="si-report-paper si-blank-report";
+    paper.append(element("p","BASE DEMO OFICIAL - SI · FOLHA PARA PREENCHER","si-report-kicker"),
+      element("h2",value("report-title")||"Relatório de investigação"),
+      element("p",`Responsável: ${value("report-author")||"________________________"} · Data: ${value("report-date")||"____/____/______"}`,"si-report-byline"));
+    const objective=value("report-objective");
+    if(objective){const section=document.createElement("section");section.className="si-report-section";
+      section.append(element("h3","Objetivo"),element("p",objective));paper.append(section);}
+    for(const name of ["Montagem e procedimentos","Observações e medições","Análise e interpretação","Conclusão"]){
+      const section=document.createElement("section");section.className="si-report-section";
+      section.append(element("h3",name));
+      for(let i=0;i<8;i++){const line=document.createElement("div");line.className="si-writing-line";line.setAttribute("aria-hidden","true");section.append(line);}
+      paper.append(section);
+    }
+    return paper;
+  }
+  function printSheet(content:HTMLElement):void {
+    const sheet=j("si-print-sheet");if(!sheet)return;
+    sheet.replaceChildren(content);sheet.hidden=false;
+    try{window.print();}catch{sheet.hidden=true;sheet.replaceChildren();notify("Impressão indisponível neste navegador.","warning");}
   }
   function reportHTML(report:SavedReport):string {
     const reportNode=reportContent(report);
@@ -160,6 +208,23 @@ namespace BaseDemoSI {
     });
     const date=j("report-date") as HTMLInputElement|null;if(date&&!date.value)date.value=(()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);})();
     j("journal-export")?.addEventListener("click",()=>exportFile("base-si-caderno-backup.json",journal.exportJSON(),"application/json;charset=utf-8"));
+    j("journal-csv")?.addEventListener("click",()=>exportFile("base-si-caderno.csv",journalCSV(journal.snapshot().notes),"text/csv;charset=utf-8"));
+    j("journal-print")?.addEventListener("click",()=>printSheet(journalPrintSheet()));
+    (j("journal-filter") as HTMLSelectElement|null)?.addEventListener("change",event=>{
+      const filter=(event.currentTarget as HTMLSelectElement).value;
+      if(filter==="todos"||filter==="observacao"||filter==="hipotese"||filter==="conclusao"){
+        journalFilter=filter;renderJournal();
+      }
+    });
+    j("journal-clear")?.addEventListener("click",()=>{void (async()=>{
+      if(guidedActivityContext()){notify("Encerre a investigação antes de limpar os registros.","warning");return;}
+      if(!journal.snapshot().notes.length){notify("O Caderno já está vazio.","info");return;}
+      const yes=await confirmDialog({title:"Limpar Caderno?",description:"Exporte uma cópia antes de apagar. Relatórios já emitidos serão preservados. Esta ação não pode ser desfeita.",confirmText:"Limpar Caderno",destructive:true});
+      if(!yes)return;
+      if(guidedActivityContext()){notify("Atividade em andamento; o Caderno não foi alterado.","warning");return;}
+      if(journal.clearNotes())notify("Registros do Caderno removidos. Relatórios preservados.","success");
+      else notify("Não foi possível limpar o Caderno; os registros foram preservados.","warning");
+    })();});
     (j("journal-import") as HTMLInputElement|null)?.addEventListener("change",event=>{void (async()=>{
       const field=event.currentTarget as HTMLInputElement,file=field.files?.[0];field.value="";
       if(!file)return;
@@ -180,9 +245,9 @@ namespace BaseDemoSI {
         else notify("Não foi possível restaurar o arquivo.","warning");}
     })();});
     j("reports-print")?.addEventListener("click",()=>{
-      const report=currentReport(),sheet=j("si-print-sheet");if(!report||!sheet)return;
-      sheet.replaceChildren(reportContent(report));sheet.hidden=false;window.print();
+      const report=currentReport();if(report)printSheet(reportContent(report));
     });
+    j("reports-blank")?.addEventListener("click",()=>printSheet(blankReportSheet()));
     window.addEventListener("afterprint",()=>{const sheet=j("si-print-sheet");if(sheet){sheet.hidden=true;sheet.replaceChildren();}});
     j("reports-html")?.addEventListener("click",()=>{const report=currentReport();if(!report)return;
       exportFile(`base-si-relatorio-${report.id}.html`,reportHTML(report),"text/html;charset=utf-8");

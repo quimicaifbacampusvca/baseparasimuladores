@@ -382,6 +382,9 @@
               </form>
               <div class="si-record-file-actions">
                 <button id="journal-export" class="button outline" type="button">Exportar backup JSON</button>
+                <button id="journal-csv" class="button outline" type="button">Baixar Caderno CSV</button>
+                <button id="journal-print" class="button outline" type="button">Imprimir Caderno</button>
+                <button id="journal-clear" class="button outline" type="button">Limpar Caderno</button>
                 <label class="button outline si-record-upload" for="journal-import">Restaurar backup
                   <input id="journal-import" type="file" accept=".json,application/json" aria-label="Selecionar backup do Caderno">
                 </label>
@@ -390,6 +393,8 @@
             </section>
             <section class="si-records-card" aria-labelledby="journal-list-title">
               <div class="si-records-card-top"><h2 id="journal-list-title">Histórico do Caderno</h2><span id="journal-total" aria-live="polite"></span></div>
+              <label for="journal-filter" class="si-record-filter-label">Filtrar registros</label>
+              <select id="journal-filter" class="si-record-filter"><option value="todos">Todos</option><option value="observacao">Observações</option><option value="hipotese">Hipóteses</option><option value="conclusao">Conclusões</option></select>
               <p id="journal-readings" class="si-records-help" aria-live="polite"></p>
               <div id="journal-entries" class="si-journal-list"></div>
             </section>
@@ -422,7 +427,7 @@
           </div>
           <section class="si-records-card si-report-preview-card" aria-labelledby="reports-preview-title">
             <div class="si-records-card-top"><h2 id="reports-preview-title">Pré-visualização</h2>
-              <div class="si-journal-actions"><button id="reports-print" class="button outline" type="button" disabled>Imprimir</button><button id="reports-html" class="button outline" type="button" disabled>Baixar HTML</button></div>
+              <div class="si-journal-actions"><button id="reports-blank" class="button outline" type="button">Folha para preencher</button><button id="reports-print" class="button outline" type="button" disabled>Imprimir</button><button id="reports-html" class="button outline" type="button" disabled>Baixar HTML</button></div>
             </div>
             <div id="report-preview" class="si-report-preview"></div>
           </section>

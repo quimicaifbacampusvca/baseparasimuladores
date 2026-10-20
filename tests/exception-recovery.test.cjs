@@ -64,7 +64,7 @@ assert.equal(Object.keys(recovered.entries).length,0,'checkpoint novo é reverti
 // Regressão de código: importações destrutivas devem revalidar sessão após confirmação.
 const records=fs.readFileSync(path.join(__dirname,'../src/records-ui.ts'),'utf8');
 assert.match(records,/if\(guidedActivityContext\(\)\)/);
-assert.equal(records.split('if(guidedActivityContext())').length-1,2);
+assert((records.split('if(guidedActivityContext())').length-1)>=4,'importação e limpeza bloqueadas durante a atividade');
 const educational=fs.readFileSync(path.join(__dirname,'../src/education-ui.ts'),'utf8');
 assert.match(educational,/const original=checkpoints;/);
 assert.match(educational,/if\(!checkpointSave\(\)\)\{/);

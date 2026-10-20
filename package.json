@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.9.16",
+  "version": "0.9.17",
   "private": true,
-  "description": "Auditoria de conflitos entre abas, importações seguras e recuperação de sessões",
+  "description": "Auditoria documental do Caderno, relatórios e impressão",
   "scripts": {
     "build": "tsc -p tsconfig.json && python3 scripts/build_standalone.py",
-    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/scene-interaction.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs && node tests/docks.test.cjs && node tests/viewer-families.test.cjs && node tests/mobile-contract.test.cjs && node tests/menu-equivalence.test.cjs && node tests/menu-presets-tour.test.cjs && node tests/feedback.test.cjs && node tests/home-continuity.test.cjs && node tests/guided-session.test.cjs && node tests/guided-report.test.cjs && node tests/activity-lifecycle.test.cjs && node tests/exception-recovery.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/scene-interaction.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs && node tests/docks.test.cjs && node tests/viewer-families.test.cjs && node tests/mobile-contract.test.cjs && node tests/menu-equivalence.test.cjs && node tests/menu-presets-tour.test.cjs && node tests/feedback.test.cjs && node tests/home-continuity.test.cjs && node tests/guided-session.test.cjs && node tests/guided-report.test.cjs && node tests/activity-lifecycle.test.cjs && node tests/exception-recovery.test.cjs && node tests/documentary-fidelity.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },
