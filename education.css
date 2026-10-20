@@ -8,3 +8,9 @@
 .edu-related strong{flex:1 0 100%;font-size:13px;color:var(--text)}
 .edu-related .button{min-height:44px}
 @media(max-width:420px){.edu-related .button{flex:1 1 100%;min-width:0}.edu-actions .button{min-height:44px}}
+
+/* Identificação por tentativa (0.9.14). */
+.edu-identification{margin:16px 0;min-width:0}.edu-identification fieldset{border:1px solid var(--border,#cbd3dd);border-radius:12px;padding:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.edu-identification legend{font-weight:700;padding:0 8px}.edu-identification-field{display:grid;gap:5px;min-width:0;font-size:.92rem;font-weight:600}.edu-identification-field input{min-width:0;width:100%;box-sizing:border-box;border-radius:8px;border:1px solid var(--border,#cbd3dd);padding:10px 12px;min-height:44px;background:var(--surface,#fff);color:var(--text,#1e2b37)}
+.edu-identification>.button{margin-top:10px}.edu-identification-field input:focus-visible{outline:3px solid var(--accent,#407da4);outline-offset:2px}
+@media(max-width:520px){.edu-identification fieldset{grid-template-columns:minmax(0,1fr);gap:10px}}

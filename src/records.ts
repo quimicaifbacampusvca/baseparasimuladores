@@ -18,7 +18,8 @@ namespace BaseDemoSI {
     return id(n.id,"note") && instant(n.createdAt) && noteKinds.includes(n.kind as NoteKind)
       && valueText(n.body,1200) && (n.entityId === null || valueText(n.entityId,80))
       && (n.entityLabel === null || valueText(n.entityLabel,64))
-      && ((n.entityId === null) === (n.entityLabel === null));
+      && ((n.entityId === null) === (n.entityLabel === null))
+      && (n.attemptId===undefined || (typeof n.attemptId==="string" && /^attempt-[a-z0-9-]{4,70}$/.test(n.attemptId)));
   }
   function validReading(r: unknown): r is ReadingRecord {
     if (!r || typeof r !== "object" || Array.isArray(r)) return false;
@@ -28,11 +29,25 @@ namespace BaseDemoSI {
       && (x.entityId === null || valueText(x.entityId,80))
       && Number.isSafeInteger(x.sequence) && (x.sequence??0) > 0;
   }
+  function validActivity(v:unknown):v is GuidedReportContext {
+    if(!v||typeof v!=="object"||Array.isArray(v))return false;
+    const a=v as Partial<GuidedReportContext>,i=a.identity as GuidedIdentification|undefined;
+    return typeof a.attemptId==="string" && /^attempt-[a-z0-9-]{4,70}$/.test(a.attemptId)
+      && valueText(a.activityId,80) && valueText(a.title,100) && valueText(a.objective,300)
+      && Array.isArray(a.steps) && a.steps.length>=1 && a.steps.length<=5 && a.steps.every(s=>valueText(s,140))
+      && (a.kind==="mission"||a.kind==="script") && validModule(a.module)
+      && Number.isSafeInteger(a.progress) && (a.progress??-1)>=0
+      && Number.isSafeInteger(a.total) && (a.total??0)>=1 && (a.total??0)<=5 && (a.progress??6)<=a.total!
+      && Number.isSafeInteger(a.readingsBaseline) && (a.readingsBaseline??-1)>=0
+      && !!i && [i.nome,i.turma,i.professor,i.grupo].every(s=>typeof s==="string"&&s.length<=100)
+      && realDay(i.data);
+  }
   function validReport(value: unknown): value is SavedReport {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
     const r = value as Partial<SavedReport>;
     if (!id(r.id,"report") || !instant(r.createdAt) || !valueText(r.title,100)
       || !safeOptional(r.author,100) || !realDay(r.sessionDate) || !safeOptional(r.objective,1000)
+      || (r.activity!==undefined&&!validActivity(r.activity))
       || !r.options || typeof r.options !== "object" || Array.isArray(r.options)
       || typeof r.options.includeScene !== "boolean" || typeof r.options.includeNotes !== "boolean"
       || typeof r.options.includeReadings !== "boolean" || !Array.isArray(r.scene) || r.scene.length > 60
@@ -84,13 +99,15 @@ namespace BaseDemoSI {
     };
     return {
       snapshot:()=>parseJournal(state)!,
-      addNote(value,scene):boolean {
+      addNote(value,scene,attemptId):boolean {
         if(state.notes.length>=MAX_NOTES || !value || typeof value!=="object" || Array.isArray(value))return false;
         const data=value as {kind?:unknown;body?:unknown};
-        if(!noteKinds.includes(data.kind as NoteKind) || !valueText(data.body,1200))return false;
+        if(!noteKinds.includes(data.kind as NoteKind) || !valueText(data.body,1200) ||
+           (attemptId!==undefined && !/^attempt-[a-z0-9-]{4,70}$/.test(attemptId)))return false;
         const selected=scene.entities.find(e=>e.id===scene.selectedId);
         const note:JournalNote={id:nextId("note"),createdAt:clock().toISOString(),kind:data.kind as NoteKind,
-          body:data.body.trim(),entityId:selected?.id??null,entityLabel:selected?.label??null};
+          body:data.body.trim(),entityId:selected?.id??null,entityLabel:selected?.label??null,
+          ...(attemptId?{attemptId}:{})};
         return persist({...state,notes:[...state.notes,note]});
       },
       removeNote(noteId):boolean {
@@ -101,13 +118,14 @@ namespace BaseDemoSI {
         if(state.reports.length>=MAX_REPORTS || !value || typeof value!=="object" || Array.isArray(value))return false;
         const v=value as Partial<ReportInput>;
         if(!valueText(v.title,100) || !safeOptional(v.author,100) || !realDay(v.sessionDate)
-          || !safeOptional(v.objective,1000) || typeof v.includeScene!=="boolean"
+          || !safeOptional(v.objective,1000) || (v.activity!==undefined&&!validActivity(v.activity)) || typeof v.includeScene!=="boolean"
           || typeof v.includeNotes!=="boolean" || typeof v.includeReadings!=="boolean")return false;
         const report:SavedReport={id:nextId("report"),createdAt:clock().toISOString(),title:v.title.trim(),
           author:v.author.trim(),sessionDate:v.sessionDate,objective:v.objective.trim(),
+          ...(v.activity?{activity:v.activity}:{}),
           scene:v.includeScene?scene.entities.map(e=>({id:e.id,label:e.label,kind:e.kind})):[],
-          notes:v.includeNotes?state.notes.map(n=>({...n})):[],
-          readings:v.includeReadings?readings.map(r=>({...r})):[],
+          notes:v.includeNotes?state.notes.filter(n=>!v.activity||n.attemptId===v.activity.attemptId).map(n=>({...n})):[],
+          readings:v.includeReadings?readings.filter(r=>!v.activity||r.sequence>v.activity.readingsBaseline).map(r=>({...r})):[],
           options:{includeScene:v.includeScene,includeNotes:v.includeNotes,includeReadings:v.includeReadings}};
         if(!validReport(report))return false;
         return persist({...state,reports:[...state.reports,report]});

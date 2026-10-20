@@ -1,6 +1,16 @@
 namespace BaseDemoSI {
   export type ActivityKind = "mission" | "script";
   export type RequirementKind = "manual" | "entities" | "selection" | "readings";
+  export interface GuidedIdentification {
+    readonly nome: string; readonly turma: string; readonly data: string;
+    readonly professor: string; readonly grupo: string;
+  }
+  export interface GuidedReportContext {
+    readonly attemptId: string; readonly activityId: string; readonly kind: ActivityKind;
+    readonly title: string; readonly objective: string; readonly steps: readonly string[]; readonly module: ModuleId; readonly progress: number;
+    readonly total: number; readonly identity: GuidedIdentification;
+    readonly readingsBaseline: number;
+  }
   export interface LearningTopic {
     readonly id: string;
     readonly title: string;

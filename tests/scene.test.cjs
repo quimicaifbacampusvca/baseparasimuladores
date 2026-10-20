@@ -58,7 +58,7 @@ let n=0; while(n<100 && store.dispatch({type:'add',entity:api.makeEntity('circle
 assert.equal(store.getSnapshot().entities.length,60);
 assert.equal(n,59);
 assert.equal(store.dispatch({type:'add',entity:api.makeEntity('circle','overflow')}),false);
-assert.equal(api.manifest.version,'0.9.13');
+assert.equal(api.manifest.version,'0.9.14');
 const documentation=['README.md','docs/PLANO-DE-CONSTRUCAO.md','docs/ACEITE-0.1.0.md','docs/ACEITE-0.2.0.md','index.html'];
 for(const file of documentation) assert(!/SIAB/i.test(fs.readFileSync(path.join(root,file),'utf8')),`${file}: referência indevida`);
 console.log('OK: cenas, comandos, histórico, isolamento, validação, 60 entidades, documentação autônoma.');

@@ -42,6 +42,7 @@ namespace BaseDemoSI {
     }
     const refresh=()=>{
       select.value=activeModule;
+      select.disabled=!!guidedActivityContext();
       const current=moduleDefinitions.find(item=>item.id===activeModule)!;
       const message=document.getElementById("si-module-description");if(message)message.textContent=current.summary;
       document.getElementById("si-workspace")?.setAttribute("data-module",activeModule);
@@ -51,8 +52,12 @@ namespace BaseDemoSI {
       document.querySelectorAll<HTMLButtonElement>("[data-menu-action^=add-]").forEach(button=>{button.disabled=!moduleAllows("tools");});
       document.getElementById("si-module-choice")?.setAttribute("title",current.summary);
     };
-    select.addEventListener("change",()=>{if(selectModule(select.value))notify("Módulo atualizado.","info");refresh();});
+    select.addEventListener("change",()=>{
+      if(guidedActivityContext()){notify("O módulo está definido pela atividade em andamento.","warning");refresh();return;}
+      if(selectModule(select.value))notify("Módulo atualizado.","info");refresh();
+    });
     window.addEventListener("si-module-change",()=>{refresh();});
+    window.addEventListener("si-guided-context-changed",refresh);
     refresh();
     window.dispatchEvent(new CustomEvent("si-module-change",{detail:activeModule}));
   }

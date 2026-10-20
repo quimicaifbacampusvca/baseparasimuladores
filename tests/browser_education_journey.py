@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fluxo educacional contextual da 0.9.13, em HTML autocontido, sem rede."""
+"""Fluxo educacional contextual da 0.9.14, em HTML autocontido, sem rede."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 root=Path(__file__).resolve().parent.parent

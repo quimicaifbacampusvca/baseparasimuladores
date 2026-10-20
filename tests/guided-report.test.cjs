@@ -1,0 +1,38 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const dir=path.resolve(__dirname,'..');
+const src=fs.readFileSync(path.join(dir,'app.js'),'utf8');
+const memory=new Map();
+const document={readyState:'loading',addEventListener(){},querySelectorAll(){return []},getElementById(){return null},documentElement:{},body:{}};
+const window={location:{hash:'#/missoes'},localStorage:{getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,String(v))},addEventListener(){},dispatchEvent(){}};
+const context={document,window,Set,Map,Object,Date,Math,console,URLSearchParams,Event:class {constructor(type){this.type=type}},CustomEvent:class {constructor(type,o){this.type=type;this.detail=o?.detail}}};
+vm.createContext(context);vm.runInContext(src,context);
+const api=context.BaseDemoSI;
+const empty={schemaVersion:1,selectedId:null,entities:[]};
+const io={read:k=>memory.get(k)??null,write:(k,v)=>(memory.set(k,v),true)};
+const journal=api.createJournalStore(io,()=>new Date('2026-10-20T10:00:00.000Z'));
+const entity={id:'a',kind:'block',label:'Objeto A',tone:'teal',x:20,y:40,width:10,height:10};
+const scene={...empty,entities:[entity]};
+const contextA={attemptId:'attempt-abc12345',activityId:'script-start',kind:'script',title:'Construção orientada',objective:'Objetivo de teste',steps:['Etapa 1','Etapa 2','Etapa 3'],module:'explorar',progress:2,total:3,
+ identity:{nome:'Estudante 1',turma:'2º B',data:'2026-10-20',professor:'Docente 1',grupo:'Equipe 1'},readingsBaseline:4};
+assert(journal.addNote({kind:'observacao',body:'Anotação livre'},empty));
+assert(journal.addNote({kind:'observacao',body:'Anotação da tentativa'},scene,contextA.attemptId));
+const reading=n=>({label:'Valor',value:n,unit:'u',extensionId:'demo',instrumentId:'instrument',entityId:null,sequence:n});
+const report={title:'Relatório de atividade',author:contextA.identity.nome,sessionDate:contextA.identity.data,objective:'Analisar',
+ includeScene:true,includeNotes:true,includeReadings:true,activity:contextA};
+assert(journal.makeReport(report,scene,[reading(1),reading(4),reading(5),reading(7)]));
+const saved=journal.snapshot().reports[0];
+assert.equal(saved.activity.identity.nome,'Estudante 1');
+assert.equal(saved.scene.length,1);
+assert.deepEqual(Array.from(saved.notes,n=>n.body),['Anotação da tentativa'],'não misturar notas livres');
+assert.deepEqual(Array.from(saved.readings,n=>n.sequence),[5,7],'não misturar leituras antigas');
+const exported=journal.exportJSON();
+const imported=api.createJournalStore({read:()=>null,write:()=>true});
+assert(imported.importJSON(JSON.parse(exported)), 'compatibilidade do backup com metadados');
+assert.equal(imported.snapshot().reports[0].activity.attemptId,contextA.attemptId);
+const plain=api.createJournalStore({read:()=>null,write:()=>true});
+assert(plain.makeReport({title:'Livre',author:'',sessionDate:'2026-10-20',objective:'',includeScene:true,includeNotes:false,includeReadings:false},empty,[]));
+assert(!plain.snapshot().reports[0].activity,'relatórios livres não recebem identidade inventada');
+const tampered=JSON.parse(exported);tampered.document.reports[0].activity.progress=999;
+assert.equal(plain.importJSON(tampered),false,'dados educacionais inválidos não substituem o backup');
+assert.equal(plain.snapshot().reports.length,1,'importação inválida é atômica');
+console.log('OK: relatórios vinculados à tentativa, identificação, isolamento de notas e leituras, backups e validação.');

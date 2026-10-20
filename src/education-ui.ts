@@ -17,7 +17,19 @@ namespace BaseDemoSI {
   const guidedKey = "guided-return-v1";
   const sessionKey = "guided-session-v1";
   const checkpointsKey = "guided-checkpoints-v1";
-  interface GuidedCheckpoint { scene:SceneSnapshot; readingsBaseline:number; }
+  const today=():string=>{const now=new Date();return new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);};
+  const blankIdentity=():GuidedIdentification=>({nome:"",turma:"",data:today(),professor:"",grupo:""});
+  function validIdentification(v:unknown):v is GuidedIdentification {
+    if(!v||typeof v!=="object"||Array.isArray(v))return false;
+    const x=v as Partial<GuidedIdentification>;
+    return [x.nome,x.turma,x.professor,x.grupo].every(s=>typeof s==="string" && s.length<=100)
+      && typeof x.data==="string" && /^\d{4}-\d{2}-\d{2}$/.test(x.data)
+      && !Number.isNaN(Date.parse(x.data+"T00:00:00Z"))
+      && new Date(x.data+"T00:00:00Z").toISOString().slice(0,10)===x.data;
+  }
+  const attemptId=():string=>`attempt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;
+  const validAttempt=(id:unknown):id is string=>typeof id==="string" && /^attempt-[a-z0-9-]{4,70}$/.test(id);
+  interface GuidedCheckpoint { scene:SceneSnapshot; readingsBaseline:number; attemptId?:string; identity?:GuidedIdentification; }
   let checkpoints:Record<string,GuidedCheckpoint>=Object.create(null);
   function restoreCheckpoints():void {
     checkpoints=Object.create(null);
@@ -28,14 +40,14 @@ namespace BaseDemoSI {
       const entries=Object.entries(value.entries);
       if(entries.length>29)return;
       for(const [url,entry] of entries){
-        if(!validatedGuidedLink(url) || !entry || !parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline<0)return;
+        if(!validatedGuidedLink(url) || !entry || !parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline<0 || (entry.attemptId!==undefined&&!validAttempt(entry.attemptId)) || (entry.identity!==undefined&&!validIdentification(entry.identity)))return;
       }
       for(const [url,entry] of entries)checkpoints[url]={scene:parseScene(entry.scene)!,readingsBaseline:entry.readingsBaseline};
     }catch{checkpoints=Object.create(null);}
   }
   function checkpointSave():void {storage.write(checkpointsKey,JSON.stringify({schemaVersion:1,entries:checkpoints}));}
   function checkpointDelete(url:string):void {delete checkpoints[url];checkpointSave();}
-  interface GuidedSession { schemaVersion:1; url:string; freeScene:SceneSnapshot; readingsBaseline:number; freeModule?:ModuleId; }
+  interface GuidedSession { schemaVersion:1; url:string; freeScene:SceneSnapshot; readingsBaseline:number; freeModule?:ModuleId; attemptId?:string; identity?:GuidedIdentification; }
   let guidedSession:GuidedSession|null=null;
   function validatedGuidedLink(value:string):{url:string;activity:LearningActivity;progress:number}|null {
     const match=/^#\/(missoes|roteiros)\?item=([a-z0-9-]{1,80})$/.exec(value);
@@ -51,8 +63,10 @@ namespace BaseDemoSI {
       const raw=JSON.parse(value) as Partial<GuidedSession>;
       if(raw.schemaVersion!==1 || typeof raw.url!=="string" || !validatedGuidedLink(raw.url)
         || !Number.isSafeInteger(raw.readingsBaseline) || (raw.readingsBaseline??-1)<0
-        || !parseScene(raw.freeScene) || (raw.freeModule!==undefined&&!validModule(raw.freeModule)))return null;
-      return {schemaVersion:1,url:raw.url,freeScene:parseScene(raw.freeScene)!,readingsBaseline:raw.readingsBaseline!,freeModule:raw.freeModule};
+        || !parseScene(raw.freeScene) || (raw.freeModule!==undefined&&!validModule(raw.freeModule))
+        || (raw.attemptId!==undefined&&!validAttempt(raw.attemptId))
+        || (raw.identity!==undefined&&!validIdentification(raw.identity)))return null;
+      return {schemaVersion:1,url:raw.url,freeScene:parseScene(raw.freeScene)!,readingsBaseline:raw.readingsBaseline!,freeModule:raw.freeModule,attemptId:raw.attemptId,identity:raw.identity};
     }catch{return null;}
   }
   function saveGuidedReturn(value:string):void {
@@ -70,9 +84,21 @@ namespace BaseDemoSI {
     const valid=guidedSession&&validatedGuidedLink(guidedSession.url);
     return valid?{url:valid.url,title:valid.activity.title,kind:valid.activity.kind,progress:valid.progress,total:valid.activity.steps.length}:null;
   }
+  export function guidedReportContext():GuidedReportContext|null {
+    const session=guidedSession,valid=session&&validatedGuidedLink(session.url);
+    if(!session||!valid)return null;
+    return {attemptId:session.attemptId??"",activityId:valid.activity.id,kind:valid.activity.kind,
+      title:valid.activity.title,objective:valid.activity.description,steps:valid.activity.steps.map(step=>step.label),
+      module:valid.activity.module??"livre",progress:valid.progress,
+      total:valid.activity.steps.length,identity:session.identity??blankIdentity(),readingsBaseline:session.readingsBaseline};
+  }
+  export function saveGuidedIdentification(value:unknown):boolean {
+    if(!guidedSession||!validIdentification(value))return false;
+    saveSession({...guidedSession,identity:value});return true;
+  }
   function sessionFor(id:string):boolean { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`)??false; }
   function scopedReadings():number {return Math.max(0,countReadings()-(guidedSession?.readingsBaseline??0));}
-  export function beginGuidedActivity(id:string,kind:ActivityKind):boolean {
+  export function beginGuidedActivity(id:string,kind:ActivityKind,identity?:GuidedIdentification):boolean {
     const activity=education.list(kind).find(a=>a.id===id);
     if(!activity)return false;
     const url=`#/${kind==="mission"?"missoes":"roteiros"}?item=${encodeURIComponent(id)}`;
@@ -81,10 +107,12 @@ namespace BaseDemoSI {
       window.location.hash="#/ambiente";return true;
     }
     if((education.snapshot().progress[id]??0)>=activity.steps.length){notify("Atividade concluída. Inicie uma nova tentativa para refazê-la.","info");return false;}
+    if(identity && !validIdentification(identity)){notify("Confira os campos da identificação.","warning");return false;}
     const original=educationScene.getSnapshot();
     const checkpoint=checkpoints[url];
     const run:GuidedSession={schemaVersion:1,url,freeScene:original,
-      readingsBaseline:checkpoint?.readingsBaseline??countReadings(),freeModule:currentModule()};
+      readingsBaseline:checkpoint?.readingsBaseline??countReadings(),freeModule:currentModule(),
+      attemptId:checkpoint?.attemptId??attemptId(),identity:identity??checkpoint?.identity??blankIdentity()};
     // Gravar o vínculo antes da alteração: uma recarga nunca perde a cena livre.
     saveSession(run);
     const blank:SceneSnapshot={schemaVersion:1,entities:[],selectedId:null};
@@ -99,21 +127,26 @@ namespace BaseDemoSI {
     window.location.hash="#/ambiente";
     return true;
   }
-  export function endGuidedActivity():void {
+  export function endGuidedActivity():boolean {
     const previous=guidedSession;
+    // Registrar o retrato documental antes de restaurar a bancada livre.
+    // Em caso de falta de espaço, manter a sessão para evitar perda de evidências.
+    if(previous && validatedGuidedLink(previous.url) && !archiveGuidedReport()){
+      notify("Não foi possível preservar o relatório. Libere espaço nos relatórios e tente novamente.","warning");return false;
+    }
     if(previous){
       const valid=validatedGuidedLink(previous.url);
       if(valid&&valid.progress<valid.activity.steps.length){
-        checkpoints[previous.url]={scene:educationScene.getSnapshot(),readingsBaseline:previous.readingsBaseline};
+        checkpoints[previous.url]={scene:educationScene.getSnapshot(),readingsBaseline:previous.readingsBaseline,attemptId:previous.attemptId,identity:previous.identity};
         checkpointSave();
       }else checkpointDelete(previous.url);
       educationScene.dispatch({type:"replace",snapshot:previous.freeScene});
       if(previous.freeModule)selectModule(previous.freeModule);
     }
     saveSession(null);
-    renderAll();
+    renderAll();return true;
   }
-  export function clearGuidedReturn():void {endGuidedActivity();}
+  export function clearGuidedReturn():boolean {return endGuidedActivity();}
   export function menuActivity(kind:ActivityKind,id:string):LearningActivity|undefined {return education?.list(kind).find(a=>a.id===id);}
   export function menuActivityProgress(id:string):number {return education?.snapshot().progress[id]??0;}
   export function advanceActivityFromMenu(id:string):{ok:boolean;message:string} {
@@ -210,9 +243,29 @@ namespace BaseDemoSI {
       item.append(text("small",criterion));list.append(item);
     }
     detail.append(list);
+    const identification= document.createElement("form");identification.className="edu-identification";
+    const identity=running?guidedReportContext()?.identity:checkpoints[`#/${route}?item=${encodeURIComponent(active.id)}`]?.identity;
+    const field=document.createElement("fieldset");field.append(text("legend","Identificação da atividade"));
+    const fields=[["nome","Nome"],["turma","Turma"],["data","Data"],["professor","Professor"],["grupo","Grupo"]] as const;
+    for(const [key,label] of fields){const wrapper=document.createElement("label");wrapper.className="edu-identification-field";
+      wrapper.append(text("span",label));const input=document.createElement("input");input.name=key;
+      input.type=key==="data"?"date":"text";if(key!=="data")input.maxLength=100;
+      input.value=identity?.[key]??(key==="data"?today():"");if(key==="data")input.required=true;
+      wrapper.append(input);field.append(wrapper);
+    }
+    identification.append(field);
+    const readIdentity=():GuidedIdentification=>{
+      const value=(key:keyof GuidedIdentification)=>((identification.elements.namedItem(key) as HTMLInputElement)?.value??"").trim();
+      return {nome:value("nome"),turma:value("turma"),data:value("data"),professor:value("professor"),grupo:value("grupo")};
+    };
+    if(running){const save=button("Salvar identificação",()=>{
+      if(!identification.reportValidity())return;
+      notify(saveGuidedIdentification(readIdentity())?"Identificação atualizada nesta tentativa.":"Não foi possível salvar a identificação.","info");
+    });identification.append(save);}
+    detail.append(identification);
     const actions=document.createElement("div");actions.className="edu-actions";
     if(!finished){
-      const begin=button(running?"Continuar na bancada":"Montar na bancada",()=>beginGuidedActivity(active.id,kind),"primary");
+      const begin=button(running?"Continuar na bancada":"Montar na bancada",()=>{if(!running && !identification.reportValidity())return;beginGuidedActivity(active.id,kind,running?undefined:readIdentity());},"primary");
       if(guidedSession&&!running){begin.disabled=true;begin.title="Encerre a atividade atual antes de iniciar outra.";}
       actions.append(begin);
       const step=active.steps[position];const allowed=running&&meetsRequirement(step,educationScene.getSnapshot(),scopedReadings());
@@ -233,7 +286,9 @@ namespace BaseDemoSI {
       });
       again.disabled=!!guidedSession;actions.append(again);
     }
-    if(running){actions.append(button("Encerrar atividade",async()=>{
+    if(running){actions.append(button("Abrir relatório da atividade",()=>{
+      window.location.hash="#/relatorios";
+    },"outline"));actions.append(button("Encerrar atividade",async()=>{
       const yes=await confirmDialog({title:"Encerrar atividade?",description:"A bancada livre será restaurada. As etapas já registradas permanecerão salvas.",confirmText:"Encerrar"});
       if(yes)endGuidedActivity();
     }));}
@@ -391,6 +446,10 @@ namespace BaseDemoSI {
       // Compatibilidade com sessões legadas: a cena antiga já é a cena de trabalho.
       guidedSession={schemaVersion:1,url:validatedGuidedLink(previous)!.url,
         freeScene:{schemaVersion:1,entities:[],selectedId:null},readingsBaseline:0};
+      storage.write(sessionKey,JSON.stringify(guidedSession));
+    }
+    if(guidedSession && (!guidedSession.attemptId || !guidedSession.identity)){
+      guidedSession={...guidedSession,attemptId:guidedSession.attemptId??attemptId(),identity:guidedSession.identity??blankIdentity()};
       storage.write(sessionKey,JSON.stringify(guidedSession));
     }
     returnToActivity=guidedSession?.url??"";

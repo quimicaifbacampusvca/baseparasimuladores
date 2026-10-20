@@ -8,6 +8,8 @@ namespace BaseDemoSI {
     readonly body: string;
     readonly entityId: string | null;
     readonly entityLabel: string | null;
+    /** Vinculado a uma tentativa; ausente nos registros anteriores. */
+    readonly attemptId?: string;
   }
   export interface ReportEntity {
     readonly id: string;
@@ -22,6 +24,7 @@ namespace BaseDemoSI {
     readonly includeScene: boolean;
     readonly includeNotes: boolean;
     readonly includeReadings: boolean;
+    readonly activity?: GuidedReportContext;
   }
   export interface SavedReport {
     readonly id: string;
@@ -30,6 +33,8 @@ namespace BaseDemoSI {
     readonly author: string;
     readonly sessionDate: string;
     readonly objective: string;
+    /** Metadados da tentativa, preservados na exportação e no relatório. */
+    readonly activity?: GuidedReportContext;
     readonly scene: readonly ReportEntity[];
     readonly notes: readonly JournalNote[];
     readonly readings: readonly ReadingRecord[];
@@ -42,7 +47,7 @@ namespace BaseDemoSI {
   }
   export interface JournalStore {
     snapshot(): JournalDocument;
-    addNote(value: unknown, scene: SceneSnapshot): boolean;
+    addNote(value: unknown, scene: SceneSnapshot, attemptId?: string): boolean;
     removeNote(id: string): boolean;
     makeReport(value: unknown, scene: SceneSnapshot, readings: readonly ReadingRecord[]): boolean;
     removeReport(id: string): boolean;

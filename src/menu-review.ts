@@ -233,7 +233,7 @@ namespace BaseDemoSI {
       if(!ctx)return;
       const decision=await confirmDialog({title:"Encerrar atividade?",description:"A bancada livre será restaurada. O progresso já registrado será preservado.",confirmText:"Encerrar"});
       if(!decision)return;
-      clearGuidedReturn();
+      if(!clearGuidedReturn())return;
       closeNavigationDrawer(false);
       window.location.hash=ctx.kind==="mission"?"#/missoes":"#/roteiros";
       syncMenuReview();

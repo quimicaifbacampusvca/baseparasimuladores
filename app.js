@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.13",
+        version: "0.9.14",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -572,7 +572,8 @@ var BaseDemoSI;
             const decision = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "A bancada livre será restaurada. O progresso já registrado será preservado.", confirmText: "Encerrar" });
             if (!decision)
                 return;
-            BaseDemoSI.clearGuidedReturn();
+            if (!BaseDemoSI.clearGuidedReturn())
+                return;
             BaseDemoSI.closeNavigationDrawer(false);
             window.location.hash = ctx.kind === "mission" ? "#/missoes" : "#/roteiros";
             syncMenuReview();
@@ -700,6 +701,7 @@ var BaseDemoSI;
         }
         const refresh = () => {
             select.value = activeModule;
+            select.disabled = !!BaseDemoSI.guidedActivityContext();
             const current = BaseDemoSI.moduleDefinitions.find(item => item.id === activeModule);
             const message = document.getElementById("si-module-description");
             if (message)
@@ -711,9 +713,18 @@ var BaseDemoSI;
             document.querySelectorAll("[data-menu-action^=add-]").forEach(button => { button.disabled = !moduleAllows("tools"); });
             document.getElementById("si-module-choice")?.setAttribute("title", current.summary);
         };
-        select.addEventListener("change", () => { if (selectModule(select.value))
-            BaseDemoSI.notify("Módulo atualizado.", "info"); refresh(); });
+        select.addEventListener("change", () => {
+            if (BaseDemoSI.guidedActivityContext()) {
+                BaseDemoSI.notify("O módulo está definido pela atividade em andamento.", "warning");
+                refresh();
+                return;
+            }
+            if (selectModule(select.value))
+                BaseDemoSI.notify("Módulo atualizado.", "info");
+            refresh();
+        });
         window.addEventListener("si-module-change", () => { refresh(); });
+        window.addEventListener("si-guided-context-changed", refresh);
         refresh();
         window.dispatchEvent(new CustomEvent("si-module-change", { detail: activeModule }));
     }
@@ -1197,7 +1208,8 @@ var BaseDemoSI;
         return id(n.id, "note") && instant(n.createdAt) && noteKinds.includes(n.kind)
             && valueText(n.body, 1200) && (n.entityId === null || valueText(n.entityId, 80))
             && (n.entityLabel === null || valueText(n.entityLabel, 64))
-            && ((n.entityId === null) === (n.entityLabel === null));
+            && ((n.entityId === null) === (n.entityLabel === null))
+            && (n.attemptId === undefined || (typeof n.attemptId === "string" && /^attempt-[a-z0-9-]{4,70}$/.test(n.attemptId)));
     }
     function validReading(r) {
         if (!r || typeof r !== "object" || Array.isArray(r))
@@ -1208,12 +1220,27 @@ var BaseDemoSI;
             && (x.entityId === null || valueText(x.entityId, 80))
             && Number.isSafeInteger(x.sequence) && (x.sequence ?? 0) > 0;
     }
+    function validActivity(v) {
+        if (!v || typeof v !== "object" || Array.isArray(v))
+            return false;
+        const a = v, i = a.identity;
+        return typeof a.attemptId === "string" && /^attempt-[a-z0-9-]{4,70}$/.test(a.attemptId)
+            && valueText(a.activityId, 80) && valueText(a.title, 100) && valueText(a.objective, 300)
+            && Array.isArray(a.steps) && a.steps.length >= 1 && a.steps.length <= 5 && a.steps.every(s => valueText(s, 140))
+            && (a.kind === "mission" || a.kind === "script") && BaseDemoSI.validModule(a.module)
+            && Number.isSafeInteger(a.progress) && (a.progress ?? -1) >= 0
+            && Number.isSafeInteger(a.total) && (a.total ?? 0) >= 1 && (a.total ?? 0) <= 5 && (a.progress ?? 6) <= a.total
+            && Number.isSafeInteger(a.readingsBaseline) && (a.readingsBaseline ?? -1) >= 0
+            && !!i && [i.nome, i.turma, i.professor, i.grupo].every(s => typeof s === "string" && s.length <= 100)
+            && realDay(i.data);
+    }
     function validReport(value) {
         if (!value || typeof value !== "object" || Array.isArray(value))
             return false;
         const r = value;
         if (!id(r.id, "report") || !instant(r.createdAt) || !valueText(r.title, 100)
             || !safeOptional(r.author, 100) || !realDay(r.sessionDate) || !safeOptional(r.objective, 1000)
+            || (r.activity !== undefined && !validActivity(r.activity))
             || !r.options || typeof r.options !== "object" || Array.isArray(r.options)
             || typeof r.options.includeScene !== "boolean" || typeof r.options.includeNotes !== "boolean"
             || typeof r.options.includeReadings !== "boolean" || !Array.isArray(r.scene) || r.scene.length > 60
@@ -1295,15 +1322,17 @@ var BaseDemoSI;
         };
         return {
             snapshot: () => parseJournal(state),
-            addNote(value, scene) {
+            addNote(value, scene, attemptId) {
                 if (state.notes.length >= MAX_NOTES || !value || typeof value !== "object" || Array.isArray(value))
                     return false;
                 const data = value;
-                if (!noteKinds.includes(data.kind) || !valueText(data.body, 1200))
+                if (!noteKinds.includes(data.kind) || !valueText(data.body, 1200) ||
+                    (attemptId !== undefined && !/^attempt-[a-z0-9-]{4,70}$/.test(attemptId)))
                     return false;
                 const selected = scene.entities.find(e => e.id === scene.selectedId);
                 const note = { id: nextId("note"), createdAt: clock().toISOString(), kind: data.kind,
-                    body: data.body.trim(), entityId: selected?.id ?? null, entityLabel: selected?.label ?? null };
+                    body: data.body.trim(), entityId: selected?.id ?? null, entityLabel: selected?.label ?? null,
+                    ...(attemptId ? { attemptId } : {}) };
                 return persist({ ...state, notes: [...state.notes, note] });
             },
             removeNote(noteId) {
@@ -1316,14 +1345,15 @@ var BaseDemoSI;
                     return false;
                 const v = value;
                 if (!valueText(v.title, 100) || !safeOptional(v.author, 100) || !realDay(v.sessionDate)
-                    || !safeOptional(v.objective, 1000) || typeof v.includeScene !== "boolean"
+                    || !safeOptional(v.objective, 1000) || (v.activity !== undefined && !validActivity(v.activity)) || typeof v.includeScene !== "boolean"
                     || typeof v.includeNotes !== "boolean" || typeof v.includeReadings !== "boolean")
                     return false;
                 const report = { id: nextId("report"), createdAt: clock().toISOString(), title: v.title.trim(),
                     author: v.author.trim(), sessionDate: v.sessionDate, objective: v.objective.trim(),
+                    ...(v.activity ? { activity: v.activity } : {}),
                     scene: v.includeScene ? scene.entities.map(e => ({ id: e.id, label: e.label, kind: e.kind })) : [],
-                    notes: v.includeNotes ? state.notes.map(n => ({ ...n })) : [],
-                    readings: v.includeReadings ? readings.map(r => ({ ...r })) : [],
+                    notes: v.includeNotes ? state.notes.filter(n => !v.activity || n.attemptId === v.activity.attemptId).map(n => ({ ...n })) : [],
+                    readings: v.includeReadings ? readings.filter(r => !v.activity || r.sequence > v.activity.readingsBaseline).map(r => ({ ...r })) : [],
                     options: { includeScene: v.includeScene, includeNotes: v.includeNotes, includeReadings: v.includeReadings } };
                 if (!validReport(report))
                     return false;
@@ -2713,6 +2743,19 @@ var BaseDemoSI;
     const guidedKey = "guided-return-v1";
     const sessionKey = "guided-session-v1";
     const checkpointsKey = "guided-checkpoints-v1";
+    const today = () => { const now = new Date(); return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+    const blankIdentity = () => ({ nome: "", turma: "", data: today(), professor: "", grupo: "" });
+    function validIdentification(v) {
+        if (!v || typeof v !== "object" || Array.isArray(v))
+            return false;
+        const x = v;
+        return [x.nome, x.turma, x.professor, x.grupo].every(s => typeof s === "string" && s.length <= 100)
+            && typeof x.data === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.data)
+            && !Number.isNaN(Date.parse(x.data + "T00:00:00Z"))
+            && new Date(x.data + "T00:00:00Z").toISOString().slice(0, 10) === x.data;
+    }
+    const attemptId = () => `attempt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    const validAttempt = (id) => typeof id === "string" && /^attempt-[a-z0-9-]{4,70}$/.test(id);
     let checkpoints = Object.create(null);
     function restoreCheckpoints() {
         checkpoints = Object.create(null);
@@ -2727,7 +2770,7 @@ var BaseDemoSI;
             if (entries.length > 29)
                 return;
             for (const [url, entry] of entries) {
-                if (!validatedGuidedLink(url) || !entry || !BaseDemoSI.parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline < 0)
+                if (!validatedGuidedLink(url) || !entry || !BaseDemoSI.parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline < 0 || (entry.attemptId !== undefined && !validAttempt(entry.attemptId)) || (entry.identity !== undefined && !validIdentification(entry.identity)))
                     return;
             }
             for (const [url, entry] of entries)
@@ -2757,9 +2800,11 @@ var BaseDemoSI;
             const raw = JSON.parse(value);
             if (raw.schemaVersion !== 1 || typeof raw.url !== "string" || !validatedGuidedLink(raw.url)
                 || !Number.isSafeInteger(raw.readingsBaseline) || (raw.readingsBaseline ?? -1) < 0
-                || !BaseDemoSI.parseScene(raw.freeScene) || (raw.freeModule !== undefined && !BaseDemoSI.validModule(raw.freeModule)))
+                || !BaseDemoSI.parseScene(raw.freeScene) || (raw.freeModule !== undefined && !BaseDemoSI.validModule(raw.freeModule))
+                || (raw.attemptId !== undefined && !validAttempt(raw.attemptId))
+                || (raw.identity !== undefined && !validIdentification(raw.identity)))
                 return null;
-            return { schemaVersion: 1, url: raw.url, freeScene: BaseDemoSI.parseScene(raw.freeScene), readingsBaseline: raw.readingsBaseline, freeModule: raw.freeModule };
+            return { schemaVersion: 1, url: raw.url, freeScene: BaseDemoSI.parseScene(raw.freeScene), readingsBaseline: raw.readingsBaseline, freeModule: raw.freeModule, attemptId: raw.attemptId, identity: raw.identity };
         }
         catch {
             return null;
@@ -2781,9 +2826,26 @@ var BaseDemoSI;
         return valid ? { url: valid.url, title: valid.activity.title, kind: valid.activity.kind, progress: valid.progress, total: valid.activity.steps.length } : null;
     }
     BaseDemoSI.guidedActivityContext = guidedActivityContext;
+    function guidedReportContext() {
+        const session = guidedSession, valid = session && validatedGuidedLink(session.url);
+        if (!session || !valid)
+            return null;
+        return { attemptId: session.attemptId ?? "", activityId: valid.activity.id, kind: valid.activity.kind,
+            title: valid.activity.title, objective: valid.activity.description, steps: valid.activity.steps.map(step => step.label),
+            module: valid.activity.module ?? "livre", progress: valid.progress,
+            total: valid.activity.steps.length, identity: session.identity ?? blankIdentity(), readingsBaseline: session.readingsBaseline };
+    }
+    BaseDemoSI.guidedReportContext = guidedReportContext;
+    function saveGuidedIdentification(value) {
+        if (!guidedSession || !validIdentification(value))
+            return false;
+        saveSession({ ...guidedSession, identity: value });
+        return true;
+    }
+    BaseDemoSI.saveGuidedIdentification = saveGuidedIdentification;
     function sessionFor(id) { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`) ?? false; }
     function scopedReadings() { return Math.max(0, countReadings() - (guidedSession?.readingsBaseline ?? 0)); }
-    function beginGuidedActivity(id, kind) {
+    function beginGuidedActivity(id, kind, identity) {
         const activity = education.list(kind).find(a => a.id === id);
         if (!activity)
             return false;
@@ -2800,10 +2862,15 @@ var BaseDemoSI;
             BaseDemoSI.notify("Atividade concluída. Inicie uma nova tentativa para refazê-la.", "info");
             return false;
         }
+        if (identity && !validIdentification(identity)) {
+            BaseDemoSI.notify("Confira os campos da identificação.", "warning");
+            return false;
+        }
         const original = educationScene.getSnapshot();
         const checkpoint = checkpoints[url];
         const run = { schemaVersion: 1, url, freeScene: original,
-            readingsBaseline: checkpoint?.readingsBaseline ?? countReadings(), freeModule: BaseDemoSI.currentModule() };
+            readingsBaseline: checkpoint?.readingsBaseline ?? countReadings(), freeModule: BaseDemoSI.currentModule(),
+            attemptId: checkpoint?.attemptId ?? attemptId(), identity: identity ?? checkpoint?.identity ?? blankIdentity() };
         // Gravar o vínculo antes da alteração: uma recarga nunca perde a cena livre.
         saveSession(run);
         const blank = { schemaVersion: 1, entities: [], selectedId: null };
@@ -2821,10 +2888,16 @@ var BaseDemoSI;
     BaseDemoSI.beginGuidedActivity = beginGuidedActivity;
     function endGuidedActivity() {
         const previous = guidedSession;
+        // Registrar o retrato documental antes de restaurar a bancada livre.
+        // Em caso de falta de espaço, manter a sessão para evitar perda de evidências.
+        if (previous && validatedGuidedLink(previous.url) && !BaseDemoSI.archiveGuidedReport()) {
+            BaseDemoSI.notify("Não foi possível preservar o relatório. Libere espaço nos relatórios e tente novamente.", "warning");
+            return false;
+        }
         if (previous) {
             const valid = validatedGuidedLink(previous.url);
             if (valid && valid.progress < valid.activity.steps.length) {
-                checkpoints[previous.url] = { scene: educationScene.getSnapshot(), readingsBaseline: previous.readingsBaseline };
+                checkpoints[previous.url] = { scene: educationScene.getSnapshot(), readingsBaseline: previous.readingsBaseline, attemptId: previous.attemptId, identity: previous.identity };
                 checkpointSave();
             }
             else
@@ -2835,9 +2908,10 @@ var BaseDemoSI;
         }
         saveSession(null);
         renderAll();
+        return true;
     }
     BaseDemoSI.endGuidedActivity = endGuidedActivity;
-    function clearGuidedReturn() { endGuidedActivity(); }
+    function clearGuidedReturn() { return endGuidedActivity(); }
     BaseDemoSI.clearGuidedReturn = clearGuidedReturn;
     function menuActivity(kind, id) { return education?.list(kind).find(a => a.id === id); }
     BaseDemoSI.menuActivity = menuActivity;
@@ -2975,10 +3049,46 @@ var BaseDemoSI;
             list.append(item);
         }
         detail.append(list);
+        const identification = document.createElement("form");
+        identification.className = "edu-identification";
+        const identity = running ? guidedReportContext()?.identity : checkpoints[`#/${route}?item=${encodeURIComponent(active.id)}`]?.identity;
+        const field = document.createElement("fieldset");
+        field.append(text("legend", "Identificação da atividade"));
+        const fields = [["nome", "Nome"], ["turma", "Turma"], ["data", "Data"], ["professor", "Professor"], ["grupo", "Grupo"]];
+        for (const [key, label] of fields) {
+            const wrapper = document.createElement("label");
+            wrapper.className = "edu-identification-field";
+            wrapper.append(text("span", label));
+            const input = document.createElement("input");
+            input.name = key;
+            input.type = key === "data" ? "date" : "text";
+            if (key !== "data")
+                input.maxLength = 100;
+            input.value = identity?.[key] ?? (key === "data" ? today() : "");
+            if (key === "data")
+                input.required = true;
+            wrapper.append(input);
+            field.append(wrapper);
+        }
+        identification.append(field);
+        const readIdentity = () => {
+            const value = (key) => (identification.elements.namedItem(key)?.value ?? "").trim();
+            return { nome: value("nome"), turma: value("turma"), data: value("data"), professor: value("professor"), grupo: value("grupo") };
+        };
+        if (running) {
+            const save = button("Salvar identificação", () => {
+                if (!identification.reportValidity())
+                    return;
+                BaseDemoSI.notify(saveGuidedIdentification(readIdentity()) ? "Identificação atualizada nesta tentativa." : "Não foi possível salvar a identificação.", "info");
+            });
+            identification.append(save);
+        }
+        detail.append(identification);
         const actions = document.createElement("div");
         actions.className = "edu-actions";
         if (!finished) {
-            const begin = button(running ? "Continuar na bancada" : "Montar na bancada", () => beginGuidedActivity(active.id, kind), "primary");
+            const begin = button(running ? "Continuar na bancada" : "Montar na bancada", () => { if (!running && !identification.reportValidity())
+                return; beginGuidedActivity(active.id, kind, running ? undefined : readIdentity()); }, "primary");
             if (guidedSession && !running) {
                 begin.disabled = true;
                 begin.title = "Encerre a atividade atual antes de iniciar outra.";
@@ -3011,6 +3121,9 @@ var BaseDemoSI;
             actions.append(again);
         }
         if (running) {
+            actions.append(button("Abrir relatório da atividade", () => {
+                window.location.hash = "#/relatorios";
+            }, "outline"));
             actions.append(button("Encerrar atividade", async () => {
                 const yes = await BaseDemoSI.confirmDialog({ title: "Encerrar atividade?", description: "A bancada livre será restaurada. As etapas já registradas permanecerão salvas.", confirmText: "Encerrar" });
                 if (yes)
@@ -3273,6 +3386,10 @@ var BaseDemoSI;
                 freeScene: { schemaVersion: 1, entities: [], selectedId: null }, readingsBaseline: 0 };
             BaseDemoSI.storage.write(sessionKey, JSON.stringify(guidedSession));
         }
+        if (guidedSession && (!guidedSession.attemptId || !guidedSession.identity)) {
+            guidedSession = { ...guidedSession, attemptId: guidedSession.attemptId ?? attemptId(), identity: guidedSession.identity ?? blankIdentity() };
+            BaseDemoSI.storage.write(sessionKey, JSON.stringify(guidedSession));
+        }
         returnToActivity = guidedSession?.url ?? "";
         if (previous !== returnToActivity)
             BaseDemoSI.storage.write(guidedKey, returnToActivity);
@@ -3355,6 +3472,14 @@ var BaseDemoSI;
         const subtitle = element("p", `Responsável: ${report.author || "Não informado"} · Data: ${localDate(report.sessionDate)} · Emissão: ${localDate(report.createdAt)}`);
         subtitle.className = "si-report-byline";
         paper.append(subtitle);
+        if (report.activity) {
+            const a = report.activity, identity = a.identity;
+            const section = document.createElement("section");
+            section.className = "si-report-section";
+            section.append(element("h3", "Identificação da atividade"), element("p", `Nome: ${identity.nome || "Não informado"} · Turma: ${identity.turma || "Não informada"}`), element("p", `Professor: ${identity.professor || "Não informado"} · Grupo: ${identity.grupo || "Não informado"}`), element("p", `Data: ${localDate(identity.data)} · Módulo: ${a.module}`), element("p", `${a.kind === "mission" ? "Missão" : "Roteiro"}: ${a.title} · Etapas registradas: ${a.progress}/${a.total}`));
+            section.append(createList("Etapas do percurso", ["Etapa", "Situação"], a.steps.map((name, index) => [`${index + 1}. ${name}`, index < a.progress ? "Registrada" : "Pendente"])));
+            paper.append(section);
+        }
         if (report.objective) {
             const section = document.createElement("section");
             section.className = "si-report-section";
@@ -3472,12 +3597,63 @@ var BaseDemoSI;
         const style = `body{font:11pt/1.5 Georgia,serif;color:#1b2933;max-width:820px;margin:28px auto;padding:20px}h2{font-size:24pt}h3{font-size:13pt;margin-top:22px}p{white-space:pre-wrap;overflow-wrap:anywhere}.si-report-kicker{font:700 9pt Arial;letter-spacing:.12em}.si-report-byline{font:10pt Arial;color:#455867}table{width:100%;border-collapse:collapse;font:9pt Arial;table-layout:fixed}th,td{border:1px solid #b8c4cc;padding:8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#e7eef3}.si-report-disclaimer{font-size:9pt;margin-top:26px;border-top:1px solid #aebbc5;padding-top:10px}@page{size:A4;margin:15mm}`;
         return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório local</title><style>${style}</style></head><body>${reportNode.outerHTML}</body></html>`;
     }
+    let presentedAttempt = "";
+    function prepareGuidedReport() {
+        if (!registered)
+            return;
+        const context = BaseDemoSI.guidedReportContext(), banner = j("report-guided-context");
+        if (banner) {
+            banner.hidden = !context;
+            banner.textContent = context
+                ? `Relatório vinculado à ${context.kind === "mission" ? "missão" : "investigação"} “${context.title}” · ${context.progress}/${context.total} etapas. Apenas registros desta tentativa serão incluídos.` : "";
+        }
+        if (!context) {
+            presentedAttempt = "";
+            return;
+        }
+        const presentationKey = context.attemptId + "|" + JSON.stringify(context.identity);
+        if (presentedAttempt === presentationKey)
+            return;
+        presentedAttempt = presentationKey;
+        const set = (id, value) => { const input = j(id); if (input)
+            input.value = value; };
+        set("report-title", `Relatório — ${context.title}`.slice(0, 100));
+        set("report-author", context.identity.nome);
+        set("report-date", context.identity.data);
+        set("report-objective", context.objective);
+    }
+    /** Consolida apenas a tentativa atual; uma saída sem registros não produz relatório vazio. */
+    function archiveGuidedReport() {
+        const ctx = BaseDemoSI.guidedReportContext();
+        if (!ctx || !registered)
+            return true;
+        const scoped = extensionRecords().filter(r => r.sequence > ctx.readingsBaseline);
+        const notes = journal.snapshot().notes.filter(n => n.attemptId === ctx.attemptId);
+        const scene = journalScene.getSnapshot();
+        // Relatório parcial não impede um registro final mais completo.
+        if (journal.snapshot().reports.some(r => r.activity?.attemptId === ctx.attemptId
+            && r.activity.progress === ctx.progress && r.notes.length >= notes.length
+            && r.readings.length >= scoped.length && r.scene.length >= scene.entities.length))
+            return true;
+        const referenceEntities = (ctx.module === "medir" || ctx.module === "calcular") ? 1 : 0;
+        if (ctx.progress === 0 && !scoped.length && !notes.length && scene.entities.length <= referenceEntities)
+            return true;
+        const archived = journal.makeReport({ title: `Relatório — ${ctx.title}`.slice(0, 100), author: ctx.identity.nome,
+            sessionDate: ctx.identity.data, objective: ctx.objective,
+            includeScene: true, includeReadings: true, includeNotes: true, activity: ctx }, scene, extensionRecords());
+        if (archived) {
+            openReportId = null;
+            renderReports();
+        }
+        return archived;
+    }
+    BaseDemoSI.archiveGuidedReport = archiveGuidedReport;
     function configure() {
         j("journal-form")?.addEventListener("submit", event => {
             event.preventDefault();
             const form = event.currentTarget;
             const data = { kind: j("journal-kind").value, body: j("journal-body").value.trim() };
-            if (journal.addNote(data, journalScene.getSnapshot())) {
+            if (journal.addNote(data, journalScene.getSnapshot(), BaseDemoSI.guidedReportContext()?.attemptId)) {
                 form.reset();
                 BaseDemoSI.notify("Registro adicionado ao Caderno.", "success");
             }
@@ -3488,8 +3664,16 @@ var BaseDemoSI;
             event.preventDefault();
             const i = (id) => j(id).value.trim();
             const checked = (id) => j(id).checked;
+            const context = BaseDemoSI.guidedReportContext();
             const draft = { title: i("report-title"), author: i("report-author"), sessionDate: i("report-date"), objective: i("report-objective"),
+                ...(context ? { activity: context } : {}),
                 includeScene: checked("report-scene"), includeNotes: checked("report-notes"), includeReadings: checked("report-readings") };
+            if (context && journal.snapshot().reports.some(r => r.activity?.attemptId === context.attemptId
+                && r.activity.progress === context.progress && r.notes.length >= journal.snapshot().notes.filter(n => n.attemptId === context.attemptId).length
+                && r.readings.length >= extensionRecords().filter(r => r.sequence > context.readingsBaseline).length)) {
+                BaseDemoSI.notify("Este estado da tentativa já possui relatório salvo. Abra-o na lista.", "info");
+                return;
+            }
             if (journal.makeReport(draft, journalScene.getSnapshot(), extensionRecords())) {
                 openReportId = null;
                 renderReports();
@@ -3564,10 +3748,12 @@ var BaseDemoSI;
         journal = BaseDemoSI.createJournalStore(BaseDemoSI.storage);
         journal.subscribe(() => { renderJournal(); renderReports(); });
         window.addEventListener("si-education-observation", () => renderJournal());
-        window.addEventListener("si-route-changed", () => { renderJournal(); renderReports(); });
+        window.addEventListener("si-route-changed", () => { renderJournal(); renderReports(); prepareGuidedReport(); });
+        window.addEventListener("si-guided-context-changed", prepareGuidedReport);
         configure();
         renderJournal();
         renderReports();
+        prepareGuidedReport();
     }
     BaseDemoSI.setupJournal = setupJournal;
 })(BaseDemoSI || (BaseDemoSI = {}));

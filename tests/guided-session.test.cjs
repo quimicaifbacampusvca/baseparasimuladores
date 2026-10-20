@@ -55,4 +55,4 @@ assert.equal(second.api.advanceActivityFromMenu('mission-create').ok,false,'Etap
 const corrupted=new Map([[prefix+'guided-session-v1','{"schemaVersion":1,"url":"#/missoes?item=mission-create","freeScene":{},"readingsBaseline":0}']]);
 assert.equal(load(corrupted).api.guidedActivityContext(),null);
 assert(fs.readFileSync(path.join(root,'src/education-ui.ts'),'utf8').includes('checkpointDelete'));
-console.log('OK: 0.9.13 — iniciar/continuar/encerrar, bancada isolada, checkpoints, progresso, recarga e validação.');
+console.log('OK: 0.9.14 — iniciar/continuar/encerrar, bancada isolada, checkpoints, progresso, recarga e validação.');

@@ -55,3 +55,5 @@
   .si-print-sheet .si-report-table-wrap {overflow:visible}
   .si-print-sheet tr,.si-print-sheet .si-report-section {break-inside:avoid}
 }
+
+.si-guided-report-context{border:1px solid var(--border,#cbd3dd);border-inline-start:4px solid var(--accent,#3b83ad);border-radius:8px;padding:11px 13px;margin:10px 0 14px;overflow-wrap:anywhere;background:var(--surface,#fff);color:var(--text,#1e2b37)}
