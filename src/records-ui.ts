@@ -163,13 +163,20 @@ namespace BaseDemoSI {
     (j("journal-import") as HTMLInputElement|null)?.addEventListener("change",event=>{void (async()=>{
       const field=event.currentTarget as HTMLInputElement,file=field.files?.[0];field.value="";
       if(!file)return;
+      if(guidedActivityContext()){
+        notify("Encerre a atividade orientada antes de restaurar registros. A tentativa atual foi preservada.","warning");return;
+      }
       if(file.size>300000){notify("Arquivo acima do limite de importação.","warning");return;}
       let decoded:unknown=null;try{decoded=parseJournalImport(await file.text());}catch{decoded=null;}
       if(!decoded || !parseJournal((decoded as {document?:unknown}).document) || (decoded as {format?:unknown}).format!=="base-demo-si-journal-v1"){
         notify("Arquivo incompatível ou inválido. O Caderno não foi alterado.","warning");return;
       }
       const yes=await confirmDialog({title:"Restaurar Caderno e relatórios?",description:"O conteúdo atual do Caderno e os relatórios salvos serão substituídos. Cena, extensões e atividades não serão alteradas.",confirmText:"Restaurar backup",destructive:true});
-      if(yes){if(journal.importJSON(decoded)){openReportId=null;notify("Backup restaurado com validação.","success");}
+      if(yes){
+        if(guidedActivityContext()){
+          notify("A investigação foi iniciada durante a confirmação. Encerre-a antes de importar registros.","warning");return;
+        }
+        if(journal.importJSON(decoded)){openReportId=null;notify("Backup restaurado com validação.","success");}
         else notify("Não foi possível restaurar o arquivo.","warning");}
     })();});
     j("reports-print")?.addEventListener("click",()=>{

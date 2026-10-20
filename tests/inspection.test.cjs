@@ -14,7 +14,7 @@ assert(style.includes('.si-sheet-active .si-notice:not(:last-child)'));
 assert(js.includes('markStorageUnavailable'));
 assert(js.includes('setupNavigationDrawer'));
 assert(js.includes('closeNavigationDrawer'));
-assert(read('sw.js').includes('base-demo-si-v0.9.15'));
+assert(read('sw.js').includes('base-demo-si-v0.9.16'));
 assert(read('sw.js').includes('"./inspection.css"'));
 for(const item of ['src/navigation.ts','src/storage.ts','src/app.ts','src/router.ts','docs/ACEITE-0.9.1.md','docs/VISTORIA-FUNCIONAL-0.9.0.md','README.md'])
  assert(!/SIAB/i.test(read(item)),`Referência não permitida em ${item}`);

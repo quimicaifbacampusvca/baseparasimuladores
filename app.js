@@ -6,7 +6,7 @@ var BaseDemoSI;
         id: "base-demo-oficial-si",
         name: "Base Demo Oficial - SI",
         shortName: "SI",
-        version: "0.9.15",
+        version: "0.9.16",
         language: "pt-BR",
         requiresNetwork: false,
         routes: Object.freeze([
@@ -40,10 +40,88 @@ var BaseDemoSI;
             banner.hidden = false;
     }
     BaseDemoSI.markStorageUnavailable = markStorageUnavailable;
+    // Os documentos essenciais não podem ser mesclados automaticamente entre abas.
+    // Além do evento storage, a leitura imediatamente antes de gravar detecta
+    // mudanças externas mesmo quando o evento ainda não foi processado.
+    const criticalKeys = new Set([
+        "scene-project-v1", "education-document-v1", "journal-document-v1",
+        "guided-session-v1", "guided-checkpoints-v1", "guided-return-v1"
+    ]);
+    const lastObserved = new Map();
+    let storageConflict = false;
+    function hasStorageConflict() {
+        if (storageConflict)
+            return true;
+        // Proteção também para alterações concorrentes ocorridas antes do evento storage.
+        try {
+            for (const [key, expected] of lastObserved) {
+                if (window.localStorage.getItem(`${BaseDemoSI.manifest.id}:${key}`) !== expected) {
+                    reportStorageConflict();
+                    return true;
+                }
+            }
+        }
+        catch {
+            markStorageUnavailable();
+        }
+        return false;
+    }
+    BaseDemoSI.hasStorageConflict = hasStorageConflict;
+    function reportStorageConflict() {
+        if (storageConflict)
+            return;
+        storageConflict = true;
+        if (typeof document.createElement !== "function" || !document.body)
+            return;
+        const overlay = document.createElement("div");
+        overlay.id = "si-storage-conflict";
+        overlay.setAttribute("role", "alertdialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-labelledby", "si-conflict-title");
+        overlay.setAttribute("aria-describedby", "si-conflict-description");
+        const panel = document.createElement("div");
+        panel.className = "si-storage-conflict-panel";
+        const heading = document.createElement("h2");
+        heading.id = "si-conflict-title";
+        heading.textContent = "Alteração detectada em outra aba";
+        const description = document.createElement("p");
+        description.id = "si-conflict-description";
+        description.textContent = "Outra aba alterou dados deste aplicativo. Para evitar sobrescrever atividades, montagens e relatórios, esta aba foi bloqueada para edição. Recarregue para ler os dados atualizados.";
+        const action = document.createElement("button");
+        action.type = "button";
+        action.className = "button primary";
+        action.textContent = "Recarregar dados";
+        action.addEventListener("click", () => window.location.reload());
+        panel.append(heading, description, action);
+        overlay.append(panel);
+        document.body.append(overlay);
+        const shell = document.querySelector(".app-shell");
+        if (shell)
+            shell.inert = true;
+        action.focus({ preventScroll: true });
+    }
+    function setupStorageConflictProtection() {
+        window.addEventListener("storage", event => {
+            if (!event.key || !event.key.startsWith(`${BaseDemoSI.manifest.id}:`))
+                return;
+            const key = event.key.slice(BaseDemoSI.manifest.id.length + 1);
+            if (!criticalKeys.has(key))
+                return;
+            const known = lastObserved.get(key);
+            // Ausência de leitura local também significa que ainda não houve edição desse
+            // documento; ao primeiro acesso futuro vamos conferir o valor atualizado.
+            if (lastObserved.has(key) && known !== event.newValue)
+                reportStorageConflict();
+        });
+    }
+    BaseDemoSI.setupStorageConflictProtection = setupStorageConflictProtection;
     BaseDemoSI.storage = {
         read(key) {
             try {
-                return window.localStorage.getItem(`${BaseDemoSI.manifest.id}:${key}`);
+                const value = window.localStorage.getItem(`${BaseDemoSI.manifest.id}:${key}`);
+                if (criticalKeys.has(key) && !lastObserved.has(key))
+                    lastObserved.set(key, value);
+                return value;
             }
             catch {
                 markStorageUnavailable();
@@ -51,8 +129,22 @@ var BaseDemoSI;
             }
         },
         write(key, value) {
+            if (criticalKeys.has(key) && hasStorageConflict())
+                return false;
             try {
-                window.localStorage.setItem(`${BaseDemoSI.manifest.id}:${key}`, value);
+                const fullKey = `${BaseDemoSI.manifest.id}:${key}`;
+                if (criticalKeys.has(key)) {
+                    const actual = window.localStorage.getItem(fullKey);
+                    if (lastObserved.has(key) && lastObserved.get(key) !== actual) {
+                        reportStorageConflict();
+                        return false;
+                    }
+                    if (!lastObserved.has(key))
+                        lastObserved.set(key, actual);
+                }
+                window.localStorage.setItem(fullKey, value);
+                if (criticalKeys.has(key))
+                    lastObserved.set(key, value);
                 return true;
             }
             catch {
@@ -1439,6 +1531,8 @@ var BaseDemoSI;
         const emit = (event) => { for (const listener of [...listeners])
             listener(event); };
         function commit(next) {
+            if (BaseDemoSI.hasStorageConflict())
+                return false;
             const parsed = parseScene(next);
             if (!parsed || JSON.stringify(parsed) === JSON.stringify(present))
                 return false;
@@ -1501,6 +1595,8 @@ var BaseDemoSI;
                 return commit({ schemaVersion: 1, entities, selectedId });
             },
             restoreContext(snapshot) {
+                if (BaseDemoSI.hasStorageConflict())
+                    return false;
                 const next = parseScene(snapshot);
                 if (!next)
                     return false;
@@ -1511,6 +1607,8 @@ var BaseDemoSI;
                 return true;
             },
             select(id) {
+                if (BaseDemoSI.hasStorageConflict())
+                    return false;
                 if (id !== null && !present.entities.some(e => e.id === id))
                     return false;
                 if (present.selectedId === id)
@@ -1520,6 +1618,8 @@ var BaseDemoSI;
                 return true;
             },
             undo() {
+                if (BaseDemoSI.hasStorageConflict())
+                    return false;
                 const previous = past.pop();
                 if (!previous)
                     return false;
@@ -1529,6 +1629,8 @@ var BaseDemoSI;
                 return true;
             },
             redo() {
+                if (BaseDemoSI.hasStorageConflict())
+                    return false;
                 const next = future.pop();
                 if (!next)
                     return false;
@@ -2874,6 +2976,8 @@ var BaseDemoSI;
     function sessionFor(id) { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`) ?? false; }
     function scopedReadings() { return Math.max(0, countReadings() - (guidedSession?.readingsBaseline ?? 0)); }
     function beginGuidedActivity(id, kind, identity) {
+        if (BaseDemoSI.hasStorageConflict())
+            return false;
         const activity = education.list(kind).find(a => a.id === id);
         if (!activity)
             return false;
@@ -2918,6 +3022,8 @@ var BaseDemoSI;
     }
     BaseDemoSI.beginGuidedActivity = beginGuidedActivity;
     function endGuidedActivity() {
+        if (BaseDemoSI.hasStorageConflict())
+            return false;
         const previous = guidedSession;
         if (!previous)
             return true;
@@ -2931,11 +3037,17 @@ var BaseDemoSI;
         const checkpoint = incomplete
             ? { scene: educationScene.getSnapshot(), readingsBaseline: previous.readingsBaseline, attemptId: previous.attemptId, identity: previous.identity }
             : null;
+        const olderCheckpoint = checkpoints[previous.url] ?? null;
         if (!checkpointUpdate(previous.url, checkpoint)) {
             BaseDemoSI.notify("Não foi possível salvar o estado da tentativa. A atividade continua aberta.", "warning");
             return false;
         }
         if (!saveSession(null)) {
+            // Não deixar o checkpoint parecer fechado quando a sessão ainda está ativa.
+            if (!checkpointUpdate(previous.url, olderCheckpoint)) {
+                BaseDemoSI.notify("O armazenamento falhou ao encerrar. Não feche esta aba; preserve um backup do Caderno.", "warning");
+                return false;
+            }
             BaseDemoSI.notify("Não foi possível concluir o encerramento no armazenamento local. Tente novamente.", "warning");
             return false;
         }
@@ -2953,6 +3065,8 @@ var BaseDemoSI;
     function menuActivityProgress(id) { return education?.snapshot().progress[id] ?? 0; }
     BaseDemoSI.menuActivityProgress = menuActivityProgress;
     function advanceActivityFromMenu(id) {
+        if (BaseDemoSI.hasStorageConflict())
+            return { ok: false, message: "Outra aba alterou os registros. Recarregue os dados antes de continuar." };
         if (!education || !educationScene || !sessionFor(id))
             return { ok: false, message: "Inicie esta atividade antes de registrar etapas." };
         return education.advance(id, educationScene.getSnapshot(), scopedReadings());
@@ -3418,17 +3532,24 @@ var BaseDemoSI;
                 BaseDemoSI.notify("Encerre a atividade em andamento antes de substituir a biblioteca.", "warning");
                 return;
             }
-            if (education.importTeachers(decoded)) {
-                // Uma atividade importada pode manter o mesmo ID e alterar seus critérios.
-                // Não reaproveitar checkpoints de versões anteriores do conteúdo.
-                checkpoints = Object.create(null);
-                if (!checkpointSave())
-                    BaseDemoSI.notify("Atividades importadas, mas não foi possível limpar as tentativas salvas.", "warning");
-                else
-                    BaseDemoSI.notify("Atividades importadas e validadas.", "success");
+            // Primeira fase: preservar checkpoints antigos e validar a nova biblioteca.
+            // Se a gravação da biblioteca falhar, restaurar os checkpoints antigos.
+            const original = checkpoints;
+            checkpoints = Object.create(null);
+            if (!checkpointSave()) {
+                checkpoints = original;
+                BaseDemoSI.notify("Importação cancelada: não foi possível preservar a integridade das tentativas.", "warning");
+                return;
             }
-            else
-                BaseDemoSI.notify("Formato incompatível ou conteúdo inválido; nenhuma atividade foi alterada.", "warning");
+            if (education.importTeachers(decoded))
+                BaseDemoSI.notify("Atividades importadas e validadas.", "success");
+            else {
+                checkpoints = original;
+                if (!checkpointSave())
+                    BaseDemoSI.notify("Falha na importação e na recuperação dos checkpoints. Preserve os backups existentes.", "warning");
+                else
+                    BaseDemoSI.notify("Formato incompatível, falha de gravação ou conteúdo inválido; a biblioteca anterior foi preservada.", "warning");
+            }
         });
     }
     function setupEducation(scene) {
@@ -3755,6 +3876,10 @@ var BaseDemoSI;
                 field.value = "";
                 if (!file)
                     return;
+                if (BaseDemoSI.guidedActivityContext()) {
+                    BaseDemoSI.notify("Encerre a atividade orientada antes de restaurar registros. A tentativa atual foi preservada.", "warning");
+                    return;
+                }
                 if (file.size > 300000) {
                     BaseDemoSI.notify("Arquivo acima do limite de importação.", "warning");
                     return;
@@ -3772,6 +3897,10 @@ var BaseDemoSI;
                 }
                 const yes = await BaseDemoSI.confirmDialog({ title: "Restaurar Caderno e relatórios?", description: "O conteúdo atual do Caderno e os relatórios salvos serão substituídos. Cena, extensões e atividades não serão alteradas.", confirmText: "Restaurar backup", destructive: true });
                 if (yes) {
+                    if (BaseDemoSI.guidedActivityContext()) {
+                        BaseDemoSI.notify("A investigação foi iniciada durante a confirmação. Encerre-a antes de importar registros.", "warning");
+                        return;
+                    }
                     if (journal.importJSON(decoded)) {
                         openReportId = null;
                         BaseDemoSI.notify("Backup restaurado com validação.", "success");
@@ -4621,6 +4750,7 @@ var BaseDemoSI;
         for (const name of document.querySelectorAll("[data-app-name]")) {
             name.textContent = BaseDemoSI.manifest.name;
         }
+        BaseDemoSI.setupStorageConflictProtection();
         BaseDemoSI.setupPreferences();
         BaseDemoSI.setupComponents();
         BaseDemoSI.setupScene();

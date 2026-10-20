@@ -6,7 +6,7 @@ const ctx={document:doc,window:{},navigator:{},Set,Map,Object,Date,console,URL,B
 vm.createContext(ctx);vm.runInContext(read('app.js'),ctx,{filename:'app.js'});const api=ctx.BaseDemoSI;
 const teacher={id:'teacher-link-01',kind:'script',origin:'teacher',title:'Atividade Ágil',description:'Observe a cena e conclua duas ações.',steps:[{label:'Criar objeto',requirement:'entities',minimum:1},{label:'Selecionar objeto',requirement:'selection',minimum:1}]};
 const bad={...teacher,id:'teacher-script-02',steps:[{label:'invalid',requirement:'script',minimum:1}]};
-assert.equal(api.manifest.version,'0.9.15');
+assert.equal(api.manifest.version,'0.9.16');
 assert.equal(api.currentRoute('#/manual'),'manual');
 assert.equal(api.searchManual('painéis').some(x=>x.id==='bancada'),true);
 assert(api.searchManual('INTERNET').length>0);

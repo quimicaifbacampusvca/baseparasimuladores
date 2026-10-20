@@ -108,6 +108,7 @@ namespace BaseDemoSI {
   function sessionFor(id:string):boolean { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`)??false; }
   function scopedReadings():number {return Math.max(0,countReadings()-(guidedSession?.readingsBaseline??0));}
   export function beginGuidedActivity(id:string,kind:ActivityKind,identity?:GuidedIdentification):boolean {
+    if(hasStorageConflict())return false;
     const activity=education.list(kind).find(a=>a.id===id);
     if(!activity)return false;
     const url=`#/${kind==="mission"?"missoes":"roteiros"}?item=${encodeURIComponent(id)}`;
@@ -140,6 +141,7 @@ namespace BaseDemoSI {
     return true;
   }
   export function endGuidedActivity():boolean {
+    if(hasStorageConflict())return false;
     const previous=guidedSession;
     if(!previous)return true;
     // Relatório e checkpoint são preservados antes de descartar a sessão ativa.
@@ -151,10 +153,15 @@ namespace BaseDemoSI {
     const checkpoint:GuidedCheckpoint|null=incomplete
       ?{scene:educationScene.getSnapshot(),readingsBaseline:previous.readingsBaseline,attemptId:previous.attemptId,identity:previous.identity}
       :null;
+    const olderCheckpoint=checkpoints[previous.url]??null;
     if(!checkpointUpdate(previous.url,checkpoint)){
       notify("Não foi possível salvar o estado da tentativa. A atividade continua aberta.","warning");return false;
     }
     if(!saveSession(null)){
+      // Não deixar o checkpoint parecer fechado quando a sessão ainda está ativa.
+      if(!checkpointUpdate(previous.url,olderCheckpoint)){
+        notify("O armazenamento falhou ao encerrar. Não feche esta aba; preserve um backup do Caderno.","warning");return false;
+      }
       notify("Não foi possível concluir o encerramento no armazenamento local. Tente novamente.","warning");return false;
     }
     educationScene.restoreContext(previous.freeScene);
@@ -165,6 +172,7 @@ namespace BaseDemoSI {
   export function menuActivity(kind:ActivityKind,id:string):LearningActivity|undefined {return education?.list(kind).find(a=>a.id===id);}
   export function menuActivityProgress(id:string):number {return education?.snapshot().progress[id]??0;}
   export function advanceActivityFromMenu(id:string):{ok:boolean;message:string} {
+    if(hasStorageConflict())return {ok:false,message:"Outra aba alterou os registros. Recarregue os dados antes de continuar."};
     if(!education || !educationScene || !sessionFor(id))return {ok:false,message:"Inicie esta atividade antes de registrar etapas."};
     return education.advance(id,educationScene.getSnapshot(),scopedReadings());
   }
@@ -452,13 +460,21 @@ namespace BaseDemoSI {
       const accepted=await confirmDialog({title:"Importar atividades?",description:"As atividades personalizadas atuais serão substituídas. O progresso dos temas e das atividades oficiais será mantido.",confirmText:"Importar atividades",destructive:true});
       if(!accepted)return;
       if(guidedSession){notify("Encerre a atividade em andamento antes de substituir a biblioteca.","warning");return;}
-      if(education.importTeachers(decoded)){
-        // Uma atividade importada pode manter o mesmo ID e alterar seus critérios.
-        // Não reaproveitar checkpoints de versões anteriores do conteúdo.
-        checkpoints=Object.create(null);
-        if(!checkpointSave())notify("Atividades importadas, mas não foi possível limpar as tentativas salvas.","warning");
-        else notify("Atividades importadas e validadas.","success");
-      }else notify("Formato incompatível ou conteúdo inválido; nenhuma atividade foi alterada.","warning");
+      // Primeira fase: preservar checkpoints antigos e validar a nova biblioteca.
+      // Se a gravação da biblioteca falhar, restaurar os checkpoints antigos.
+      const original=checkpoints;
+      checkpoints=Object.create(null);
+      if(!checkpointSave()){
+        checkpoints=original;
+        notify("Importação cancelada: não foi possível preservar a integridade das tentativas.","warning");
+        return;
+      }
+      if(education.importTeachers(decoded))notify("Atividades importadas e validadas.","success");
+      else {
+        checkpoints=original;
+        if(!checkpointSave())notify("Falha na importação e na recuperação dos checkpoints. Preserve os backups existentes.","warning");
+        else notify("Formato incompatível, falha de gravação ou conteúdo inválido; a biblioteca anterior foi preservada.","warning");
+      }
     });
   }
   export function setupEducation(scene:SceneStore):void {

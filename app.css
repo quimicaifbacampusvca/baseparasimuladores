@@ -18,3 +18,10 @@
 @media(max-width:1000px){.workspace-interactive{grid-template-columns:155px minmax(0,1fr) 170px}.workspace-interactive .preview-dock{padding:12px}}
 @media(max-width:760px){.workspace-interactive{grid-template-columns:1fr}.workspace-interactive .stage{order:0;min-height:340px}.workspace-interactive .preview-dock:first-child{order:1}.workspace-interactive .preview-dock:last-child{order:2}.tool-stack{flex-direction:row;flex-wrap:wrap}.tool-stack .button{flex:1 1 130px}.scene-count{width:100%;margin:0}.workspace-interactive .preview-dock{min-height:0}}
 @media(prefers-reduced-motion:reduce){.scene-entity{transition:none!important}}
+
+/* Conflitos entre abas: bloquear a edição sem perder o acesso ao recarregamento. */
+#si-storage-conflict{position:fixed;inset:0;z-index:2147483640;background:rgba(6,17,29,.83);display:grid;place-items:center;padding:1rem;overflow:auto}
+.si-storage-conflict-panel{box-sizing:border-box;max-width:32rem;width:100%;padding:1.5rem;border-radius:1rem;border:1px solid var(--line,#718096);background:var(--surface,#fff);color:var(--text,#182435);box-shadow:0 22px 90px rgba(0,0,0,.4)}
+.si-storage-conflict-panel h2{margin:0 0 .75rem;font-size:1.25rem}
+.si-storage-conflict-panel p{line-height:1.55;margin:0 0 1rem}
+.si-storage-conflict-panel button{min-height:44px}

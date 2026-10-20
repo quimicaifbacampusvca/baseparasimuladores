@@ -1,6 +1,6 @@
-# Base Demo Oficial - SI · 0.9.15
+# Base Demo Oficial - SI · 0.9.16
 
-Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.15 — Auditoria do percurso Aprender, Missões, Roteiros e autoria docente.**
+Plataforma universal para simuladores educacionais, autocontida e sem dependências externas obrigatórias durante a execução. **Versão 0.9.16 — Recuperação em situações excepcionais, importações seguras e conflitos entre abas.**
 
 ## Executar
 
@@ -95,3 +95,14 @@ A identificação do participante acompanha a investigação orientada e seus ch
 ## 0.9.15 — Integridade do ciclo de vida das atividades
 
 As transições entre a bancada livre e uma investigação orientada não compartilham mais o histórico de Desfazer/Refazer. A retomada preserva o identificador e os campos de identificação da **mesma tentativa** após recarregar checkpoints; registrar etapas, iniciar e encerrar dependem de confirmação de armazenamento. Vínculos legados incompletos não substituem a bancada livre. Consulte [a auditoria de aceitação 0.9.15](docs/ACEITE-0.9.15.md) para os critérios e testes.
+
+
+## 0.9.16 — Auditoria de recuperação e segurança operacional
+
+- **Conflitos entre abas:** a versão observada dos documentos críticos (cena, educação, relatórios, sessão e checkpoints) é conferida antes de gravar. O evento `storage` alerta sobre alterações externas; em caso de divergência, a aba interrompe modificações e solicita recarga, evitando sobrescritas silenciosas. Não equivale a transações atômicas entre abas: ações simultâneas no mesmo milissegundo e falhas totais do dispositivo ainda precisam de validação adicional.
+- **Importação de Caderno:** backups não substituem registros durante uma investigação ativa, inclusive se a atividade começar durante a confirmação.
+- **Importação de atividades:** limpeza dos checkpoints passa a preceder a troca da biblioteca, com restauração da cópia anterior se a gravação da nova biblioteca falhar. Não há garantia de transação multichave diante de desligamento abrupto.
+- **Encerramento:** se a sessão não puder ser removida do armazenamento, o checkpoint anterior é restaurado e a investigação permanece ativa.
+- **Offline:** sem serviços de rede ou bibliotecas novas. Testes de execução em PWA instalada e navegadores alternativos continuam pendentes.
+
+Consulte `docs/ACEITE-0.9.16.md` para o escopo e os resultados dos testes.

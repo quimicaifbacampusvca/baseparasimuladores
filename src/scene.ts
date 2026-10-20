@@ -47,6 +47,7 @@ namespace BaseDemoSI {
     const listeners = new Set<(event: SceneEvent) => void>();
     const emit = (event: SceneEvent): void => { for (const listener of [...listeners]) listener(event); };
     function commit(next: SceneSnapshot): boolean {
+      if(hasStorageConflict())return false;
       const parsed = parseScene(next);
       if (!parsed || JSON.stringify(parsed) === JSON.stringify(present)) return false;
       past.push(clone(present));
@@ -94,6 +95,7 @@ namespace BaseDemoSI {
         return commit({ schemaVersion: 1, entities, selectedId });
       },
       restoreContext(snapshot): boolean {
+        if(hasStorageConflict())return false;
         const next=parseScene(snapshot);
         if(!next)return false;
         past.length=0;future.length=0;
@@ -102,15 +104,18 @@ namespace BaseDemoSI {
         return true;
       },
       select(id): boolean {
+        if(hasStorageConflict())return false;
         if (id !== null && !present.entities.some(e => e.id === id)) return false;
         if (present.selectedId === id) return false;
         present = { ...present, selectedId: id }; emit("selection"); return true;
       },
       undo(): boolean {
+        if(hasStorageConflict())return false;
         const previous = past.pop(); if (!previous) return false;
         future.push(clone(present)); present = previous; emit("history"); return true;
       },
       redo(): boolean {
+        if(hasStorageConflict())return false;
         const next = future.pop(); if (!next) return false;
         past.push(clone(present)); present = next; emit("history"); return true;
       },

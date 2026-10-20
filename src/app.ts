@@ -7,6 +7,7 @@ namespace BaseDemoSI {
     for (const name of document.querySelectorAll<HTMLElement>("[data-app-name]")) {
       name.textContent = manifest.name;
     }
+    setupStorageConflictProtection();
     setupPreferences();
     setupComponents();
     setupScene();
