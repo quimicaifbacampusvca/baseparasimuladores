@@ -93,6 +93,14 @@ namespace BaseDemoSI {
         }
         return commit({ schemaVersion: 1, entities, selectedId });
       },
+      restoreContext(snapshot): boolean {
+        const next=parseScene(snapshot);
+        if(!next)return false;
+        past.length=0;future.length=0;
+        present=next;
+        emit("edit");
+        return true;
+      },
       select(id): boolean {
         if (id !== null && !present.entities.some(e => e.id === id)) return false;
         if (present.selectedId === id) return false;

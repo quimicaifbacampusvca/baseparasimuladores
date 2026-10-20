@@ -1,11 +1,11 @@
 {
   "name": "base-demo-oficial-si",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "private": true,
-  "description": "Auditoria funcional da Home, retomada contextual e persistência validada",
+  "description": "Auditoria do ciclo de vida das atividades: recuperação, integridade e encerramento",
   "scripts": {
     "build": "tsc -p tsconfig.json && python3 scripts/build_standalone.py",
-    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/scene-interaction.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs && node tests/docks.test.cjs && node tests/viewer-families.test.cjs && node tests/mobile-contract.test.cjs && node tests/menu-equivalence.test.cjs && node tests/menu-presets-tour.test.cjs && node tests/feedback.test.cjs && node tests/home-continuity.test.cjs && node tests/guided-session.test.cjs && node tests/guided-report.test.cjs",
+    "test": "node tests/foundation.test.cjs && node tests/scene.test.cjs && node tests/workspace.test.cjs && node tests/scene-interaction.test.cjs && node tests/components.test.cjs && node tests/extensions.test.cjs && node tests/education.test.cjs && node tests/records.test.cjs && node tests/distribution.test.cjs && node tests/inspection.test.cjs && node tests/completion.test.cjs && node tests/organization.test.cjs && node tests/education-organization.test.cjs && node tests/home-fidelity.test.cjs && node tests/docks.test.cjs && node tests/viewer-families.test.cjs && node tests/mobile-contract.test.cjs && node tests/menu-equivalence.test.cjs && node tests/menu-presets-tour.test.cjs && node tests/feedback.test.cjs && node tests/home-continuity.test.cjs && node tests/guided-session.test.cjs && node tests/guided-report.test.cjs && node tests/activity-lifecycle.test.cjs",
     "check": "npm run build && npm test",
     "serve": "python3 -m http.server 8080"
   },

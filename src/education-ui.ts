@@ -42,11 +42,18 @@ namespace BaseDemoSI {
       for(const [url,entry] of entries){
         if(!validatedGuidedLink(url) || !entry || !parseScene(entry.scene) || !Number.isSafeInteger(entry.readingsBaseline) || entry.readingsBaseline<0 || (entry.attemptId!==undefined&&!validAttempt(entry.attemptId)) || (entry.identity!==undefined&&!validIdentification(entry.identity)))return;
       }
-      for(const [url,entry] of entries)checkpoints[url]={scene:parseScene(entry.scene)!,readingsBaseline:entry.readingsBaseline};
+      for(const [url,entry] of entries)checkpoints[url]={scene:parseScene(entry.scene)!,readingsBaseline:entry.readingsBaseline,attemptId:entry.attemptId,identity:entry.identity};
     }catch{checkpoints=Object.create(null);}
   }
-  function checkpointSave():void {storage.write(checkpointsKey,JSON.stringify({schemaVersion:1,entries:checkpoints}));}
-  function checkpointDelete(url:string):void {delete checkpoints[url];checkpointSave();}
+  function checkpointSave():boolean {return storage.write(checkpointsKey,JSON.stringify({schemaVersion:1,entries:checkpoints}));}
+  function checkpointUpdate(url:string,checkpoint:GuidedCheckpoint|null):boolean {
+    const before=checkpoints[url];
+    if(checkpoint)checkpoints[url]=checkpoint;else delete checkpoints[url];
+    if(checkpointSave())return true;
+    if(before)checkpoints[url]=before;else delete checkpoints[url];
+    return false;
+  }
+  function checkpointDelete(url:string):boolean {return checkpointUpdate(url,null);}
   interface GuidedSession { schemaVersion:1; url:string; freeScene:SceneSnapshot; readingsBaseline:number; freeModule?:ModuleId; attemptId?:string; identity?:GuidedIdentification; }
   let guidedSession:GuidedSession|null=null;
   function validatedGuidedLink(value:string):{url:string;activity:LearningActivity;progress:number}|null {
@@ -75,10 +82,12 @@ namespace BaseDemoSI {
     mountReturnLink();
     window.dispatchEvent(new Event("si-guided-context-changed"));
   }
-  function saveSession(session:GuidedSession|null):void {
+  function saveSession(session:GuidedSession|null):boolean {
+    // Persistir primeiro: uma falha de quota não deve criar uma sessão invisível à recarga.
+    if(!storage.write(sessionKey,session?JSON.stringify(session):""))return false;
     guidedSession=session;
-    storage.write(sessionKey,session?JSON.stringify(session):"");
     saveGuidedReturn(session?.url??"");
+    return true;
   }
   export function guidedActivityContext():{url:string;title:string;kind:ActivityKind;progress:number;total:number}|null {
     const valid=guidedSession&&validatedGuidedLink(guidedSession.url);
@@ -94,7 +103,7 @@ namespace BaseDemoSI {
   }
   export function saveGuidedIdentification(value:unknown):boolean {
     if(!guidedSession||!validIdentification(value))return false;
-    saveSession({...guidedSession,identity:value});return true;
+    return saveSession({...guidedSession,identity:value});
   }
   function sessionFor(id:string):boolean { return guidedActivityContext()?.url.endsWith(`?item=${encodeURIComponent(id)}`)??false; }
   function scopedReadings():number {return Math.max(0,countReadings()-(guidedSession?.readingsBaseline??0));}
@@ -114,7 +123,10 @@ namespace BaseDemoSI {
       readingsBaseline:checkpoint?.readingsBaseline??countReadings(),freeModule:currentModule(),
       attemptId:checkpoint?.attemptId??attemptId(),identity:identity??checkpoint?.identity??blankIdentity()};
     // Gravar o vínculo antes da alteração: uma recarga nunca perde a cena livre.
-    saveSession(run);
+    if(!saveSession(run)){
+      notify("Não foi possível salvar o início da atividade. Confira o armazenamento antes de continuar.","warning");
+      return false;
+    }
     const blank:SceneSnapshot={schemaVersion:1,entities:[],selectedId:null};
     const targetModule=activity.module??"livre";
     selectModule(targetModule);
@@ -123,27 +135,30 @@ namespace BaseDemoSI {
     const starter:SceneSnapshot=(targetModule==="medir"||targetModule==="calcular")
       ?{schemaVersion:1,entities:[makeEntity("block",`obj-atividade-${id}`)],selectedId:null}
       :blank;
-    educationScene.dispatch({type:"replace",snapshot:checkpoint?.scene??starter});
+    educationScene.restoreContext(checkpoint?.scene??starter);
     window.location.hash="#/ambiente";
     return true;
   }
   export function endGuidedActivity():boolean {
     const previous=guidedSession;
-    // Registrar o retrato documental antes de restaurar a bancada livre.
-    // Em caso de falta de espaço, manter a sessão para evitar perda de evidências.
-    if(previous && validatedGuidedLink(previous.url) && !archiveGuidedReport()){
+    if(!previous)return true;
+    // Relatório e checkpoint são preservados antes de descartar a sessão ativa.
+    if(validatedGuidedLink(previous.url) && !archiveGuidedReport()){
       notify("Não foi possível preservar o relatório. Libere espaço nos relatórios e tente novamente.","warning");return false;
     }
-    if(previous){
-      const valid=validatedGuidedLink(previous.url);
-      if(valid&&valid.progress<valid.activity.steps.length){
-        checkpoints[previous.url]={scene:educationScene.getSnapshot(),readingsBaseline:previous.readingsBaseline,attemptId:previous.attemptId,identity:previous.identity};
-        checkpointSave();
-      }else checkpointDelete(previous.url);
-      educationScene.dispatch({type:"replace",snapshot:previous.freeScene});
-      if(previous.freeModule)selectModule(previous.freeModule);
+    const valid=validatedGuidedLink(previous.url);
+    const incomplete=!!valid && valid.progress<valid.activity.steps.length;
+    const checkpoint:GuidedCheckpoint|null=incomplete
+      ?{scene:educationScene.getSnapshot(),readingsBaseline:previous.readingsBaseline,attemptId:previous.attemptId,identity:previous.identity}
+      :null;
+    if(!checkpointUpdate(previous.url,checkpoint)){
+      notify("Não foi possível salvar o estado da tentativa. A atividade continua aberta.","warning");return false;
     }
-    saveSession(null);
+    if(!saveSession(null)){
+      notify("Não foi possível concluir o encerramento no armazenamento local. Tente novamente.","warning");return false;
+    }
+    educationScene.restoreContext(previous.freeScene);
+    if(previous.freeModule)selectModule(previous.freeModule);
     renderAll();return true;
   }
   export function clearGuidedReturn():boolean {return endGuidedActivity();}
@@ -279,9 +294,13 @@ namespace BaseDemoSI {
       const again=button("Iniciar nova tentativa",async()=>{
         if(guidedSession){notify("Encerre a atividade atual antes de iniciar outra tentativa.","warning");return;}
         const yes=await confirmDialog({title:"Reiniciar atividade?",description:"Uma nova tentativa começará do início. O progresso anterior desta atividade será reiniciado.",confirmText:"Iniciar novamente",destructive:true});
-        if(yes&&education.resetActivity(active.id)){
-          checkpointDelete(`#/${route}?item=${encodeURIComponent(active.id)}`);
-          beginGuidedActivity(active.id,kind);
+        if(yes){
+          const url=`#/${route}?item=${encodeURIComponent(active.id)}`;
+          if(!checkpointDelete(url)){
+            notify("Não foi possível limpar a tentativa anterior do armazenamento.","warning");return;
+          }
+          if(education.resetActivity(active.id))beginGuidedActivity(active.id,kind);
+          else notify("Não foi possível reiniciar a atividade.","warning");
         }
       });
       again.disabled=!!guidedSession;actions.append(again);
@@ -304,10 +323,13 @@ namespace BaseDemoSI {
       const info=document.createElement("div");info.append(text("strong",a.title),text("small",`${a.kind==="mission"?"Missão":"Roteiro"} · ${a.steps.length} etapa(s)`));
       card.append(info,button("Criar link",()=>offerShareLink(a)),button("Excluir",async()=>{
         const accepted=await confirmDialog({title:"Excluir atividade?",description:`A atividade ${a.title} e seu progresso serão excluídos deste navegador.`,confirmText:"Excluir",destructive:true});
-        if(accepted&&education.removeActivity(a.id)){
-          checkpointDelete(`#/${a.kind==="mission"?"missoes":"roteiros"}?item=${encodeURIComponent(a.id)}`);
-          notify("Atividade removida.","info");
+        if(!accepted)return;
+        if(guidedSession){notify("Encerre a investigação em andamento antes de excluir atividades.","warning");return;}
+        const url=`#/${a.kind==="mission"?"missoes":"roteiros"}?item=${encodeURIComponent(a.id)}`;
+        if(!checkpointDelete(url)){
+          notify("Não foi possível limpar a tentativa salva. A atividade foi preservada.","warning");return;
         }
+        if(education.removeActivity(a.id))notify("Atividade removida.","info");
       }));target.append(card);
     }
   }
@@ -429,11 +451,13 @@ namespace BaseDemoSI {
       if(!decoded){notify("Arquivo de atividades inválido.","warning");return;}
       const accepted=await confirmDialog({title:"Importar atividades?",description:"As atividades personalizadas atuais serão substituídas. O progresso dos temas e das atividades oficiais será mantido.",confirmText:"Importar atividades",destructive:true});
       if(!accepted)return;
+      if(guidedSession){notify("Encerre a atividade em andamento antes de substituir a biblioteca.","warning");return;}
       if(education.importTeachers(decoded)){
         // Uma atividade importada pode manter o mesmo ID e alterar seus critérios.
         // Não reaproveitar checkpoints de versões anteriores do conteúdo.
-        checkpoints=Object.create(null);checkpointSave();
-        notify("Atividades importadas e validadas.","success");
+        checkpoints=Object.create(null);
+        if(!checkpointSave())notify("Atividades importadas, mas não foi possível limpar as tentativas salvas.","warning");
+        else notify("Atividades importadas e validadas.","success");
       }else notify("Formato incompatível ou conteúdo inválido; nenhuma atividade foi alterada.","warning");
     });
   }
@@ -443,10 +467,15 @@ namespace BaseDemoSI {
     const previous=storage.read(guidedKey)??"";
     guidedSession=readGuidedSession(storage.read(sessionKey));
     if(!guidedSession && previous && validatedGuidedLink(previous)){
-      // Compatibilidade com sessões legadas: a cena antiga já é a cena de trabalho.
-      guidedSession={schemaVersion:1,url:validatedGuidedLink(previous)!.url,
-        freeScene:{schemaVersion:1,entities:[],selectedId:null},readingsBaseline:0};
-      storage.write(sessionKey,JSON.stringify(guidedSession));
+      // Vínculos legados sem freeScene não permitem recuperar a sessão com segurança.
+      // Não transformar a bancada existente numa tentativa artificial; preservá-la intacta.
+      storage.write(guidedKey,"");
+      notify("O vínculo antigo da atividade não contém uma sessão recuperável. A bancada existente foi preservada.","info");
+    }
+    if(guidedSession){
+      // Na recarga o módulo salvo deve corresponder à investigação, não à última cena livre.
+      const active=validatedGuidedLink(guidedSession.url);
+      if(active)selectModule(active.activity.module??"livre");
     }
     if(guidedSession && (!guidedSession.attemptId || !guidedSession.identity)){
       guidedSession={...guidedSession,attemptId:guidedSession.attemptId??attemptId(),identity:guidedSession.identity??blankIdentity()};

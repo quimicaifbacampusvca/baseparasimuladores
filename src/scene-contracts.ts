@@ -28,6 +28,8 @@ namespace BaseDemoSI {
   export interface SceneStore {
     getSnapshot(): SceneSnapshot;
     dispatch(command: SceneCommand): boolean;
+    /** Troca de contexto: não transportar Desfazer/Refazer entre sessões. */
+    restoreContext(snapshot: SceneSnapshot): boolean;
     select(id: string | null): boolean;
     undo(): boolean;
     redo(): boolean;

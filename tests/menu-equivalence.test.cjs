@@ -12,6 +12,6 @@ assert(style.includes(':root.si-simple-reading body'));
 assert(style.includes(':root.si-no-motion *'));
 assert(menu.includes('root.style.fontSize=pref.font===1'));
 assert(html.includes('aria-controls="si-startup-panel" aria-expanded="false"'));
-assert.equal(JSON.parse(read('package.json')).version,'0.9.14');
+assert.equal(JSON.parse(read('package.json')).version,'0.9.15');
 assert(!/SIAB/i.test(read('docs/AUDITORIA-MENU-0.9.9.md')));
 console.log('OK: contexto, finalização, encerramento de atividades e preferências de leitura.');

@@ -81,7 +81,8 @@ namespace BaseDemoSI {
     const emit=()=>{for(const cb of [...subscribers])cb();};
     const persist=(next:EducationDocument):boolean=>{
       const safe=parseEducation(next);if(!safe)return false;
-      state=safe;io.write(EDU_KEY,JSON.stringify(state));emit();return true;
+      if(!io.write(EDU_KEY,JSON.stringify(safe)))return false;
+      state=safe;emit();return true;
     };
     const available=()=>[...officialActivities,...state.teacherActivities];
     const get=(id:string)=>available().find(a=>a.id===id);
@@ -95,7 +96,8 @@ namespace BaseDemoSI {
         if(!a)return {ok:false,message:"Atividade não encontrada."};
         const i=state.progress[id]??0;if(i>=a.steps.length)return {ok:false,message:"Atividade já concluída."};
         if(!meetsRequirement(a.steps[i],scene,readingCount))return {ok:false,message:"Critério ainda não atendido na cena."};
-        const progress={...state.progress,[id]:i+1};persist({...state,progress});
+        const progress={...state.progress,[id]:i+1};
+        if(!persist({...state,progress}))return {ok:false,message:"Não foi possível salvar a etapa. Verifique o armazenamento e tente novamente."};
         return {ok:true,message:i+1===a.steps.length?"Atividade concluída.":"Etapa registrada. Continue o roteiro."};},
       resetActivity(id){if(!get(id))return false;
         const progress={...state.progress};delete progress[id];
